@@ -1,5 +1,6 @@
 import sqlite3
 import csv
+from cs50 import SQL
 
 csv_file = 'pokemon.csv'
 sql_file = 'pokedex.db'
@@ -8,58 +9,58 @@ conn = sqlite3.connect(sql_file)
 cursor = conn.cursor()
 
 cursor.execute("""
-                CREATE TABLE IF NOT EXISTS pokemon (
-                    id INTEGER PRIMARY KEY UNIQUE NOT NULL,
-                    pokedex_num INTEGER NOT NULL,
-                    name TEXT NOT NULL,
-                    jap_name TEXT NOT NULL,
-                    generation INTEGER NOT NULL,       
-                    status TEXT NOT NULL,
-                    species TEXT NOT NULL,
-                    type_num INTEGER NOT NULL,
-                    type_1 TEXT NOT NULL,
-                    type_2 TEXT,
-                    height_m NUMERIC NOT NULL,
-                    weight_kg NUMERIC,
-                    abilities_num INTEGER NOT NULL,
-                    ability_1 TEXT NOT NULL,
-                    ability_2 TEXT,
-                    ability_hidden TEXT NOT NULL,
-                    stat_total INTEGER NOT NULL,
-                    hp INTEGER NOT NULL,
-                    attack INTEGER NOT NULL,
-                    defense INTEGER NOT NULL,
-                    sp_attack INTEGER NOT NULL,
-                    sp_defense INTEGER NOT NULL,
-                    speed INTEGER NOT NULL,
-                    catch_rate INTEGER,
-                    base_friendship INTEGER,
-                    base_exp INTEGER,
-                    growth_rate TEXT,
-                    egg_type_num INTEGER NOT NULL,
-                    egg_type_1 TEXT,
-                    egg_type_2 TEXT,
-                    percent_male NUMERIC,
-                    egg_cycles INTEGER,
-                    against_normal NUMERIC NOT NULL,
-                    against_fire NUMERIC NOT NULL,
-                    against_water NUMERIC NOT NULL,
-                    against_electric NUMERIC NOT NULL,
-                    against_grass NUMERIC NOT NULL,
-                    against_ice NUMERIC NOT NULL,   
-                    against_fight NUMERIC NOT NULL,
-                    against_poison NUMERIC NOT NULL,
-                    against_ground NUMERIC NOT NULL,
-                    against_flying NUMERIC NOT NULL,
-                    against_psychic NUMERIC NOT NULL,
-                    against_bug NUMERIC NOT NULL,
-                    against_rock NUMERIC NOT NULL,
-                    against_ghost NUMERIC NOT NULL,
-                    against_dragon NUMERIC NOT NULL,
-                    against_dark NUMERIC NOT NULL,
-                    against_steel NUMERIC NOT NULL,
-                    against_fairy NUMERIC NOT NULL
-                );
+CREATE TABLE IF NOT EXISTS pokemon (
+    id INTEGER PRIMARY KEY UNIQUE NOT NULL,
+    pokedex_num INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    jap_name TEXT NOT NULL,
+    generation INTEGER NOT NULL,       
+    status TEXT NOT NULL,
+    species TEXT NOT NULL,
+    type_num INTEGER NOT NULL,
+    type_1 TEXT NOT NULL,
+    type_2 TEXT,
+    height_m NUMERIC NOT NULL,
+    weight_kg NUMERIC,
+    abilities_num INTEGER NOT NULL,
+    ability_1 TEXT NOT NULL,
+    ability_2 TEXT,
+    ability_hidden TEXT NOT NULL,
+    stat_total INTEGER NOT NULL,
+    hp INTEGER NOT NULL,
+    attack INTEGER NOT NULL,
+    defense INTEGER NOT NULL,
+    sp_attack INTEGER NOT NULL,
+    sp_defense INTEGER NOT NULL,
+    speed INTEGER NOT NULL,
+    catch_rate INTEGER,
+    base_friendship INTEGER,
+    base_exp INTEGER,
+    growth_rate TEXT,
+    egg_type_num INTEGER NOT NULL,
+    egg_type_1 TEXT,
+    egg_type_2 TEXT,
+    percent_male NUMERIC,
+    egg_cycles INTEGER,
+    against_normal NUMERIC NOT NULL,
+    against_fire NUMERIC NOT NULL,
+    against_water NUMERIC NOT NULL,
+    against_electric NUMERIC NOT NULL,
+    against_grass NUMERIC NOT NULL,
+    against_ice NUMERIC NOT NULL,   
+    against_fight NUMERIC NOT NULL,
+    against_poison NUMERIC NOT NULL,
+    against_ground NUMERIC NOT NULL,
+    against_flying NUMERIC NOT NULL,
+    against_psychic NUMERIC NOT NULL,
+    against_bug NUMERIC NOT NULL,
+    against_rock NUMERIC NOT NULL,
+    against_ghost NUMERIC NOT NULL,
+    against_dragon NUMERIC NOT NULL,
+    against_dark NUMERIC NOT NULL,
+    against_steel NUMERIC NOT NULL,
+    against_fairy NUMERIC NOT NULL
+);
                """)
 
 with open(csv_file, 'r') as file:
@@ -87,20 +88,6 @@ cursor.executemany("""
                    """, rows)
 
 conn.commit()
-conn.close()   
+conn.close() 
 
 print('Data Imported Sucessfully')
-
-
-"""
-type2: TEXT        ````row.get
-ability2: TEXT      ````row.get
-
-base_friendship INTEGER,
-base_exp INTEGER,
-growth_rate TEXT,           ````row.get
-egg_type_1 TEXT,            ````row.get
-egg_type_2 TEXT,            ````row.get
-
-
-"""

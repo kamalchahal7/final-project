@@ -7,7 +7,10 @@
 
 import SwiftUI
 
-
+struct Pokemon: Decodable {
+    let name: String
+    let type: String
+}
 
 struct ContentView: View {
     // Inputed Data on Search Tab Bar
@@ -17,11 +20,14 @@ struct ContentView: View {
     // Returned Data from pokedata.db
     @State private var fetchedData: String = ""
     // Initial Tab
-    @State private var selectedTab = 0
+    @State private var selectedTab = 4
     // Checks if search bar is active or not
     @State private var isSearchActive: Bool = false
     // Checks if input field is in focus or not
     @FocusState private var isSearchFieldFocused: Bool
+    // Background for Search Bar
+    @State private var offsetY: CGFloat = -UIScreen.main.bounds.height
+   
     
     var body: some View {
         
@@ -37,62 +43,99 @@ struct ContentView: View {
        
         // SEARCH TAB BAR
         TabView (selection: $selectedTab){
-            ZStack {
-                // Background Colour
-                Color(red: 0.82, green: 0.71, blue: 0.55)
-                    .edgesIgnoringSafeArea(.all)
+            GeometryReader { geometry in
+                ZStack {
+                    // Background that slides in
+                    if isSearchActive {
+                        Rectangle()
+                        // change opacity to whatever u want
+                            .foregroundColor(Color.white.opacity(0.5))
+                            .frame(height: geometry.size.height * 0.46)
+                            .offset(y: -geometry.size.height * 0.3)
+                            .transition(.move(edge: .top))
+                            .animation(.easeInOut(duration: 1.0), value: isSearchActive)
+                    }
+                }
                 VStack {
-                        Spacer()
+                    Spacer()
+                    if !isSearchActive {
                         Image("pokeball")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                        ZStack(alignment: .leading) {
-                            Image(systemName: "magnifyingglass")
-                                .font(.system(size: 20, weight: .bold))
-                                .padding(.leading, 20)
-                                .zIndex(/*@START_MENU_TOKEN@*/1.0/*@END_MENU_TOKEN@*/)
-                            
-                            TextField("Search Pokemon:", text: $pokedata)
-                                .font(.system(size: 25, weight: .medium))
-                                .autocapitalization(.none)
-                                .padding(.leading, 30) // Adjust padding to make space for the image
-                                .padding()
-                                .multilineTextAlignment(.center)
-                                .background(Color.white)
-                                .cornerRadius(20)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.black, lineWidth: 3)
-                                )
-                                .onChange(of: pokedata) {
-                                    submitPokedata()
+                    }
+                    // ZStack for the button
+                    ZStack {
+                        if isSearchActive {
+                            Button(action: {
+                                withAnimation(.easeInOut(duration: 1.0)) {
+                                    isSearchActive.toggle()
+                                    isSearchFieldFocused = false
                                 }
+                            }) {
+                                Image(systemName: "chevron.backward")
+                                    .font(.system(size: 35, weight: .bold))
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                    }
+                    .offset(y: isSearchActive ? -geometry.size.height * 0.385 : 0)
+                    .animation(.easeInOut(duration: 0.5), value: isSearchActive)
+
+                    // ZStack for the search bar
+                    ZStack(alignment: .leading) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 20, weight: .bold))
+                            .padding(.leading, 20)
+                            .zIndex(1.0)
+
+                        TextField("Search Pokemon:", text: $pokedata, onEditingChanged: { editing in
+                            withAnimation {
+                                isSearchActive = editing
+                            }
+                        })
+                        .font(.system(size: 25, weight: .medium))
+                        .focused($isSearchFieldFocused)
+                        .autocapitalization(.none)
+                        .padding(.leading, 40)
+                        .padding()
+                        .multilineTextAlignment(.leading)
+                        .background(Color.white)
+                        .cornerRadius(20)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.black, lineWidth: 3)
+                        )
+                        .transition(.move(edge: .top))
+                        .onAppear {
+                            withAnimation(.easeInOut) {
+                                // Trigger the animation
+                            }
+                        }
+                        .onChange(of: pokedata) {
+                            submitPokedata()
+                        }
+                    }
+                    .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
+                    .offset(y: isSearchActive ? -geometry.size.height * 0.46 : 0)
+                    .animation(.easeInOut(duration: 0.5), value: isSearchActive)
+                    if !isSearchActive {
                         Text("Enter Pokemon Name or Pokedex #")
                             .foregroundColor(.white)
                             .font(.system(size: 20, weight: .bold))
                             .padding(5)
-                        Text("\(fetchedData)")
-                        
-                        //                        Button(action: {
-                        //                            submitPokedata()
-                        //                        }) {
-                        //                            Text("Submit")
-                        //                        }
-                        //                        .padding()
-                        //                        .background(Color.blue)
-                        //                        .foregroundColor(.white)
-                        //                        .font(.system(size: 20, weight: .bold))
-                        //                        .cornerRadius(20)
-                        //                        .padding(.top, 10)
-                        
-                        Spacer()
+                    }
                     
+                    
+                    Spacer()
                 }
                 .padding()
             }
+            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {
                 Label("Search", systemImage: "magnifyingglass")
+            }
+            .onAppear() {
+                UITabBar.appearance().backgroundColor = .white
             }
             .tag(0)
             
@@ -133,6 +176,7 @@ struct ContentView: View {
                         Button("Upload Picture") {
                             
                         }
+                        .padding()
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.green)
@@ -235,7 +279,8 @@ struct ContentView: View {
                             })
                         }
                     }
-                }
+            }
+            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
 
                 .tabItem {
                     Label("Collection", systemImage: "square.on.square")
@@ -244,9 +289,27 @@ struct ContentView: View {
             
             // PROFILE TAB BAR
             GeometryReader { geometry in
+                ZStack {
+                    // Background that slides in
+                    if isSearchActive {
+                        Rectangle()
+                            .foregroundColor(Color.white.opacity(0.5))
+                            .frame(height: geometry.size.height * 0.25)
+                            .offset(y: -geometry.size.height * 0.1)
+                            .transition(.move(edge: .top))
+                            .animation(.easeInOut(duration: 1.0), value: isSearchActive)
+                    }
+                }
+                
                 VStack {
-                    Spacer()
-                    ZStack {
+                    if !isSearchActive { Spacer() }
+                    if !isSearchActive {
+                        Image("pokeball")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    }
+                    // ZStack for the search bar
+                    ZStack(alignment: .leading) {
                         if isSearchActive {
                             Button(action: {
                                 withAnimation(.easeInOut(duration: 1.0)) {
@@ -255,32 +318,28 @@ struct ContentView: View {
                                 }
                             }) {
                                 Image(systemName: "chevron.backward")
+                                    
                                     .font(.system(size: 35, weight: .bold))
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            
                         }
-                    }
-                    .offset(y: isSearchActive ? -geometry.size.height * 0.385 : 0)
-                    .animation(.easeInOut(duration: 1.0), value: isSearchActive)
-                    
-                    
-                    ZStack(alignment: .leading) {
-                        
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 20, weight: .bold))
                             .padding(.leading, 20)
                             .zIndex(1.0)
-                        
-                        TextField("Search Pokemon:", text: $pokedata, onEditingChanged: {
-                            editing in withAnimation {
-                                
+                            .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
+                            
+
+                        TextField("Search Pokemon:", text: $pokedata, onEditingChanged: { editing in
+                            withAnimation {
                                 isSearchActive = editing
                             }
                         })
                         .font(.system(size: 25, weight: .medium))
                         .focused($isSearchFieldFocused)
                         .autocapitalization(.none)
-                        .padding(.leading, 40) // Adjust padding to make space for the image
+                        .padding(.leading, 40)
                         .padding()
                         .multilineTextAlignment(.leading)
                         .background(Color.white)
@@ -295,18 +354,35 @@ struct ContentView: View {
                                 // Trigger the animation
                             }
                         }
+                        .onChange(of: pokedata) {
+                            submitPokedata()
+                        }
+                        .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
+                        
                     }
-                    .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
-                    .offset(y: isSearchActive ? -geometry.size.height * 0.46 : 0)
-                    .animation(.easeInOut(duration: 0.75), value: isSearchActive)
+                    .animation(.easeInOut(duration: 0.5), value: isSearchActive)
                     
-                    Spacer()
+                    if !isSearchActive {
+                        Text("Enter Pokemon Name or Pokedex #")
+                            .foregroundColor(.white)
+                            .font(.system(size: 20, weight: .bold))
+                            .padding(7)
+                    }
+                    
+                    if isSearchActive {
+                        Spacer()
+                            .frame(height: geometry.size.height * 0.05)
+                        
+                        Text("\(fetchedData)")
+                            .padding(2)
+                    }
+                    
+                    
+                    if !isSearchActive { Spacer() }
                 }
                 .padding()
-                
             }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
-            
             .tabItem {
                 Label("Profile", systemImage: "person.fill")
             }
@@ -320,6 +396,8 @@ struct ContentView: View {
         // Changes Colour of the Tab Bar Font
         
     }
+    
+    
     
     func submitPokedata() {
         guard let url = URL(string: "http://127.0.0.1:5000/") else {

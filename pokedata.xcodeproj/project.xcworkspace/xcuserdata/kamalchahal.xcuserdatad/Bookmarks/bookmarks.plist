@@ -12,13 +12,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>38</string>
+					<string>44</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>37</string>
+					<string>43</string>
 					<key>Timestamp</key>
-					<string>744592709.9819781</string>
+					<string>744680761.400368</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -42,8 +42,8 @@
 </string>
 				<key>trailing</key>
 				<string>        TabView (selection: $selectedTab){
-            ZStack {
-                // Background Colour
+            GeometryReader { geometry in
+                ZStack {
 </string>
 			</dict>
 			<key>type</key>
@@ -57,13 +57,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>100</string>
+					<string>143</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>99</string>
+					<string>142</string>
 					<key>Timestamp</key>
-					<string>744594123.946036</string>
+					<string>744680761.400304</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -102,13 +102,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>174</string>
+					<string>218</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>173</string>
+					<string>217</string>
 					<key>Timestamp</key>
-					<string>744594123.946086</string>
+					<string>744680761.400353</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -147,13 +147,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>222</string>
+					<string>266</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>221</string>
+					<string>265</string>
 					<key>Timestamp</key>
-					<string>744594123.946069</string>
+					<string>744680761.400337</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -192,13 +192,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>245</string>
+					<string>290</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>244</string>
+					<string>289</string>
 					<key>Timestamp</key>
-					<string>744594123.946101</string>
+					<string>744680761.400381</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -222,8 +222,8 @@
 </string>
 				<key>trailing</key>
 				<string>            GeometryReader { geometry in
-                VStack {
-                    Spacer()
+                ZStack {
+                    // Background that slides in
 </string>
 			</dict>
 			<key>type</key>

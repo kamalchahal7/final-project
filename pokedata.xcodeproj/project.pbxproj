@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		64017A042C64294100501281 /* PokemonInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64017A032C64294100501281 /* PokemonInfo.swift */; };
 		649A97722C5DCB3D00917D74 /* pokedataApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A97712C5DCB3D00917D74 /* pokedataApp.swift */; };
 		649A97742C5DCB3D00917D74 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A97732C5DCB3D00917D74 /* ContentView.swift */; };
 		649A97762C5DCB4000917D74 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 649A97752C5DCB4000917D74 /* Assets.xcassets */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		64017A032C64294100501281 /* PokemonInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonInfo.swift; sourceTree = "<group>"; };
 		649A976E2C5DCB3D00917D74 /* pokedata.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pokedata.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		649A97712C5DCB3D00917D74 /* pokedataApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pokedataApp.swift; sourceTree = "<group>"; };
 		649A97732C5DCB3D00917D74 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 			children = (
 				649A97712C5DCB3D00917D74 /* pokedataApp.swift */,
 				649A97732C5DCB3D00917D74 /* ContentView.swift */,
+				64017A032C64294100501281 /* PokemonInfo.swift */,
 				649A97752C5DCB4000917D74 /* Assets.xcassets */,
 				649A97772C5DCB4000917D74 /* Preview Content */,
 			);
@@ -215,6 +218,9 @@
 				Base,
 			);
 			mainGroup = 649A97652C5DCB3D00917D74;
+			packageReferences = (
+				64017A022C6417DF00501281 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
+			);
 			productRefGroup = 649A976F2C5DCB3D00917D74 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -259,6 +265,7 @@
 			files = (
 				649A97742C5DCB3D00917D74 /* ContentView.swift in Sources */,
 				649A97722C5DCB3D00917D74 /* pokedataApp.swift in Sources */,
+				64017A042C64294100501281 /* PokemonInfo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -582,6 +589,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		64017A022C6417DF00501281 /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/swiftui-introspect.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = 649A97662C5DCB3D00917D74 /* Project object */;
 }

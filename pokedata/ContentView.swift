@@ -13,6 +13,53 @@ struct Pokemon: Decodable, Identifiable {
     let id: Int
     let name: String
     let pokedex_num: Int
+    let jap_name: String
+    let generation: Int
+    let status: String
+    let species: String
+    let type_num: Int
+    let type_1: String
+    let type_2: String
+    let height_m: Float
+    let weight_kg: Float
+    let abilities_num: Int
+    let ability_1: String
+    let ability_2: String
+    let ability_hidden: String
+    let stat_total: Int
+    let hp: Int
+    let attack: Int
+    let defense: Int
+    let sp_attack: Int
+    let sp_defense: Int
+    let speed: Int
+    let catch_rate: Int
+    let base_friendship: Int
+    let base_exp: Int
+    let growth_rate: String
+    let egg_type_num: Int
+    let egg_type_1: String
+    let egg_type_2: String
+    let percent_male: Float?
+    let egg_cycles: Int
+    let against_normal: Float
+    let against_fire: Float
+    let against_water: Float
+    let against_electric: Float
+    let against_grass: Float
+    let against_ice: Float
+    let against_fight: Float
+    let against_poison: Float
+    let against_ground: Float
+    let against_flying: Float
+    let against_psychic: Float
+    let against_bug: Float
+    let against_rock: Float
+    let against_ghost: Float
+    let against_dragon: Float
+    let against_dark: Float
+    let against_steel: Float
+    let against_fairy: Float
 }
 
 struct ContentView: View {
@@ -418,34 +465,35 @@ struct ContentView: View {
                                 .frame(height: geometry.size.height * 0.02)
                         }
                         ZStack {
-                                    VStack {
-                                        List(fetchedData, id: \.id) { pokemon in
-                                            Button(action: {
-                                                withAnimation(.easeInOut) {
-                                                    selected = pokemon
-                                                    showDetail = true
-                                                }
-                                            }) {
-                                                Text(pokemon.name)
-                                                    .font(.system(size: 20))
-                                            }
+                            VStack {
+                                List(fetchedData, id: \.id) { pokemon in
+                                    Button(action: {
+                                        withAnimation(.easeInOut) {
+                                            selected = pokemon
+                                            showDetail = true
                                         }
-                                        .scrollContentBackground(.hidden)
-                                        .padding(.horizontal, -16)
-                                    }
-
-                                    // Overlay detail view when an item is selected
-                                    if showDetail, let selectedPokemon = selected {
-                                        PokemonInfo(pokemon: selectedPokemon, onDismiss: {
-                                            withAnimation(.easeInOut) {
-                                                showDetail = false
-                                            }
-                                        })
-                                        .transition(.move(edge: .trailing))
-                                        .edgesIgnoringSafeArea(.all)
-                                        .zIndex(1)
+                                    }) {
+                                        Text(pokemon.name)
+                                            .font(.system(size: 20))
                                     }
                                 }
+                                .scrollContentBackground(.hidden)
+                                .padding(.horizontal, -16)
+                            }
+                            
+                            // Overlay detail view when an item is selected
+                            if showDetail, let selectedPokemon = selected {
+                                PokemonInfo(pokemon: selectedPokemon, onDismiss: {
+                                    withAnimation(.easeInOut) {
+                                        showDetail = false
+                                    }
+                                })
+                                .transition(.move(edge: .trailing))
+                                .edgesIgnoringSafeArea(.all)
+                                .zIndex(1)
+                            }
+                        }
+
                         
                                                     
                         

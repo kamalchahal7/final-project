@@ -1,7 +1,7 @@
 import os
 
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session, jsonify
+from flask import Flask, flash, redirect, render_template, request, session, jsonify, send_from_directory
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -10,7 +10,7 @@ import pytz
 utc_time = datetime.now(pytz.timezone('UTC'))
 est_time = utc_time.astimezone(pytz.timezone('US/Eastern'))
 
-from data import lookup
+from functions import lookup, search
 
 # Configure application
 app = Flask(__name__)
@@ -22,6 +22,10 @@ Session(app)
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///pokedex.db")
+
+# Configure Images in a File Directory
+image_folder = 'archive_new/'
+images = os.listdir(image_folder)
 
 @app.after_request
 def after_request(response):
@@ -39,11 +43,16 @@ def index():
 
         if not pokedata:
             return "Oops! Please Enter a Valid Pokemon Name or Pokedex #", 400
+        
         pokedata = lookup(pokedata)
 
         if not pokedata:
             return "Oops! Please Enter a Valid Pokemon Name or Pokedex #", 400
-        
         return jsonify(pokedata), 200
     else: 
         return jsonify({}), 200
+
+@app.route("/images/<filename>", methods = ["GET"])
+def serve_image(filename):
+    print(f"Serving file: {filename} from {image_folder}")
+    return send_from_directory(image_folder, filename), 200

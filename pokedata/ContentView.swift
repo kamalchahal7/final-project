@@ -11,8 +11,8 @@ import SwiftUI
 
 struct Pokemon: Decodable, Identifiable {
     let id: Int
-    let name: String
     let pokedex_num: Int
+    let name: String
     let jap_name: String
     let generation: Int
     let status: String
@@ -21,7 +21,7 @@ struct Pokemon: Decodable, Identifiable {
     let type_1: String
     let type_2: String
     let height_m: Float
-    let weight_kg: Float
+    let weight_kg: Float?
     let abilities_num: Int
     let ability_1: String
     let ability_2: String
@@ -33,15 +33,15 @@ struct Pokemon: Decodable, Identifiable {
     let sp_attack: Int
     let sp_defense: Int
     let speed: Int
-    let catch_rate: Int
-    let base_friendship: Int
-    let base_exp: Int
-    let growth_rate: String
+    let catch_rate: Int?
+    let base_friendship: Int?
+    let base_exp: Int?
+    let growth_rate: String?
     let egg_type_num: Int
     let egg_type_1: String
     let egg_type_2: String
     let percent_male: Float?
-    let egg_cycles: Int
+    let egg_cycles: Int?
     let against_normal: Float
     let against_fire: Float
     let against_water: Float
@@ -83,10 +83,13 @@ struct ContentView: View {
     @State private var selected: Pokemon? = nil
     // Checks if view should be shown or not
     @State private var showDetail = false
+    // Returned Data from python image database
+    @State private var pokemonImages: [String: UIImage] = [:]
+
     
-    init() {
-            setupNavigationBarAppearance()
-        }
+//    init() {
+//            setupNavigationBarAppearance()
+//        }
     
     var body: some View {
         
@@ -208,7 +211,6 @@ struct ContentView: View {
                     Image("pokeicon")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: UIScreen.main.bounds.width * 0.7)
                     //                    Text("Search for any Pokemon!")
                     HStack {
                         TextField("Search Pokemon Card:", text: $pokecard)
@@ -235,7 +237,6 @@ struct ContentView: View {
                         Button("Upload Picture") {
                             
                         }
-                        .padding()
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.green)
@@ -353,9 +354,9 @@ struct ContentView: View {
 //                    let safeAreaTop = geometry.safeAreaInsets.top
 //                    var heightMultiplier = 0.0
 //                    var offsetMultiplier = 0.0
-//                    
+//
 //                    if isSearchActive {
-//                        
+//
 //                        if safeAreaTop > 25 {
 //                            heightMultiplier = 0.17
 //                            offsetMultiplier = 0.1
@@ -435,15 +436,17 @@ struct ContentView: View {
                                 .onAppear {
                                     withAnimation(.easeInOut) {
                                         // Trigger the animation
+//                                        fetchPokedata()
                                     }
+                                    
                                 }
                                 .onChange(of: pokedata) {
-                                    //                            if pokedata.isEmpty {
-                                    //                                fetchedData = []
-                                    //                            }
-                                    //                            else {
-                                    submitPokedata()
-                                    //                            }
+//                                    if pokedata.isEmpty {
+//                                        fetchPokedata()
+//                                    }
+//                                    else {
+                                        submitPokedata()
+//                                    }
                                 }
                                 .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
                             }
@@ -473,8 +476,20 @@ struct ContentView: View {
                                             showDetail = true
                                         }
                                     }) {
-                                        Text(pokemon.name)
-                                            .font(.system(size: 20))
+                                        HStack {
+                                            if let image = pokemonImages[pokemon.name] {
+                                                Image(uiImage: image)
+                                                    .resizable()
+                                                    .frame(width: 50, height: 50)
+                                            }
+                                            Text(String(format: "#%04d", pokemon.pokedex_num))
+                                            Text(pokemon.name)
+                                                .font(.system(size: 20))
+                                        }
+                                        .onAppear {
+                                            fetchImage(for: pokemon)
+                                        }
+                                        
                                     }
                                 }
                                 .scrollContentBackground(.hidden)
@@ -482,8 +497,8 @@ struct ContentView: View {
                             }
                             
                             // Overlay detail view when an item is selected
-                            if showDetail, let selectedPokemon = selected {
-                                PokemonInfo(pokemon: selectedPokemon, onDismiss: {
+                            if showDetail, let selectedPokemon = selected, let selectedImage = pokemonImages[selectedPokemon.name] {
+                                PokemonInfo(selectedImage: selectedImage, pokemon: selectedPokemon, onDismiss: {
                                     withAnimation(.easeInOut) {
                                         showDetail = false
                                     }
@@ -539,18 +554,18 @@ struct ContentView: View {
         
     }
     
-    private func setupNavigationBarAppearance() {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithTransparentBackground()
-            appearance.backgroundColor = .clear // Set background color to clear
-            appearance.titleTextAttributes = [.foregroundColor: UIColor.white] // Customize title color if needed
-            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white] // Customize large title color if needed
-            
-            UINavigationBar.appearance().standardAppearance = appearance
-            UINavigationBar.appearance().scrollEdgeAppearance = appearance
-            UINavigationBar.appearance().compactAppearance = appearance
-            UINavigationBar.appearance().tintColor = .clear // Customize tint color if needed
-    }
+//    private func setupNavigationBarAppearance() {
+//            let appearance = UINavigationBarAppearance()
+//            appearance.configureWithTransparentBackground()
+//            appearance.backgroundColor = .clear // Set background color to clear
+//            appearance.titleTextAttributes = [.foregroundColor: UIColor.white] // Customize title color if needed
+//            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white] // Customize large title color if needed
+//            
+//            UINavigationBar.appearance().standardAppearance = appearance
+//            UINavigationBar.appearance().scrollEdgeAppearance = appearance
+//            UINavigationBar.appearance().compactAppearance = appearance
+//            UINavigationBar.appearance().tintColor = .clear // Customize tint color if needed
+//    }
 
     func submitPokedata() {
             guard let url = URL(string: "http://127.0.0.1:5000/") else {
@@ -559,12 +574,12 @@ struct ContentView: View {
             }
 
             var request = URLRequest(url: url)
+        
             request.httpMethod = "POST"
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-
             let bodyData = "pokedata=\(pokedata)"
             request.httpBody = bodyData.data(using: .utf8)
-
+            
             URLSession.shared.dataTask(with: request) { data, response, error in
                 if let data = data {
                     do {
@@ -583,6 +598,61 @@ struct ContentView: View {
                 }
             }.resume()
         }
+    
+    
+    
+//    func fetchPokedata() {
+//        guard let url = URL(string: "http://127.0.0.1:5000/") else {
+//            print("Invalid URL")
+//            return
+//        }
+//
+//        var request = URLRequest(url: url)
+//        request.httpMethod = "GET"
+//
+//        URLSession.shared.dataTask(with: request) { data, response, error in
+//            if let data = data {
+//                do {
+//                    let pokemonArray = try JSONDecoder().decode([Pokemon].self, from: data)
+//                    DispatchQueue.main.async {
+//                        fetchedData = pokemonArray
+//                    }
+//                    
+//                } catch {
+//                    print("Error converting data to JSON: \(error)")
+//                    DispatchQueue.main.async {
+//                        print("THERES SOMETHING WRONG")
+//                        fetchedData = []
+//                    }
+//                }
+//            }
+//        }.resume()
+//    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    func fetchImage(for pokemon: Pokemon) {
+        guard let imageUrl = URL(string: "http://127.0.0.1:5000/images/\(pokemon.name)_new.png") else {
+            print("Invalid URL")
+            return
+        }
+        
+        URLSession.shared.dataTask(with: imageUrl) { data, response, error in
+            if let data = data {
+                DispatchQueue.main.async {
+                    self.pokemonImages[pokemon.name] = UIImage(data: data)
+                }
+            }
+        }.resume()
+    }
 }
 
 

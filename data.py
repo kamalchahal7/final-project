@@ -1,6 +1,5 @@
 import sqlite3
 import csv
-from cs50 import SQL
 
 csv_file = 'pokemon.csv'
 sql_file = 'pokedex.db'
@@ -12,7 +11,7 @@ cursor.execute("""
 CREATE TABLE IF NOT EXISTS pokemon (
     id INTEGER PRIMARY KEY UNIQUE NOT NULL,
     pokedex_num INTEGER NOT NULL,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL, 
     jap_name TEXT NOT NULL,
     generation INTEGER NOT NULL,       
     status TEXT NOT NULL,
@@ -25,7 +24,7 @@ CREATE TABLE IF NOT EXISTS pokemon (
     abilities_num INTEGER NOT NULL,
     ability_1 TEXT NOT NULL,
     ability_2 TEXT,
-    ability_hidden TEXT NOT NULL,
+    ability_hidden TEXT,
     stat_total INTEGER NOT NULL,
     hp INTEGER NOT NULL,
     attack INTEGER NOT NULL,

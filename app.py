@@ -10,7 +10,7 @@ import pytz
 utc_time = datetime.now(pytz.timezone('UTC'))
 est_time = utc_time.astimezone(pytz.timezone('US/Eastern'))
 
-from functions import lookup, search
+from functions import lookup, search, find
 
 # Configure application
 app = Flask(__name__)
@@ -42,10 +42,11 @@ def index():
         pokedata = request.form.get("pokedata")
 
         if not pokedata:
-            return "Oops! Please Enter a Valid Pokemon Name or Pokedex #", 400
+            return jsonify("No Results Found")
         
         pokedata = lookup(pokedata)
 
+        print(pokedata)
         if not pokedata:
             return "Oops! Please Enter a Valid Pokemon Name or Pokedex #", 400
         return jsonify(pokedata), 200
@@ -56,3 +57,22 @@ def index():
 def serve_image(filename):
     print(f"Serving file: {filename} from {image_folder}")
     return send_from_directory(image_folder, filename), 200
+
+@app.route("/cards", methods = ["GET", "POST"])
+def tcg():
+    """ Shows Info/Pricing on Pokemon Cards """
+    if request.method == "POST":
+        pokecard = request.form.get("pokecard")
+
+        if not pokecard:
+            return "Oops! Please enter the name/id of a Valid Pokemon Card", 400
+        pokecard = find(pokecard)
+        if not pokecard:
+            return "Oops! Please enter the name/id of a Valid Pokemon Card", 400
+        
+        print(pokecard)
+
+        return jsonify(pokecard), 200
+    else: 
+        return jsonify({}), 200
+

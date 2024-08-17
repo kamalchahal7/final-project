@@ -2,5 +2,3 @@ __pycache__/
 *.dSYM/
 *.xcworkspace/
 *.xcuserdata/
-.venv/
-archive_new/*.png~

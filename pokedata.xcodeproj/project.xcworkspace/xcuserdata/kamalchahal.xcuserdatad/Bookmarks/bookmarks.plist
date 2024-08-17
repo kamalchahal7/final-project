@@ -12,13 +12,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>106</string>
+					<string>115</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>105</string>
+					<string>114</string>
 					<key>Timestamp</key>
-					<string>745044903.2115459</string>
+					<string>745557536.91962</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -57,13 +57,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>205</string>
+					<string>326</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>204</string>
+					<string>325</string>
 					<key>Timestamp</key>
-					<string>745044903.211494</string>
+					<string>745557536.9196891</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -86,54 +86,9 @@
             
 </string>
 				<key>trailing</key>
-				<string>            ZStack {
-                Color(red: 0.82, green: 0.71, blue: 0.55)
-                    .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
-</string>
-			</dict>
-			<key>type</key>
-			<string>bookmark</string>
-		</dict>
-		<dict>
-			<key>destination</key>
-			<dict>
-				<key>location-parameters</key>
-				<dict>
-					<key>EndingColumnNumber</key>
-					<string>0</string>
-					<key>EndingLineNumber</key>
-					<string>278</string>
-					<key>StartingColumnNumber</key>
-					<string>0</string>
-					<key>StartingLineNumber</key>
-					<string>277</string>
-					<key>Timestamp</key>
-					<string>745049016.0302041</string>
-				</dict>
-				<key>rebasable-url</key>
-				<dict>
-					<key>base</key>
-					<string>workspace</string>
-					<key>payload</key>
-					<dict>
-						<key>relative-path</key>
-						<string>pokedata/ContentView.swift</string>
-					</dict>
-				</dict>
-			</dict>
-			<key>text-context</key>
-			<dict>
-				<key>focused</key>
-				<string>            // HISTORY TAB BAR (may get rid of this)
-</string>
-				<key>leading</key>
-				<string>            .tag(1)
-            
-</string>
-				<key>trailing</key>
 				<string>            GeometryReader { geometry in
-                        VStack {
-                            Spacer()
+                ZStack {
+                    // Background that slides in
 </string>
 			</dict>
 			<key>type</key>
@@ -147,13 +102,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>326</string>
+					<string>541</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>325</string>
+					<string>540</string>
 					<key>Timestamp</key>
-					<string>745049016.030175</string>
+					<string>745557536.9196579</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -192,13 +147,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>350</string>
+					<string>565</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>349</string>
+					<string>564</string>
 					<key>Timestamp</key>
-					<string>745049016.0301189</string>
+					<string>745557536.919675</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>

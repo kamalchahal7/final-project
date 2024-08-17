@@ -47,12 +47,16 @@ struct PokemonInfo: View {
                         Button("Back") {
                             onDismiss()
                         }
+                        .padding(10)
+                        .background(Color.gray)
+                        .foregroundStyle(Color.white)
+                        .cornerRadius(10)
                         
                         
                         
                         Spacer()
                     }
-                    .padding([.top, .leading, .trailing])
+                    .padding(.top, 40)
                     
                     
                     Spacer()

@@ -65,7 +65,76 @@ struct Pokemon: Decodable, Identifiable {
 struct PokemonCard: Decodable, Identifiable {
     let id: String
     let name: String
+    let supertype: String
+    let subtypes: [String]
+    let hp: String?
+    let types: [String]?
+    let evolvesFrom: String?
+    let rules: [String]?
+    
+    let ancientTraitName: String?
+    let ancientTraitText: String?
+    
+    let abilitiesName: [String]?
+    let abilitiesText: [String]?
+    let abilitiesType: [String]?
+    
+    let attacksCost: [String]?
+    let attacksName: [String]?
+    let attacksText: [String]?
+    let attacksDamage: [String]?
+    let attacksConvertedEnergyCost: [Int]?
+    
+    let weaknessesType: [String]?
+    let weaknessesValue: [String]?
+    
+    let resistancesType: [String]?
+    let resistancesValue: [String]?
+    
+    let retreatCost: [String]?
+    let convertedRetreatCost: Int?
+    
+    let number: String
+    let artist: String?
+    let rarity: String?
+    let flavorText: String?
+    let nationalPokedexNumbers: [Int]?
+    
+    let legalitiesStandard: String?
+    let legalitiesExpanded: String?
+    let legalitiesUnlimited: String?
+    
+    let regulationMark: String?
+    let lowImageURL: String
+    let highImageURL: String
+    let tcgURL: String?
+    let tcgUpdatedAt: String?
+    
+    let tcgPricesType: [String]?
+    var tcgPricesLow: [String: Double?]
+    let tcgPricesMid: [String: Double?]
+    let tcgPricesHigh: [String: Double?]
+    let tcgPricesMarket: [String: Double?]
+    let tcgPricesDirectLow: [String: Double?]
+    
+    let setId: String
+    let setName: String
+    let setSeries: String
+    let setPrintedTotal: Int
+    let setTotal: Int
+    
+    let setLegalitiesStandard: String?
+    let setLegalitiesExpanded: String?
+    let setLegalitiesUnlimited: String?
+    
+    let setPtcgoCode: String?
+    let setReleaseDate: String?
+    let setUpdatedAt: String?
+    
+    let setImagesSymbol: String?
+    let setImagesLogo: String?
 }
+
 
 struct ContentView: View {
     // Inputed Data on Search Tab Bar
@@ -80,14 +149,19 @@ struct ContentView: View {
     @State private var selectedTab = 1
     // Checks if search bar is active or not
     @State private var isSearchActive: Bool = false
+    // Checks if someone has submitted a search
+    // Checks if search bar is active or not
+    @State private var search: Bool = false
     // Checks if input field is in focus or not
     @FocusState private var isSearchFieldFocused: Bool
     // Background for Search Bar
 //    @State private var offsetY: CGFloat = -UIScreen.main.bounds.height
     // Checks if it is the first time searching
 //    @State private var isFirstTime = true
-    // Used for selected item
+    // Used for selected pokemon
     @State private var selected: Pokemon? = nil
+    // Used for selected card
+    @State private var selectedCard: PokemonCard? = nil
     // Checks if view should be shown or not
     @State private var showDetail = false
     // Returned Data from python image database
@@ -343,7 +417,7 @@ struct ContentView: View {
 //                            heightMultiplier = 0.29
 //                            offsetMultiplier = 0.15
 //                        }
-                    if isSearchActive {
+                    if search {
                         let isNotchDevice = geometry.safeAreaInsets.top > 20
                         let heightMultiplier = isNotchDevice ? 0.17 : 0.29
                         let offsetMultiplier = isNotchDevice ? 0.1 : 0.15
@@ -353,15 +427,15 @@ struct ContentView: View {
                             .frame(height: geometry.safeAreaInsets.top + (geometry.size.height * heightMultiplier))
                             .offset(y: -geometry.size.height * offsetMultiplier)
                             .transition(.move(edge: .top))
-                            .animation(.easeInOut(duration: 1.0), value: isSearchActive)
+                            .animation(.easeInOut(duration: 1.0), value: search)
                     }
                     
                 }
                 .opacity(showDetail ? 0 : 1)
                 
                 VStack {
-                    if !isSearchActive && !showDetail { Spacer() }
-                    if !isSearchActive {
+                    if !search && !showDetail { Spacer() }
+                    if !search {
                         Image("pokeicon")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
@@ -370,10 +444,10 @@ struct ContentView: View {
                     
                     ZStack(alignment: .leading) {
                         if !showDetail {
-                            if isSearchActive {
+                            if search {
                                 Button(action: {
                                     withAnimation(.easeInOut(duration: 1.0)) {
-                                        isSearchActive.toggle()
+                                        search.toggle()
                                         hasAnimated = false
                                         isSearchFieldFocused = false
                                     }
@@ -390,53 +464,44 @@ struct ContentView: View {
                                     .font(.system(size: 20, weight: .bold))
                                     .padding(.leading, 20)
                                     .zIndex(1.0)
-                                    .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
+                                    .padding(.leading, search ? geometry.size.width * 0.1 : 0)
                                 
                                 
-                                TextField("Search PokeCard:", text: $pokecard, onEditingChanged: { editing in
-                                    if editing && !hasAnimated {
-                                        withAnimation {
-                                            isSearchActive = true
+                                TextField("Search PokeCard:", text: $pokecard)
+                                    .font(.system(size: 25, weight: .medium))
+                                    .focused($isSearchFieldFocused)
+                                    .autocapitalization(.none)
+                                    .padding(.leading, 40)
+                                    .padding()
+                                    .multilineTextAlignment(.leading)
+                                    .background(Color.white)
+                                    .cornerRadius(20)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .stroke(Color.black, lineWidth: 3)
+                                    )
+                                    .transition(.move(edge: .top))
+                                    .onAppear {
+                                        withAnimation(.easeInOut) {
+                                            // Trigger the animation
                                         }
-                                        hasAnimated = true
+                                        
                                     }
-                                })
-                                .font(.system(size: 25, weight: .medium))
-                                .focused($isSearchFieldFocused)
-                                .autocapitalization(.none)
-                                .padding(.leading, 40)
-                                .padding()
-                                .multilineTextAlignment(.leading)
-                                .background(Color.white)
-                                .cornerRadius(20)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.black, lineWidth: 3)
-                                )
-                                .transition(.move(edge: .top))
-                                .onAppear {
-                                    withAnimation(.easeInOut) {
-                                        // Trigger the animation
-//                                        fetchPokedata()
-                                    }
-                                    
-                                }
-                                .onChange(of: pokecard) {
-//                                    if pokedata.isEmpty {
-//                                        fetchPokedata()
-//                                    }
-//                                    else {
+                                    .onSubmit {
+    //                                    if pokecard.!isEmpty {
+    //                                        submitPokecard()
+    //                                    }
+                                        search = true
                                         submitPokecard()
-//                                    }
-                                }
-                                .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
+                                    }
+                                    .padding(.leading, search ? geometry.size.width * 0.1 : 0)
                             }
                         }
                     }
-                    .animation(.easeInOut(duration: 0.5), value: isSearchActive)
+                    .animation(.easeInOut(duration: 0.5), value: search)
                     .animation(.easeInOut(duration: 0.00000001), value: !showDetail)
                     
-                    if !isSearchActive {
+                    if !search {
                         HStack {
                             Button(action: {
                                 withAnimation(.easeInOut) {
@@ -480,7 +545,47 @@ struct ContentView: View {
                         .font(.system(size: 20, weight: .bold))
                     }
                     
-                    if !isSearchActive { Spacer() }
+                    if search {
+                        if !showDetail {
+                            Spacer()
+                                .frame(height: geometry.size.height * 0.02)
+                        }
+                        ZStack {
+                            VStack {
+                                List(cardData, id: \.id) { pokemoncard in
+                                    Button(action: {
+                                        withAnimation(.easeInOut) {
+                                            selectedCard = pokemoncard
+                                            showDetail = true
+                                        }
+                                    }) {
+                                        
+                                        AsyncImage(url: URL(string: pokemoncard.lowImageURL)) { image in
+                                            image.resizable().scaledToFit().frame(height: 200)
+                                        } placeholder: {
+                                            //                                                ProgressView()
+                                        }
+                                        
+                                        
+                                        
+                                    }
+                                }
+                                .scrollContentBackground(.hidden)
+                                .padding(.horizontal, -16)
+                            }
+                            if showDetail, let selectedCard = selectedCard {
+                                PokemonCardInfo(pokemonCard: selectedCard, onDismiss: {
+                                    withAnimation(.easeInOut) {
+                                        showDetail = false
+                                    }
+                                })
+                                .transition(.move(edge: .trailing))
+                                .edgesIgnoringSafeArea(.all)
+                                .zIndex(1)
+                            }
+                        }
+                    }
+                    if !search { Spacer() }
                 }
                 .padding(showDetail ? 0 : 16)
             }
@@ -698,6 +803,7 @@ struct ContentView: View {
                         DispatchQueue.main.async {
                             fetchedData = pokemonArray
                         }
+                        print(fetchedData)
                     } catch {
                         print("Error converting data to JSON: \(error)")
                         DispatchQueue.main.async {
@@ -712,36 +818,42 @@ struct ContentView: View {
     
     func submitPokecard() {
         guard let url = URL(string: "http://127.0.0.1:5000/cards") else {
-                print("Invalid URL")
-                return
-            }
-
-            var request = URLRequest(url: url)
-        
-            request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            let bodyData = "pokecard=\(pokecard)"
-            request.httpBody = bodyData.data(using: .utf8)
-            
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                if let data = data {
-                    do {
-                        let pokemonCardArray = try JSONDecoder().decode([PokemonCard].self, from: data)
-                        DispatchQueue.main.async {
-                            cardData = pokemonCardArray
-                        }
-                        print(cardData)
-                    } catch {
-                        print("Error converting data to JSON: \(error)")
-                        DispatchQueue.main.async {
-                            cardData = []
-                        }
-                    }
-                } else if let error = error {
-                    print("HTTP Request Failed \(error)")
-                }
-            }.resume()
+            print("Invalid URL")
+            return
         }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        
+        // You need to make sure pokecard is properly formatted to be URL encoded
+        let bodyData = "pokecard=\(pokecard)"
+        request.httpBody = bodyData.data(using: .utf8)
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let data = data {
+                do {
+                    // Print the raw JSON data as a string
+                    let jsonString = String(data: data, encoding: .utf8)
+                    print("Received JSON: \(String(describing: jsonString))")
+                    
+                    let pokemonCard = try JSONDecoder().decode([PokemonCard].self, from: data)
+                    DispatchQueue.main.async {
+                        cardData = pokemonCard
+                    }
+                    print(cardData)
+                } catch {
+                    print("Error converting data to JSON: \(error)")
+                    DispatchQueue.main.async {
+                        cardData = []
+                    }
+                }
+            } else if let error = error {
+                print("HTTP Request Failed \(error)")
+            }
+        }.resume()
+    }
+
     
     
     
@@ -826,4 +938,168 @@ struct ContentView: View {
 //                    }
 
 
+//// MARK: - Main Card Struct
+//struct PokemonCard: Codable, Identifiable {
+//    let abilities: [Ability]?
+//    let artist: String
+//    let ancientTrait: AncientTrait? // Updated: hash with properties name and text
+//    let attacks: [Attack]?
+//    let convertedRetreatCost: Int
+//    let evolvesFrom: String?
+//    let flavorText: String
+//    let hp: String
+//    let id: String
+//    let images: CardImages
+//    let legalities: Legalities
+//    let regulationMark: String? // Updated: string
+//    let name: String
+//    let nationalPokedexNumbers: [Int]
+//    let number: String
+//    let rarity: String
+//    let resistances: [Resistance]? // Updated: list of hashes
+//    let retreatCost: [String]
+//    let rules: [String]? // Updated: list of strings
+//    let set: CardSet
+//    let subtypes: [String]
+//    let supertype: String
+//    let tcgplayer: TCGPlayer?
+//    let types: [String]
+//    let weaknesses: [Weakness]
+//}
+//
+//// MARK: - AncientTrait Struct (Updated)
+//struct AncientTrait: Codable {
+//    let name: String
+//    let text: String
+//}
+//
+//// MARK: - Ability Struct
+//struct Ability: Codable {
+//    let name: String
+//    let text: String
+//    let type: String
+//}
+//
+//// MARK: - Attack Struct
+//struct Attack: Codable {
+//    let name: String
+//    let cost: [String]
+//    let convertedEnergyCost: Int
+//    let damage: String
+//    let text: String
+//}
+//
+//// MARK: - Weakness Struct
+//struct Weakness: Codable {
+//    let type: String
+//    let value: String
+//}
+//
+//// MARK: - Resistance Struct (Updated)
+//struct Resistance: Codable {
+//    let type: String
+//    let value: String
+//}
+//
+//// MARK: - CardSet Struct
+//struct CardSet: Codable {
+//    let id: String
+//    let name: String
+//    let series: String
+//    let printedTotal: Int
+//    let total: Int
+//    let legalities: Legalities
+//    let ptcgoCode: String
+//    let releaseDate: String
+//    let updatedAt: String
+//    let images: SetImages
+//}
+//
+//// MARK: - Legalities Struct
+//struct Legalities: Codable {
+//    let unlimited: String
+//    let standard: String
+//    let expanded: String
+//}
+//
+//// MARK: - CardImages Struct
+//struct CardImages: Codable {
+//    let small: String
+//    let large: String
+//}
+//
+//// MARK: - SetImages Struct
+//struct SetImages: Codable {
+//    let symbol: String
+//    let logo: String
+//}
+//
+//// MARK: - TCGPlayer Struct
+//struct TCGPlayer: Codable {
+//    let url: String
+//    let updatedAt: String
+//    let prices: Prices
+//}
+//
+//// MARK: - Prices Struct (TCGPlayer)
+//struct Prices: Codable {
+//    let normal: PriceDetails?
+//    let reverseHolofoil: PriceDetails?
+//}
+//
+//// MARK: - PriceDetails Struct
+//struct PriceDetails: Codable {
+//    let low: Double?
+//    let mid: Double?
+//    let high: Double?
+//    let market: Double?
+//    let directLow: Double?
+//}
+//
+
+//    func submitPokecard() {
+//        guard let url = URL(string: "http://127.0.0.1:5000/cards") else {
+//                print("Invalid URL")
+//                return
+//            }
+//
+//            var request = URLRequest(url: url)
+//        
+//            request.httpMethod = "POST"
+//            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+//            let bodyData = "pokecard=\(pokecard)"
+//            request.httpBody = bodyData.data(using: .utf8
+//        
+//        URLSession.shared.dataTask(with: request) { data, response, error in
+//                    if let error = error {
+//                        print("HTTP Request Failed: \(error.localizedDescription)")
+//                        DispatchQueue.main.async {
+//                            cardData = []
+//                        }
+//                        return
+//                    }
+//
+//                    guard let data = data else {
+//                        print("No data received")
+//                        DispatchQueue.main.async {
+//                            cardData = []
+//                        }
+//                        return
+//                    }
+//
+//                    do {
+//                        let pokemonCardArray = try JSONDecoder().decode([PokemonCard].self, from: data)
+//                        DispatchQueue.main.async {
+//                            cardData = pokemonCardArray
+//                        }
+//                        print("Valid JSON Data")
+//                        print(cardData)
+//                    } catch {
+//                        print("Error decoding JSON: \(error)")
+//                        DispatchQueue.main.async {
+//                            cardData = []
+//                        }
+//                    }
+//                }.resume()
+//        }
 //

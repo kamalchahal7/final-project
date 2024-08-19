@@ -461,6 +461,7 @@ struct PokemonInfo: View {
                             }
                         }
                     }
+                    .padding(.bottom, 100)
                     
 //                    Group {
 //                                            HStack {

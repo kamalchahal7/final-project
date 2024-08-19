@@ -12,13 +12,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>115</string>
+					<string>189</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>114</string>
+					<string>188</string>
 					<key>Timestamp</key>
-					<string>745557536.91962</string>
+					<string>745734478.8661391</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -57,13 +57,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>326</string>
+					<string>400</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>325</string>
+					<string>399</string>
 					<key>Timestamp</key>
-					<string>745557536.9196891</string>
+					<string>745734478.866088</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -102,13 +102,58 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>541</string>
+					<string>598</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>540</string>
+					<string>597</string>
 					<key>Timestamp</key>
-					<string>745557536.9196579</string>
+					<string>745734478.866124</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>pokedata/ContentView.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>            // HISTORY TAB BAR (may get rid of this)
+</string>
+				<key>leading</key>
+				<string>            .tag(1)
+            
+</string>
+				<key>trailing</key>
+				<string>            GeometryReader { geometry in
+                        VStack {
+                            Spacer()
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>646</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>645</string>
+					<key>Timestamp</key>
+					<string>745734478.866022</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -147,13 +192,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>565</string>
+					<string>670</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>564</string>
+					<string>669</string>
 					<key>Timestamp</key>
-					<string>745557536.919675</string>
+					<string>745734478.866107</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>

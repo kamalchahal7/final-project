@@ -70,8 +70,8 @@ def tcg():
         if not pokecard:
             return "Oops! Please enter the name/id of a Valid Pokemon Card", 400
         
-        print(pokecard)
-
+        print(pokecard[9])
+        # pokecard = serialize(pokecard)
         return jsonify(pokecard), 200
     else: 
         return jsonify({}), 200

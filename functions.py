@@ -105,7 +105,7 @@ def find(value):
 
         # Checks the various available prices of a card
         if card.tcgplayer:
-            priceTypes = []
+            priceTypes = {}
             pricesLow = {}
             pricesMid = {}
             pricesHigh = {}
@@ -114,51 +114,63 @@ def find(value):
             
             priceURL = card.tcgplayer.url
             updatedAt = card.tcgplayer.updatedAt
-            normalPrices = card.tcgplayer.prices.normal
-            holofoilPrices = card.tcgplayer.prices.holofoil
-            reverseHolofoilPrices = card.tcgplayer.prices.reverseHolofoil
-            firstEditionHolofoil = card.tcgplayer.prices.firstEditionHolofoil
-            firstEditionNormal = card.tcgplayer.prices.firstEditionNormal
 
-            if normalPrices:
-                priceTypes.append("normal")
-                pricesLow["normal"] = normalPrices.low
-                pricesMid["normal"] = normalPrices.mid
-                pricesHigh["normal"] = normalPrices.high
-                pricesMarket["normal"] = normalPrices.market
-                pricesDirectLow["normal"] = normalPrices.directLow
+            if card.tcgplayer.prices:
+                if card.tcgplayer.prices.normal:
+                    x = "normal"
+                    normalPrices = card.tcgplayer.prices.normal
 
-            if holofoilPrices:
-                priceTypes.append("holofoil")
-                pricesLow["holofoil"] = holofoilPrices.low
-                pricesMid["holofoil"] = holofoilPrices.mid
-                pricesHigh["holofoil"] = holofoilPrices.high
-                pricesMarket["holofoil"] = holofoilPrices.market
-                pricesDirectLow["holofoil"] = holofoilPrices.directLow
+                    priceTypes[x] = "Normal" 
+                    pricesLow[x] = normalPrices.low
+                    pricesMid[x] = normalPrices.mid
+                    pricesHigh[x] = normalPrices.high
+                    pricesMarket[x] = normalPrices.market
+                    pricesDirectLow[x] = normalPrices.directLow
+
+                if card.tcgplayer.prices.holofoil:
+                    x = "holofoil"
+                    holofoilPrices = card.tcgplayer.prices.holofoil
+
+                    priceTypes[x] = "Holofoil" 
+                    pricesLow[x] = holofoilPrices.low
+                    pricesMid[x] = holofoilPrices.mid
+                    pricesHigh[x] = holofoilPrices.high
+                    pricesMarket[x] = holofoilPrices.market
+                    pricesDirectLow[x] = holofoilPrices.directLow
+
+                if card.tcgplayer.prices.reverseHolofoil:
+                    x = "reverseHolofoil"
+                    reverseHolofoilPrices = card.tcgplayer.prices.reverseHolofoil
+
+                    priceTypes[x] = "Reverse Holofoil" 
+                    pricesLow[x] = reverseHolofoilPrices.low
+                    pricesMid[x] = reverseHolofoilPrices.mid
+                    pricesHigh[x] = reverseHolofoilPrices.high
+                    pricesMarket[x] = reverseHolofoilPrices.market
+                    pricesDirectLow[x] = reverseHolofoilPrices.directLow
+
+                if card.tcgplayer.prices.firstEditionHolofoil:
+                    x = "firstEditionHolofoil"
+                    firstEditionHolofoil = card.tcgplayer.prices.firstEditionHolofoil
+
+                    priceTypes[x] = "First Edition Holofoil"
+                    pricesLow[x] = firstEditionHolofoil.low
+                    pricesMid[x] = firstEditionHolofoil.mid
+                    pricesHigh[x] = firstEditionHolofoil.high
+                    pricesMarket[x] = firstEditionHolofoil.market
+                    pricesDirectLow[x] = firstEditionHolofoil.directLow
+
+                if card.tcgplayer.prices.firstEditionNormal:
+                    x = "firstEditionNormal"
+                    firstEditionNormal = card.tcgplayer.prices.firstEditionNormal
+
+                    priceTypes[x] = "First Edition Normal"
+                    pricesLow[x] = firstEditionNormal.low
+                    pricesMid[x] = firstEditionNormal.mid
+                    pricesHigh[x] = firstEditionNormal.high
+                    pricesMarket[x] = firstEditionNormal.market
+                    pricesDirectLow[x] = firstEditionNormal.directLow
             
-            if reverseHolofoilPrices:
-                priceTypes.append("reverseHolofoil")
-                pricesLow["reverseHolofoil"] = reverseHolofoilPrices.low
-                pricesMid["reverseHolofoil"] = reverseHolofoilPrices.mid
-                pricesHigh["reverseHolofoil"] = reverseHolofoilPrices.high
-                pricesMarket["reverseHolofoil"] = reverseHolofoilPrices.market
-                pricesDirectLow["reverseHolofoil"] = reverseHolofoilPrices.directLow
-            
-            if firstEditionHolofoil:
-                priceTypes.append("firstEditionHolofoil")
-                pricesLow["firstEditionHolofoil"] = firstEditionHolofoil.low
-                pricesMid["firstEditionHolofoil"] = firstEditionHolofoil.mid
-                pricesHigh["firstEditionHolofoil"] = firstEditionHolofoil.high
-                pricesMarket["firstEditionHolofoil"] = firstEditionHolofoil.market
-                pricesDirectLow["firstEditionHolofoil"] = firstEditionHolofoil.directLow
-            
-            if firstEditionNormal:
-                priceTypes.append("firstEditionNormal")
-                pricesLow["firstEditionNormal"] = firstEditionNormal.low
-                pricesMid["firstEditionNormal"] = firstEditionNormal.mid
-                pricesHigh["firstEditionNormal"] = firstEditionNormal.high
-                pricesMarket["firstEditionNormal"] = firstEditionNormal.market
-                pricesDirectLow["firstEditionNormal"] = firstEditionNormal.directLow
         
         names.append({
             "id": card.id, "name": card.name, "supertype": card.supertype, "subtypes": card.subtypes, "hp": card.hp, 

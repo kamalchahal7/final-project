@@ -82,7 +82,7 @@ struct PokemonCard: Decodable, Identifiable {
     let attacksCost: [String]?
     let attacksName: [String]?
     let attacksText: [String]?
-    let attacksDamage: [String]?
+    let attacksDamage: [String?]?
     let attacksConvertedEnergyCost: [Int]?
     
     let weaknessesType: [String]?
@@ -110,8 +110,8 @@ struct PokemonCard: Decodable, Identifiable {
     let tcgURL: String?
     let tcgUpdatedAt: String?
     
-    let tcgPricesType: [String]?
-    var tcgPricesLow: [String: Double?]
+    let tcgPricesType: [String: String?]
+    let tcgPricesLow: [String: Double?]
     let tcgPricesMid: [String: Double?]
     let tcgPricesHigh: [String: Double?]
     let tcgPricesMarket: [String: Double?]
@@ -168,6 +168,11 @@ struct ContentView: View {
     @State private var pokemonImages: [String: UIImage] = [:]
     // Checks if search view is shown or not
     @State private var hasAnimated = false
+    // Holds the market value of each card
+//    @State private var marketPrices: [String] = []
+    // Holds market value of selected card
+    @State private var market: String = ""
+    
 
     
 //    init() {
@@ -552,29 +557,54 @@ struct ContentView: View {
                         }
                         ZStack {
                             VStack {
-                                List(cardData, id: \.id) { pokemoncard in
+                                List(cardData.indices, id: \.self) { index in
+                                    let pokemoncard = cardData[index]
+                                    
+                                    // Compute the market price inside the view builder
+                                    let marketPrice = calculateMarketPrice(for: pokemoncard)
+
                                     Button(action: {
                                         withAnimation(.easeInOut) {
                                             selectedCard = pokemoncard
+                                            market = calculateMarketPrice(for: pokemoncard)
                                             showDetail = true
                                         }
                                     }) {
-                                        
-                                        AsyncImage(url: URL(string: pokemoncard.lowImageURL)) { image in
-                                            image.resizable().scaledToFit().frame(height: 200)
-                                        } placeholder: {
-                                            //                                                ProgressView()
+                                        HStack {
+                                            AsyncImage(url: URL(string: pokemoncard.lowImageURL)) { image in
+                                                image
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(height: 200)
+                                            } placeholder: {
+                                                // Placeholder view (Optional)
+                                                Color.gray.frame(height: 200)
+                                            }
+
+                                            VStack(alignment: .leading) {
+                                                Text(pokemoncard.name)
+                                                    .font(.system(size: 20))
+                                                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                                                Text("\(pokemoncard.setSeries) - \(pokemoncard.setName)")
+                                                    .font(.system(size: 15))
+                                                    .padding(.bottom, 1)
+                                                Text("Market Price: ")
+                                                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                                                + Text(marketPrice)
+                                                    .fontWeight(.semibold)
+                                                    .foregroundStyle(Color(red: 0.0, green: 0.5, blue: 0.0))
+                                            }
+                                            .padding(.leading)
                                         }
-                                        
-                                        
-                                        
                                     }
                                 }
                                 .scrollContentBackground(.hidden)
+                                .foregroundStyle(Color.black)
                                 .padding(.horizontal, -16)
                             }
+
                             if showDetail, let selectedCard = selectedCard {
-                                PokemonCardInfo(pokemonCard: selectedCard, onDismiss: {
+                                PokemonCardInfo(market: $market, pokemonCard: selectedCard, onDismiss: {
                                     withAnimation(.easeInOut) {
                                         showDetail = false
                                     }
@@ -816,6 +846,21 @@ struct ContentView: View {
             }.resume()
         }
     
+    func fetchImage(for pokemon: Pokemon) {
+        guard let imageUrl = URL(string: "http://127.0.0.1:5000/images/\(pokemon.name)_new.png") else {
+            print("Invalid URL")
+            return
+        }
+        
+        URLSession.shared.dataTask(with: imageUrl) { data, response, error in
+            if let data = data {
+                DispatchQueue.main.async {
+                    self.pokemonImages[pokemon.name] = UIImage(data: data)
+                }
+            }
+        }.resume()
+    }
+    
     func submitPokecard() {
         guard let url = URL(string: "http://127.0.0.1:5000/cards") else {
             print("Invalid URL")
@@ -852,6 +897,64 @@ struct ContentView: View {
                 print("HTTP Request Failed \(error)")
             }
         }.resume()
+    }
+    
+    private func calculateMarketPrice(for pokemoncard: PokemonCard) -> String {
+        let error = "N/A"
+        if let normalPrice = pokemoncard.tcgPricesMarket["normal"] {
+            if let price = normalPrice {
+                return String(format: "$%.2f USD", normalPrice!)
+            }
+        }
+        if let holofoilPrice = pokemoncard.tcgPricesMarket["holofoil"] {
+            if let price = holofoilPrice {
+                return String(format: "$%.2f USD", holofoilPrice!)
+            }
+        }
+        if let firstEditionHolofoilPrice = pokemoncard.tcgPricesMarket["firstEditionHolofoil"] {
+            if let price = firstEditionHolofoilPrice {
+                return String(format: "$%.2f USD", firstEditionHolofoilPrice!)
+            }
+        }
+        if let firstEditionNormalPrice = pokemoncard.tcgPricesMarket["firstEditionNormal"] {
+            if let price = firstEditionNormalPrice {
+                return String(format: "$%.2f USD", firstEditionNormalPrice!)
+            }
+        }
+        if let reverseHolofoilPrice = pokemoncard.tcgPricesMarket["reverseHolofoil"] {
+            if let price = reverseHolofoilPrice {
+                return String(format: "$%.2f USD", reverseHolofoilPrice!)
+            }
+        }
+        return error
+//        let error = "No Market Price Available"
+//        if let normalPrice = pokemoncard.tcgPricesMarket["normal"] {
+//            if let price = normalPrice {
+//                return String(format: "$%.2f USD", normalPrice!)
+//            }
+//            else if let holofoilPrice = pokemoncard.tcgPricesMarket["holofoil"] {
+//                if let price = holofoilPrice {
+//                    return String(format: "$%.2f USD", holofoilPrice!)
+//                }
+//                else if let firstEditionHolofoilPrice = pokemoncard.tcgPricesMarket["firstEditionHolofoil"] {
+//                    if let price = firstEditionHolofoilPrice {
+//                        return String(format: "$%.2f USD", firstEditionHolofoilPrice!)
+//                    }
+//                    else if let firstEditionNormalPrice = pokemoncard.tcgPricesMarket["firstEditionNormal"] {
+//                        if let price = firstEditionNormalPrice {
+//                            return String(format: "$%.2f USD", firstEditionNormalPrice!)
+//                        }
+//                        else if let reverseHolofoilPrice = pokemoncard.tcgPricesMarket["reverseHolofoil"] {
+//                            if let price = reverseHolofoilPrice {
+//                                return String(format: "$%.2f USD", reverseHolofoilPrice!)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return error
+        
     }
 
     
@@ -895,20 +998,7 @@ struct ContentView: View {
     
     
     
-    func fetchImage(for pokemon: Pokemon) {
-        guard let imageUrl = URL(string: "http://127.0.0.1:5000/images/\(pokemon.name)_new.png") else {
-            print("Invalid URL")
-            return
-        }
-        
-        URLSession.shared.dataTask(with: imageUrl) { data, response, error in
-            if let data = data {
-                DispatchQueue.main.async {
-                    self.pokemonImages[pokemon.name] = UIImage(data: data)
-                }
-            }
-        }.resume()
-    }
+    
 }
 
 

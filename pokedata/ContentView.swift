@@ -62,11 +62,11 @@ struct Pokemon: Decodable, Identifiable {
     let against_fairy: Float
 }
 
-struct PokemonCard: Decodable, Identifiable {
+struct PokemonCard: Decodable, Identifiable, Equatable, Hashable {
     let id: String
     let name: String
     let supertype: String
-    let subtypes: [String]
+    let subtypes: [String]?
     let hp: String?
     let types: [String]?
     let evolvesFrom: String?
@@ -85,11 +85,11 @@ struct PokemonCard: Decodable, Identifiable {
     let attacksDamage: [String?]?
     let attacksConvertedEnergyCost: [Int]?
     
-    let weaknessesType: [String]?
-    let weaknessesValue: [String]?
+    let weaknessType: String?
+    let weaknessValue: String?
     
-    let resistancesType: [String]?
-    let resistancesValue: [String]?
+    let resistanceType: String?
+    let resistanceValue: String?
     
     let retreatCost: [String]?
     let convertedRetreatCost: Int?
@@ -108,7 +108,7 @@ struct PokemonCard: Decodable, Identifiable {
     let lowImageURL: String
     let highImageURL: String
     let tcgURL: String?
-    let tcgUpdatedAt: String?
+    let tcgUpdatedAt: String
     
     let tcgPricesType: [String: String?]
     let tcgPricesLow: [String: Double?]
@@ -146,7 +146,7 @@ struct ContentView: View {
     // Returned Data from TCG API
     @State private var cardData: [PokemonCard] = []
     // Initial Tab
-    @State private var selectedTab = 1
+    @State private var selectedTab = 3
     // Checks if search bar is active or not
     @State private var isSearchActive: Bool = false
     // Checks if someone has submitted a search
@@ -164,6 +164,10 @@ struct ContentView: View {
     @State private var selectedCard: PokemonCard? = nil
     // Checks if view should be shown or not
     @State private var showDetail = false
+    // Checks if card view should be shown or not
+    @State private var showCardDetail = false
+    // Checks if collection view should be shown or not
+    @State private var showCollectionDetail = false
     // Returned Data from python image database
     @State private var pokemonImages: [String: UIImage] = [:]
     // Checks if search view is shown or not
@@ -172,6 +176,8 @@ struct ContentView: View {
 //    @State private var marketPrices: [String] = []
     // Holds market value of selected card
     @State private var market: String = ""
+    // holds all the collected pokemon cards
+    @State private var collection: [PokemonCard] = []
     
 
     
@@ -436,10 +442,10 @@ struct ContentView: View {
                     }
                     
                 }
-                .opacity(showDetail ? 0 : 1)
+                .opacity(showCardDetail ? 0 : 1)
                 
                 VStack {
-                    if !search && !showDetail { Spacer() }
+                    if !search && !showCardDetail { Spacer() }
                     if !search {
                         Image("pokeicon")
                             .resizable()
@@ -448,7 +454,7 @@ struct ContentView: View {
                     }
                     
                     ZStack(alignment: .leading) {
-                        if !showDetail {
+                        if !showCardDetail {
                             if search {
                                 Button(action: {
                                     withAnimation(.easeInOut(duration: 1.0)) {
@@ -504,7 +510,7 @@ struct ContentView: View {
                         }
                     }
                     .animation(.easeInOut(duration: 0.5), value: search)
-                    .animation(.easeInOut(duration: 0.00000001), value: !showDetail)
+                    .animation(.easeInOut(duration: 0.00000001), value: !showCardDetail)
                     
                     if !search {
                         HStack {
@@ -551,7 +557,7 @@ struct ContentView: View {
                     }
                     
                     if search {
-                        if !showDetail {
+                        if !showCardDetail {
                             Spacer()
                                 .frame(height: geometry.size.height * 0.02)
                         }
@@ -567,7 +573,7 @@ struct ContentView: View {
                                         withAnimation(.easeInOut) {
                                             selectedCard = pokemoncard
                                             market = calculateMarketPrice(for: pokemoncard)
-                                            showDetail = true
+                                            showCardDetail = true
                                         }
                                     }) {
                                         HStack {
@@ -603,10 +609,10 @@ struct ContentView: View {
                                 .padding(.horizontal, -16)
                             }
 
-                            if showDetail, let selectedCard = selectedCard {
-                                PokemonCardInfo(market: $market, pokemonCard: selectedCard, onDismiss: {
+                            if showCardDetail, let selectedCard = selectedCard {
+                                PokemonCardInfo(market: $market, collection: $collection, pokemonCard: selectedCard, onDismiss: {
                                     withAnimation(.easeInOut) {
-                                        showDetail = false
+                                        showCardDetail = false
                                     }
                                 })
                                 .transition(.move(edge: .trailing))
@@ -617,7 +623,7 @@ struct ContentView: View {
                     }
                     if !search { Spacer() }
                 }
-                .padding(showDetail ? 0 : 16)
+                .padding(showCardDetail ? 0 : 16)
             }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {
@@ -627,45 +633,16 @@ struct ContentView: View {
             
             // HISTORY TAB BAR (may get rid of this)
             GeometryReader { geometry in
-                        VStack {
-                            Spacer()
-
-                            TextField("Search Pokemon:", text: $pokedata)
-                                .font(.system(size: 25, weight: .medium))
-                                .padding()
-                                .foregroundColor(.red)
-                                .multilineTextAlignment(.center)
-                                .background(Color.white)
-                                .cornerRadius(20)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.black, lineWidth: 3)
-                                )
-                                // Shrinks From the Right Instead of the Left
-                                //.frame(width: isSearchActive ? geometry.size.width * 0.8 : geometry.size.width * 1.0)
-                            
-                                // Or Changing .leading --> .trailing Below Also Shrinks From the Right Instead of the Left \/
-                                .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
-                                .offset(y: isSearchActive ? -geometry.size.height * 0.4 : 0)
-                                .animation(.easeInOut(duration: 0.75), value: isSearchActive)
-
-                            Button(action: {
-                                withAnimation {
-                                    isSearchActive.toggle()
-                                }
-                            }) {
-                                Image(systemName: "chevron.backward")
-                                    .padding()
-                                    .background(Color.clear)
-                                    .cornerRadius(10)
-                                    .font(.system(size: 35, weight: .bold))
-                            }
-                            Spacer()
-                        }
-                        
-                    }
-                    .padding()
-                    .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
+                VStack {
+                    Spacer()
+                    
+                    
+                    Spacer()
+                }
+            
+            }
+            .padding()
+            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
                 
                 
                 .tabItem {
@@ -674,111 +651,172 @@ struct ContentView: View {
                 .tag(2)
         
             // COLLECTION TAB BAR
-            NavigationStack {
-                Text("<Collection>")
-                    .navigationTitle("Collection")
-                    .toolbar {
-                        ToolbarItem (placement: .topBarLeading) {
-                            Text("PokeData")
-                        }
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button(action: {
-                                //todo
-                            }, label: {
-                                /*@START_MENU_TOKEN@*/Text("Button")/*@END_MENU_TOKEN@*/
-                            })
-                        }
-                    }
-            }
-            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
-
-                .tabItem {
-                    Label("Collection", systemImage: "square.on.square")
-                }
-                .tag(3)
-            
-            // PROFILE TAB BAR
             GeometryReader { geometry in
                 ZStack {
                     // Background that slides in
-                    if isSearchActive {
-                        Rectangle()
-                        // change opacity to whatever u want
-                            .foregroundColor(Color.white.opacity(0.5))
-                            .frame(height: geometry.size.height * 0.46)
-                            .offset(y: -geometry.size.height * 0.3)
-                            .transition(.move(edge: .top))
-                            .animation(.easeInOut(duration: 1.0), value: isSearchActive)
-                    }
+//                    let safeAreaTop = geometry.safeAreaInsets.top
+//                    var heightMultiplier = 0.0
+//                    var offsetMultiplier = 0.0
+//
+//                    if isSearchActive {
+//
+//                        if safeAreaTop > 25 {
+//                            heightMultiplier = 0.17
+//                            offsetMultiplier = 0.1
+//                        } else if safeAreaTop > 20 {
+//                            heightMultiplier = 0.17
+//                            offsetMultiplier = 0.1
+//                        } else {
+//                            heightMultiplier = 0.29
+//                            offsetMultiplier = 0.15
+//                        }
+                    
+                    let isNotchDevice = geometry.safeAreaInsets.top > 20
+                    let heightMultiplier = isNotchDevice ? 0.135 : 0.25
+                    let offsetMultiplier = isNotchDevice ? 0.1 : 0.15
+
+                    Rectangle()
+                        .foregroundColor(Color.blue.opacity(0.7))
+                        .frame(height: geometry.safeAreaInsets.top + (geometry.size.height * heightMultiplier))
+                        .offset(y: -geometry.size.height * offsetMultiplier)
+                        .transition(.move(edge: .top))
+                        .animation(.easeInOut(duration: 1.0), value: search)
+                    
+                    
                 }
+                
                 VStack {
-                    Spacer()
-                    if !isSearchActive {
-                        Image("pokeball")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    }
-                    // ZStack for the button
-                    ZStack {
-                        if isSearchActive {
-                            Button(action: {
-                                withAnimation(.easeInOut(duration: 1.0)) {
-                                    isSearchActive.toggle()
-                                    isSearchFieldFocused = false
+                    if !showCollectionDetail {
+                        HStack {
+                            Spacer()
+                            Text("Collection")
+                                .font(.largeTitle)
+                                .fontWeight(.heavy)
+                                .foregroundStyle(Color.white)
+                                .shadow(color: .black, radius: 3)
+                                .onAppear {
+                                    print(collection)
                                 }
-                            }) {
-                                Image(systemName: "chevron.backward")
-                                    .font(.system(size: 35, weight: .bold))
+                            Spacer()
+                            
+                        }
+                        .padding(.bottom, 28)
+                        
+                        
+                        if !collection.isEmpty {
+                            let rows = collection.chunked(into: 7)
+                            ForEach(rows, id: \.self) { row in
+                                HStack {
+                                    ForEach(row, id: \.id) { pokemonCard in
+                                        Button(action: {
+                                            withAnimation(.easeInOut) {
+                                                selectedCard = pokemonCard
+                                                market = calculateMarketPrice(for: pokemonCard)
+                                                showCollectionDetail = true
+                                            }
+                                        }) {
+                                            AsyncImage(url: URL(string: pokemonCard.lowImageURL)) { image in
+                                                image.resizable().scaledToFit().shadow(color: .white, radius: 2.5).frame(height: geometry.size.width * 0.18)
+                                            } placeholder: {
+                                                Text("Image of Pokemon Card")
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
-                    .offset(y: isSearchActive ? -geometry.size.height * 0.385 : 0)
-                    .animation(.easeInOut(duration: 0.5), value: isSearchActive)
-
-                    // ZStack for the search bar
-                    ZStack(alignment: .leading) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 20, weight: .bold))
-                            .padding(.leading, 20)
-                            .zIndex(1.0)
-
-                        TextField("Search Pokemon:", text: $pokedata, onEditingChanged: { editing in
-                            withAnimation {
-                                isSearchActive = editing
+                    if showCollectionDetail, let selectedCard = selectedCard {
+                        PokemonCardInfo(market: $market, collection: $collection, pokemonCard: selectedCard, onDismiss: {
+                            withAnimation(.easeInOut) {
+                                showCollectionDetail = false
                             }
                         })
-                        .font(.system(size: 25, weight: .medium))
-                        .focused($isSearchFieldFocused)
-                        .autocapitalization(.none)
-                        .padding(.leading, 40)
-                        .padding()
-                        .multilineTextAlignment(.leading)
-                        .background(Color.white)
-                        .cornerRadius(20)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.black, lineWidth: 3)
-                        )
-                        .transition(.move(edge: .top))
-                        .onAppear {
-                            withAnimation(.easeInOut) {
-                                // Trigger the animation
-                            }
-                        }
-                        .onChange(of: pokedata) {
-                            submitPokedata()
-                        }
+                        .transition(.move(edge: .trailing))
+                        .edgesIgnoringSafeArea(.all)
+                        .zIndex(1)
                     }
-                    .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
-                    .offset(y: isSearchActive ? -geometry.size.height * 0.46 : 0)
-                    .animation(.easeInOut(duration: 0.5), value: isSearchActive)
-                    if !isSearchActive {
-                        Text("Enter Pokemon Name or Pokedex #")
-                            .foregroundColor(.white)
-                            .font(.system(size: 20, weight: .bold))
-                            .padding(5)
-                    }
+                    
+                    
+                    
+                    
+                    //                    Image("collection1")
+                    //                        .resizable()
+                    //                        .aspectRatio(contentMode: .fit)
+                    //                        .padding(.bottom)
+                    //
+                    //                    Button(action: {
+                    //                        withAnimation(.easeInOut) {
+                    //                        }
+                    //                    }) {
+                    //                        HStack {
+                    ////                            Image(systemName: "camera")
+                    //                            Text("Pokemon Go Collection")
+                    //                        }
+                    //                        .frame(height: 27)
+                    //                    }
+                    //                    .padding()
+                    //                    .frame(maxWidth: .infinity)
+                    //                    .background(Color.pink)
+                    //                    .cornerRadius(10)
+                    //                    .overlay(
+                    //                        RoundedRectangle(cornerRadius: 10)
+                    //                            .stroke(Color.black, lineWidth: 2)
+                    //                    )
+                    //
+                    //                    Button(action: {
+                    //                        withAnimation(.easeInOut) {
+                    //                        }
+                    //                    }) {
+                    //                        HStack {
+                    ////                            Image(systemName: "camera")
+                    //                            Text("Pokemon Card Collection")
+                    //                        }
+                    //                        .frame(height: 27)
+                    //                    }
+                    //                    .padding()
+                    //                    .frame(maxWidth: .infinity)
+                    //                    .background(Color.green)
+                    //                    .cornerRadius(10)
+                    //                    .overlay(
+                    //                        RoundedRectangle(cornerRadius: 10)
+                    //                            .stroke(Color.black, lineWidth: 2)
+                    //                    )
+                    
+                    
+                    if !showCollectionDetail { Spacer() }
+                }
+                .padding(showCollectionDetail ? 0 : 16)
+            }
+            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
+            .tabItem {
+                Label("Collection", systemImage: "square.on.square")
+            }
+            .tag(3)
+//            NavigationStack {
+//                Text("<Collection>")
+//                    .navigationTitle("Collection")
+//                    .toolbar {
+//                        ToolbarItem (placement: .topBarLeading) {
+//                            Text("PokeData")
+//                        }
+//                        ToolbarItem(placement: .topBarTrailing) {
+//                            Button(action: {
+//                                //todo
+//                            }, label: {
+//                                /*@START_MENU_TOKEN@*/Text("Button")/*@END_MENU_TOKEN@*/
+//                            })
+//                        }
+//                    }
+//            }
+//            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
+
+                
+            
+            // PROFILE TAB BAR
+            GeometryReader { geometry in
+                VStack {
+                    Spacer()
                     
                     
                     Spacer()
@@ -813,6 +851,8 @@ struct ContentView: View {
 //            UINavigationBar.appearance().tintColor = .clear // Customize tint color if needed
 //    }
 
+    
+    
     func submitPokedata() {
             guard let url = URL(string: "http://127.0.0.1:5000/") else {
                 print("Invalid URL")
@@ -833,7 +873,6 @@ struct ContentView: View {
                         DispatchQueue.main.async {
                             fetchedData = pokemonArray
                         }
-                        print(fetchedData)
                     } catch {
                         print("Error converting data to JSON: \(error)")
                         DispatchQueue.main.async {
@@ -878,15 +917,14 @@ struct ContentView: View {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let data = data {
                 do {
-                    // Print the raw JSON data as a string
-                    let jsonString = String(data: data, encoding: .utf8)
-                    print("Received JSON: \(String(describing: jsonString))")
+//                    // Print the raw JSON data as a string
+//                    let jsonString = String(data: data, encoding: .utf8)
+//                    print("Received JSON: \(String(describing: jsonString))")
                     
                     let pokemonCard = try JSONDecoder().decode([PokemonCard].self, from: data)
                     DispatchQueue.main.async {
                         cardData = pokemonCard
                     }
-                    print(cardData)
                 } catch {
                     print("Error converting data to JSON: \(error)")
                     DispatchQueue.main.async {
@@ -899,34 +937,37 @@ struct ContentView: View {
         }.resume()
     }
     
+//    func calculateMultipliers(safeAreaTop: CGFloat) -> (Double, Double) {
+//        if safeAreaTop > 25 {
+//            // notch iphone
+//            return (0.164, 0.1)
+//        } else if safeAreaTop > 20 {
+//            // ipad
+//            return (0.178, 0.1)
+//        } else {
+//            // touch id iphone
+//            return (0.29, 0.15)
+//        }
+//    }
+    
     private func calculateMarketPrice(for pokemoncard: PokemonCard) -> String {
         let error = "N/A"
-        if let normalPrice = pokemoncard.tcgPricesMarket["normal"] {
-            if let price = normalPrice {
-                return String(format: "$%.2f USD", normalPrice!)
+        let priceTypes = [
+            "normal",
+            "holofoil",
+            "firstEditionHolofoil",
+            "firstEditionNormal",
+            "reverseHolofoil"
+        ]
+        
+        for type in priceTypes {
+            if let price = pokemoncard.tcgPricesMarket[type], let unwrappedPrice = price {
+                return String(format: "%.2f USD", unwrappedPrice)
             }
         }
-        if let holofoilPrice = pokemoncard.tcgPricesMarket["holofoil"] {
-            if let price = holofoilPrice {
-                return String(format: "$%.2f USD", holofoilPrice!)
-            }
-        }
-        if let firstEditionHolofoilPrice = pokemoncard.tcgPricesMarket["firstEditionHolofoil"] {
-            if let price = firstEditionHolofoilPrice {
-                return String(format: "$%.2f USD", firstEditionHolofoilPrice!)
-            }
-        }
-        if let firstEditionNormalPrice = pokemoncard.tcgPricesMarket["firstEditionNormal"] {
-            if let price = firstEditionNormalPrice {
-                return String(format: "$%.2f USD", firstEditionNormalPrice!)
-            }
-        }
-        if let reverseHolofoilPrice = pokemoncard.tcgPricesMarket["reverseHolofoil"] {
-            if let price = reverseHolofoilPrice {
-                return String(format: "$%.2f USD", reverseHolofoilPrice!)
-            }
-        }
+        
         return error
+    
 //        let error = "No Market Price Available"
 //        if let normalPrice = pokemoncard.tcgPricesMarket["normal"] {
 //            if let price = normalPrice {
@@ -944,7 +985,7 @@ struct ContentView: View {
 //                        if let price = firstEditionNormalPrice {
 //                            return String(format: "$%.2f USD", firstEditionNormalPrice!)
 //                        }
-//                        else if let reverseHolofoilPrice = pokemoncard.tcgPricesMarket["reverseHolofoil"] {
+//                       else if let reverseHolofoilPrice = pokemoncard.tcgPricesMarket["reverseHolofoil"] {
 //                            if let price = reverseHolofoilPrice {
 //                                return String(format: "$%.2f USD", reverseHolofoilPrice!)
 //                            }
@@ -956,52 +997,17 @@ struct ContentView: View {
 //        return error
         
     }
-
-    
-    
-    
-//    func fetchPokedata() {
-//        guard let url = URL(string: "http://127.0.0.1:5000/") else {
-//            print("Invalid URL")
-//            return
-//        }
-//
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//
-//        URLSession.shared.dataTask(with: request) { data, response, error in
-//            if let data = data {
-//                do {
-//                    let pokemonArray = try JSONDecoder().decode([Pokemon].self, from: data)
-//                    DispatchQueue.main.async {
-//                        fetchedData = pokemonArray
-//                    }
-//                    
-//                } catch {
-//                    print("Error converting data to JSON: \(error)")
-//                    DispatchQueue.main.async {
-//                        print("THERES SOMETHING WRONG")
-//                        fetchedData = []
-//                    }
-//                }
-//            }
-//        }.resume()
-//    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
 }
 
-
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        stride(from: 0, to: count, by: size).map {
+            Array(self[$0..<Swift.min($0 + size, count)])
+        }
+    }
+}
 
 #Preview {
     ContentView()
@@ -1145,51 +1151,99 @@ struct ContentView: View {
 //    let market: Double?
 //    let directLow: Double?
 //}
-//
 
-//    func submitPokecard() {
-//        guard let url = URL(string: "http://127.0.0.1:5000/cards") else {
-//                print("Invalid URL")
-//                return
+
+// alternate form for search screen
+//GeometryReader { geometry in
+//    ZStack {
+//        // Background that slides in
+//        if isSearchActive {
+//            Rectangle()
+//            // change opacity to whatever u want
+//                .foregroundColor(Color.white.opacity(0.5))
+//                .frame(height: geometry.size.height * 0.46)
+//                .offset(y: -geometry.size.height * 0.3)
+//                .transition(.move(edge: .top))
+//                .animation(.easeInOut(duration: 1.0), value: isSearchActive)
+//        }
+//    }
+//    VStack {
+//        Spacer()
+//        if !isSearchActive {
+//            Image("pokeball")
+//                .resizable()
+//                .aspectRatio(contentMode: .fit)
+//        }
+//        // ZStack for the button
+//        ZStack {
+//            if isSearchActive {
+//                Button(action: {
+//                    withAnimation(.easeInOut(duration: 1.0)) {
+//                        isSearchActive.toggle()
+//                        isSearchFieldFocused = false
+//                    }
+//                }) {
+//                    Image(systemName: "chevron.backward")
+//                        .font(.system(size: 35, weight: .bold))
+//                }
+//                .frame(maxWidth: .infinity, alignment: .leading)
 //            }
+//        }
+//        .offset(y: isSearchActive ? -geometry.size.height * 0.385 : 0)
+//        .animation(.easeInOut(duration: 0.5), value: isSearchActive)
 //
-//            var request = URLRequest(url: url)
-//        
-//            request.httpMethod = "POST"
-//            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-//            let bodyData = "pokecard=\(pokecard)"
-//            request.httpBody = bodyData.data(using: .utf8
-//        
-//        URLSession.shared.dataTask(with: request) { data, response, error in
-//                    if let error = error {
-//                        print("HTTP Request Failed: \(error.localizedDescription)")
-//                        DispatchQueue.main.async {
-//                            cardData = []
-//                        }
-//                        return
-//                    }
+//        // ZStack for the search bar
+//        ZStack(alignment: .leading) {
+//            Image(systemName: "magnifyingglass")
+//                .font(.system(size: 20, weight: .bold))
+//                .padding(.leading, 20)
+//                .zIndex(1.0)
 //
-//                    guard let data = data else {
-//                        print("No data received")
-//                        DispatchQueue.main.async {
-//                            cardData = []
-//                        }
-//                        return
-//                    }
-//
-//                    do {
-//                        let pokemonCardArray = try JSONDecoder().decode([PokemonCard].self, from: data)
-//                        DispatchQueue.main.async {
-//                            cardData = pokemonCardArray
-//                        }
-//                        print("Valid JSON Data")
-//                        print(cardData)
-//                    } catch {
-//                        print("Error decoding JSON: \(error)")
-//                        DispatchQueue.main.async {
-//                            cardData = []
-//                        }
-//                    }
-//                }.resume()
+//            TextField("Search Pokemon:", text: $pokedata, onEditingChanged: { editing in
+//                withAnimation {
+//                    isSearchActive = editing
+//                }
+//            })
+//            .font(.system(size: 25, weight: .medium))
+//            .focused($isSearchFieldFocused)
+//            .autocapitalization(.none)
+//            .padding(.leading, 40)
+//            .padding()
+//            .multilineTextAlignment(.leading)
+//            .background(Color.white)
+//            .cornerRadius(20)
+//            .overlay(
+//                RoundedRectangle(cornerRadius: 20)
+//                    .stroke(Color.black, lineWidth: 3)
+//            )
+//            .transition(.move(edge: .top))
+//            .onAppear {
+//                withAnimation(.easeInOut) {
+//                    // Trigger the animation
+//                }
+//            }
+//            .onChange(of: pokedata) {
+//                submitPokedata()
+//            }
+//        }
+//        .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
+//        .offset(y: isSearchActive ? -geometry.size.height * 0.46 : 0)
+//        .animation(.easeInOut(duration: 0.5), value: isSearchActive)
+//        if !isSearchActive {
+//            Text("Enter Pokemon Name or Pokedex #")
+//                .foregroundColor(.white)
+//                .font(.system(size: 20, weight: .bold))
+//                .padding(5)
 //        }
 //
+//
+//        Spacer()
+//    }
+//    .padding()
+//}
+//.background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
+//.tabItem {
+//    Label("Profile", systemImage: "person.fill")
+//}
+//.tag(4)
+//}

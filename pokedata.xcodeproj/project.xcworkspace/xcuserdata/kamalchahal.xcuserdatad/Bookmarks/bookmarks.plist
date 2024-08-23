@@ -12,13 +12,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>194</string>
+					<string>200</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>193</string>
+					<string>199</string>
 					<key>Timestamp</key>
-					<string>745870466.512104</string>
+					<string>746059488.3523329</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -57,13 +57,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>405</string>
+					<string>411</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>404</string>
+					<string>410</string>
 					<key>Timestamp</key>
-					<string>745870466.512145</string>
+					<string>746059488.352136</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -102,13 +102,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>628</string>
+					<string>634</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>627</string>
+					<string>633</string>
 					<key>Timestamp</key>
-					<string>745906991.291891</string>
+					<string>746072947.384611</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -132,8 +132,8 @@
 </string>
 				<key>trailing</key>
 				<string>            GeometryReader { geometry in
-                        VStack {
-                            Spacer()
+                VStack {
+                    Spacer()
 </string>
 			</dict>
 			<key>type</key>
@@ -147,13 +147,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>676</string>
+					<string>653</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>675</string>
+					<string>652</string>
 					<key>Timestamp</key>
-					<string>745906991.291907</string>
+					<string>746072947.384824</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -176,9 +176,9 @@
         
 </string>
 				<key>trailing</key>
-				<string>            NavigationStack {
-                Text("&lt;Collection&gt;")
-                    .navigationTitle("Collection")
+				<string>            GeometryReader { geometry in
+                ZStack {
+                    // Background that slides in
 </string>
 			</dict>
 			<key>type</key>
@@ -192,13 +192,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>700</string>
+					<string>816</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>699</string>
+					<string>815</string>
 					<key>Timestamp</key>
-					<string>745906991.291854</string>
+					<string>746073562.051306</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -217,13 +217,13 @@
 				<string>            // PROFILE TAB BAR
 </string>
 				<key>leading</key>
-				<string>                .tag(3)
+				<string>                
             
 </string>
 				<key>trailing</key>
 				<string>            GeometryReader { geometry in
-                ZStack {
-                    // Background that slides in
+                VStack {
+                    Spacer()
 </string>
 			</dict>
 			<key>type</key>

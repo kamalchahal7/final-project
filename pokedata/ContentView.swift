@@ -135,7 +135,6 @@ struct PokemonCard: Decodable, Identifiable, Equatable, Hashable {
     let setImagesLogo: String?
 }
 
-
 struct ContentView: View {
     // Inputed Data on Search Tab Bar
     @State private var pokedata: String = ""
@@ -146,7 +145,7 @@ struct ContentView: View {
     // Returned Data from TCG API
     @State private var cardData: [PokemonCard] = []
     // Initial Tab
-    @State private var selectedTab = 3
+    @State private var selectedTab = 4
     // Checks if search bar is active or not
     @State private var isSearchActive: Bool = false
     // Checks if someone has submitted a search
@@ -178,8 +177,16 @@ struct ContentView: View {
     @State private var market: String = ""
     // holds all the collected pokemon cards
     @State private var collection: [PokemonCard] = []
-    
-
+    // holds the inputted username
+    @State private var username: String = "kamal7"
+    // holds inputtted password
+    @State private var password: String = ""
+    // Checks whether registerview should be shown or not
+    @State private var showRegisterView = false
+    // Checks whether loginview should be shown or not
+    @State private var showLoginView = true
+    // date of registration
+    @State public var date = Date()
     
 //    init() {
 //            setupNavigationBarAppearance()
@@ -817,8 +824,17 @@ struct ContentView: View {
             GeometryReader { geometry in
                 VStack {
                     Spacer()
-                    
-                    
+                    if showLoginView || showRegisterView {
+                        if showLoginView {
+                            LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView)
+                        }
+                        if showRegisterView {
+                            RegisterView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, date: $date)
+                        }
+                    }
+                    else {
+                        ProfileTabView(date: $date, showLoginView: $showLoginView, collectionCount: $collection.count)
+                    }
                     Spacer()
                 }
                 .padding()

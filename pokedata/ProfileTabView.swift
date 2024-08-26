@@ -57,6 +57,7 @@ struct ProfileTabView: View {
                 List {
                     Section(header: Text("Account")) {
                         Text("Personal Details")
+                        Text("Change Password")
                         Text("View History")
                     }
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))

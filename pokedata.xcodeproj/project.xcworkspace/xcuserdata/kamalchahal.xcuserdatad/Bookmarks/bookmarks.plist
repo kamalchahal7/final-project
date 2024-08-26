@@ -18,7 +18,7 @@
 					<key>StartingLineNumber</key>
 					<string>206</string>
 					<key>Timestamp</key>
-					<string>746170247.3853689</string>
+					<string>746300727.4505939</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -63,7 +63,7 @@
 					<key>StartingLineNumber</key>
 					<string>417</string>
 					<key>Timestamp</key>
-					<string>746170247.385289</string>
+					<string>746300727.450646</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -108,7 +108,7 @@
 					<key>StartingLineNumber</key>
 					<string>640</string>
 					<key>Timestamp</key>
-					<string>746170247.38516</string>
+					<string>746300727.4506119</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -153,7 +153,7 @@
 					<key>StartingLineNumber</key>
 					<string>659</string>
 					<key>Timestamp</key>
-					<string>746170247.385242</string>
+					<string>746300727.450629</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -198,7 +198,7 @@
 					<key>StartingLineNumber</key>
 					<string>822</string>
 					<key>Timestamp</key>
-					<string>746170247.385331</string>
+					<string>746300727.450534</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -222,8 +222,8 @@
 </string>
 				<key>trailing</key>
 				<string>            GeometryReader { geometry in
+//                let isNotchDevice = geometry.safeAreaInsets.top
                 VStack {
-                    Spacer()
 </string>
 			</dict>
 			<key>type</key>

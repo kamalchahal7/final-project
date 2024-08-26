@@ -186,7 +186,7 @@ struct ContentView: View {
     // Checks whether loginview should be shown or not
     @State private var showLoginView = true
     // date of registration
-    @State public var date = Date()
+    @State public var currentDate = Date()
     
 //    init() {
 //            setupNavigationBarAppearance()
@@ -822,22 +822,22 @@ struct ContentView: View {
             
             // PROFILE TAB BAR
             GeometryReader { geometry in
+//                let isNotchDevice = geometry.safeAreaInsets.top
                 VStack {
-                    Spacer()
                     if showLoginView || showRegisterView {
                         if showLoginView {
                             LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView)
                         }
                         if showRegisterView {
-                            RegisterView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, date: $date)
+                            RegisterView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, currentDate: $currentDate)
+//                                .padding(.top, isNotchDevice > 25 ? 35 : 0)
                         }
                     }
                     else {
-                        ProfileTabView(date: $date, showLoginView: $showLoginView, collectionCount: $collection.count)
+                        ProfileTabView(date: $currentDate, showLoginView: $showLoginView, collectionCount: $collection.count)
                     }
-                    Spacer()
                 }
-                .padding()
+                .padding(showRegisterView ? 0 : 16)
             }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {

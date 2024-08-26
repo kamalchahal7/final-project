@@ -10,7 +10,10 @@ import pytz
 utc_time = datetime.now(pytz.timezone('UTC'))
 est_time = utc_time.astimezone(pytz.timezone('US/Eastern'))
 
-from functions import lookup, search, find
+from functions import lookup, search, find, date_formatter
+
+import re
+pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 # Configure application
 app = Flask(__name__)
@@ -21,7 +24,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///pokedex.db")
+db = SQL("sqlite:///accounts.db")
 
 # Configure Images in a File Directory
 image_folder = 'archive_new/'
@@ -70,9 +73,72 @@ def tcg():
         if not pokecard:
             return "Oops! Please enter the name/id of a Valid Pokemon Card", 400
         
-        print(pokecard[0])
+        print(pokecard[1])
         # pokecard = serialize(pokecard)
         return jsonify(pokecard), 200
     else: 
         return jsonify({}), 200
+    
+@app.route("/register", methods = ["GET", "POST"])
+def register(): 
+    """ Register User """
+    if request.method == "POST":
+        first_name = request.form.get("firstName")
+        last_name = request.form.get("lastName")
+        date_of_birth = request.form.get("birthDate")
+        email = request.form.get("email")
+        username = request.form.get("username")
+        password = request.form.get("password")
+        confirmation = request.form.get("confirmPassword")
+
+        # checks if all has been provided or not
+        if not first_name and last_name and date_of_birth and email and username and password and confirmation:
+            print("Data Missing")
+            return "Registration Incomplete", 400
+        else: 
+            print("Data Received Successfully")
+
+        # checks that password and confirmation password are the same
+        print(password)
+        print(confirmation)
+        print(date_of_birth)
+        if not password == confirmation:
+            return "Passwords don't match", 400
+        
+        # checks if email inputted is a valid email
+        if not re.match(pattern, email):
+            return "Invalid Email", 400
+        
+        # Check if username or email already exists
+        print(username)
+        print(email)
+        users = db.execute("SELECT username, email FROM users")
+
+        for user in users:
+            if user['username'] == username:
+                return "Username Already Taken", 400
+            if user['email'] == email:
+                return "Email is already Registered With an Existing Account", 400
+        
+        # register new user
+        db.execute("INSERT INTO users (username, password_hash, email, first_name, last_name, date_of_birth) VALUES(?, ?, ?, ?, ?, ?)",
+                   username, generate_password_hash(password), email, first_name, last_name, date_formatter(date_of_birth))
+        # check 
+        usernames = db.execute("SELECT username FROM users")
+        emails = db.execute("SELECT email FROM users")
+
+        return jsonify({}), 200
+
+    else:
+        usernames = [row['username'] for row in db.execute("SELECT username FROM users")]
+        emails = [row['email'] for row in db.execute("SELECT email FROM users")]
+
+        data = {
+            "username": usernames,
+            "email": emails
+        }
+
+        return jsonify(data), 200
+    
+
 

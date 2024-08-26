@@ -1,5 +1,6 @@
 from cs50 import SQL
 from pokemontcgsdk import Card, Set, Type, Supertype, Subtype, Rarity, RestClient, PokemonTcgException
+from datetime import datetime
 # import pokemontcgsdk
 
 
@@ -32,7 +33,7 @@ def find(value):
     names = []
 
     try:
-        cards = Card.where(q=f'name:{value}* supertype:pokemon')
+        cards = Card.where(q=f'name:{value}*')
     except PokemonTcgException:
         print("Failed to find pokemon card.")
         return None
@@ -83,25 +84,19 @@ def find(value):
 
         # Checks if a Card has a Weakness
         if card.weaknesses:
-            weaknessesType = []
-            weaknessesValue = []
-            for weakness in card.weaknesses:
-                weaknessesType.append(weakness.type)
-                weaknessesValue.append(weakness.value)
+            weaknessType = card.weaknesses[0].type
+            weaknessValue = card.weaknesses[0].value
         else:
-            weaknessesType = None
-            weaknessesValue = None
+            weaknessType = None
+            weaknessValue = None
 
         # Checks if a Card has a Resistance
         if card.resistances:
-            resistancesType = []
-            resistancesValue = []
-            for resistance in card.resistances:
-                resistancesType.append(resistance.type)
-                resistancesValue.append(resistance.value)
+            resistanceType = card.resistances[0].type
+            resistanceValue = card.resistances[0].value
         else:
-            resistancesType = None
-            resistancesValue = None
+            resistanceType = None
+            resistanceValue = None
 
         # Checks the various available prices of a card
         if card.tcgplayer:
@@ -179,9 +174,9 @@ def find(value):
             "abilitiesName": abilitiesName,
             "abilitiesText": abilitiesText, "abilitiesType": abilitiesType, "attacksCost": attacksCost, 
             "attacksName": attacksName, "attacksText": attacksText, "attacksDamage": attacksDamage, 
-            "attacksConvertedEnergyCost": attacksConvertedEnergyCost, "weaknessesType": weaknessesType, 
-            "weaknessesValue": weaknessesValue,
-            "resistancesType": resistancesType, "resistancesValue": resistancesValue,
+            "attacksConvertedEnergyCost": attacksConvertedEnergyCost, "weaknessType": weaknessType, 
+            "weaknessValue": weaknessValue,
+            "resistanceType": resistanceType, "resistanceValue": resistanceValue,
             "retreatCost": card.retreatCost, "convertedRetreatCost": card.convertedRetreatCost, "number": card.number,
             "artist": card.artist, "rarity": card.rarity, "flavorText": card.flavorText, "nationalPokedexNumbers": card.nationalPokedexNumbers,
             "legalitiesStandard": card.legalities.standard, "legalitiesExpanded": card.legalities.expanded, 
@@ -195,6 +190,12 @@ def find(value):
             "setUpdatedAt": card.set.updatedAt, "setImagesSymbol": card.set.images.symbol, "setImagesLogo": card.set.images.logo
         })
     return names
+
+def date_formatter(time):
+    print(time)
+    time = time.strip().split()[0]
+    return time
+
 
 # def serialize(obj):
 #     if hasattr(obj, '__dict__'):

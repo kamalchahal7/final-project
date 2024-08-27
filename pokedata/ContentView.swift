@@ -185,8 +185,12 @@ struct ContentView: View {
     @State private var showRegisterView = false
     // Checks whether loginview should be shown or not
     @State private var showLoginView = true
-    // date of registration
-    @State public var currentDate = Date()
+    // backend error message
+    @State private var message: String = ""
+    // backend error code
+    @State private var errorCode: String = ""
+    // checks if backend pciked up a fault
+    @State private var fault: Bool = false
     
 //    init() {
 //            setupNavigationBarAppearance()
@@ -826,15 +830,15 @@ struct ContentView: View {
                 VStack {
                     if showLoginView || showRegisterView {
                         if showLoginView {
-                            LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView)
+                            LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault)
                         }
                         if showRegisterView {
-                            RegisterView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, currentDate: $currentDate)
+                            RegisterView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault)
 //                                .padding(.top, isNotchDevice > 25 ? 35 : 0)
                         }
                     }
                     else {
-                        ProfileTabView(date: $currentDate, showLoginView: $showLoginView, collectionCount: $collection.count)
+                        ProfileTabView(showLoginView: $showLoginView, collectionCount: $collection.count)
                     }
                 }
                 .padding(showRegisterView ? 0 : 16)

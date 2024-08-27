@@ -7,11 +7,26 @@
 
 import SwiftUI
 
+enum RegisterField {
+    case firstName
+    case lastName
+    case birthDate
+    case email
+    case username
+    case password
+    case confirmPassword
+}
 struct RegisterView: View {
     @Binding var showLoginView: Bool
     @Binding var showRegisterView: Bool
-    @Binding var currentDate: Date
+    // backend error message
+    @Binding var message: String
+    // backend error code
+    @Binding var errorCode: String
+    // checks if backend pciked up a fault
+    @Binding var fault: Bool
     
+    // text field values
     @State private var firstName: String = ""
     @State private var lastName: String = ""
     @State private var birthDate = Date()
@@ -19,11 +34,20 @@ struct RegisterView: View {
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var confirmPassword: String = ""
-    @State private var registered: Bool = false
-    @State private var focused: [Bool] = [false, false, false, false, false, false]
+    
+    // text field errors
+    @State private var nameError: String? = nil
+    @State private var birthDateError: String? = nil
+    @State private var emailError: String? = nil
+    @State private var usernameError: String? = nil
+    @State private var passwordError: String? = nil
+    @State private var confirmPasswordError: String? = nil
+    
     @State private var existingUserData: Dictionary = [:]
-    @State private var uniqueCheck: [Bool] = [false, false]
     @State private var shown: Bool = false
+    
+    @FocusState private var focused: RegisterField?
+
     
     let startDate = Calendar.current.date(byAdding: .year, value: -129, to: Date())!
     let endDate = Date()
@@ -43,6 +67,13 @@ struct RegisterView: View {
                 }
                 .padding()
                 Spacer()
+            }
+            .alert(isPresented: $fault) {
+                Alert(
+                    title: Text("Status Code: \(errorCode)"),
+                    message: Text("Something went wrong: \(message)"),
+                    dismissButton: .default(Text("OK"))
+                )
             }
             .if(!isNotchDevice) { view in
                 ScrollView { view }
@@ -67,8 +98,9 @@ struct RegisterView: View {
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color.black, lineWidth: 3)
                     )
-                    .onTapGesture {
-                        focused[0] = true
+                    .focused($focused, equals: .firstName)
+                    .onChange(of: firstName) {
+                        nameError = nil
                     }
                 TextField("Last Name", text: $lastName)
                     .padding()
@@ -77,20 +109,19 @@ struct RegisterView: View {
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color.black, lineWidth: 3)
                     )
-                    .onTapGesture {
-                        focused[0] = true
+                    .focused($focused, equals: .lastName)
+                    .onChange(of: lastName) {
+                        nameError = nil
                     }
             }
             .multilineTextAlignment(.leading)
             .autocorrectionDisabled(true)
             .font(.system(size: 20, weight: .medium))
             .background(Color.white)
-            if registered && !focused[0] && (firstName.isEmpty || lastName.isEmpty) {
-                Text("*Please enter your first & last Name")
-                    .foregroundStyle(Color.red)
-                    .onAppear {
-                        print("Condition met")
-                    }
+            
+            // displays name error message
+            if let error = nameError {
+                Text(error).foregroundStyle(Color.red)
             }
             
             GroupBox {
@@ -100,7 +131,8 @@ struct RegisterView: View {
                     Spacer()
                     Button {
                         withAnimation(.easeInOut) {
-                            focused[1] = true
+                            birthDateError = nil
+                            focused = .birthDate
                             shown.toggle()
                         }
                     } label: {
@@ -122,7 +154,7 @@ struct RegisterView: View {
                     Divider()
                     Button(action: {
                         // Handle the submission of the selected date
-                        print("Selected date: \(birthDate)")
+//                        print("Selected date: \(birthDate)")
                         withAnimation(.easeInOut) {
                             shown.toggle()
                         }
@@ -141,10 +173,12 @@ struct RegisterView: View {
                     .stroke(Color.black, lineWidth: 3)
             )
             .padding(.top, 8)
-            if registered && !focused[1] && dateClipper(birthDate) == dateClipper(Date()) {
-                Text("*Please enter your date of birth")
-                    .foregroundStyle(Color.red)
+            
+            // displays birthdate error message
+            if let error = birthDateError {
+                Text(error).foregroundStyle(Color.red)
             }
+            
             
             TextField("Email", text: $email)
                 .font(.system(size: 20, weight: .medium))
@@ -159,28 +193,14 @@ struct RegisterView: View {
                         .stroke(Color.black, lineWidth: 3)
                 )
                 .padding(.top, 8)
-                .onTapGesture {
-                    focused[2] = true
-                }
+                .focused($focused, equals: .email)
                 .onChange(of: email) {
-                        // Update the state when username changes
-                        if let existingUsernames = existingUserData["email"] as? [String] {
-                            if existingUsernames.contains(email) {
-                                uniqueCheck[0] = true
-                            } else {
-                                uniqueCheck[0] = false
-                            }
-                        }
-                    }
-            
-            if registered && !focused[2] {
-                if !isValidEmail(email) {
-                    Text("*Please enter a valid email address")
-                        .foregroundStyle(Color.red)
-                } else if uniqueCheck[0] {
-                    Text("*Username already taken")
-                        .foregroundColor(.red)
+                    emailError = nil
                 }
+            
+            // displays email error message
+            if let error = emailError {
+                Text(error).foregroundStyle(Color.red)
             }
             
             TextField("Username", text: $username)
@@ -196,30 +216,16 @@ struct RegisterView: View {
                         .stroke(Color.black, lineWidth: 3)
                 )
                 .padding(.top, 8)
-                .onTapGesture {
-                    focused[3] = true
-                }
+                .focused($focused, equals: .username)
                 .onChange(of: username) {
-                        // Update the state when username changes
-                        if let existingUsernames = existingUserData["username"] as? [String] {
-                            if existingUsernames.contains(username) {
-                                uniqueCheck[1] = true
-                            } else {
-                                uniqueCheck[1] = false
-                            }
-                        }
-                    }
-
-            // Now conditionally display the error message
-            if registered && !focused[3] {
-                if username.isEmpty {
-                    Text("*Please enter a username")
-                        .foregroundStyle(Color.red)
-                } else if uniqueCheck[1] {
-                    Text("*Username already taken")
-                        .foregroundColor(.red)
+                    usernameError = nil
                 }
+
+            // displays username error message
+            if let error = usernameError {
+                Text(error).foregroundStyle(Color.red)
             }
+            
             
             SecureField("Password", text: $password)
                 .font(.system(size: 20, weight: .medium))
@@ -227,6 +233,7 @@ struct RegisterView: View {
                 .autocorrectionDisabled(true)
                 .padding()
                 .multilineTextAlignment(.leading)
+                .background(Color.white)
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
@@ -234,12 +241,14 @@ struct RegisterView: View {
                 )
                 .padding(.top, 8)
                 .textContentType(.oneTimeCode)
-                .onTapGesture {
-                    focused[4] = true
+                .focused($focused, equals: .password)
+                .onChange(of: password) {
+                    passwordError = nil
                 }
-            if registered && !focused[4] && password.isEmpty {
-                Text("*Please enter a password")
-                    .foregroundStyle(Color.red)
+            
+            // displays password error message
+            if let error = passwordError {
+                Text(error).foregroundStyle(Color.red)
             }
             
             SecureField("Confirm Password", text: $confirmPassword)
@@ -248,6 +257,7 @@ struct RegisterView: View {
                 .autocorrectionDisabled(true)
                 .padding()
                 .multilineTextAlignment(.leading)
+                .background(Color.white)
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
@@ -255,18 +265,14 @@ struct RegisterView: View {
                 )
                 .padding(.top, 8)
                 .textContentType(.oneTimeCode)
-                .onTapGesture {
-                    focused[5] = true
+                .focused($focused, equals: .confirmPassword)
+                .onChange(of: confirmPassword) {
+                    confirmPasswordError = nil
                 }
-            if registered && !focused[5] {
-                if confirmPassword.isEmpty {
-                    Text("*Please confirm password")
-                        .foregroundStyle(Color.red)
-                }
-                else if confirmPassword != password {
-                    Text("*Password confirmation doesn't match")
-                        .foregroundStyle(Color.red)
-                }
+            
+            // displays confirmation password error message
+            if let error = confirmPasswordError {
+                Text(error).foregroundStyle(Color.red)
             }
             
             HStack {
@@ -284,17 +290,50 @@ struct RegisterView: View {
                 }
                 Spacer()
                 Button(action: {
-                    registered = true
-                    for index in focused.indices {
-                        focused[index] = false
+                    if firstName.isEmpty || lastName.isEmpty {
+                        nameError = "*Please enter your first & last Name"
                     }
-                    if !firstName.isEmpty && !lastName.isEmpty && dateClipper(birthDate) != dateClipper(Date()) && !email.isEmpty && !username.isEmpty && !password.isEmpty && password == confirmPassword && !uniqueCheck[0] && !uniqueCheck[1] {
-                        currentDate = Date()
-                        submitRegistration()
-                        withAnimation(.easeInOut) {
-                            showRegisterView.toggle()
+                    if dateClipper(birthDate) == dateClipper(Date()) {
+                        birthDateError = "*Please enter your date of birth"
+                    }
+                    if !isValidEmail(email) {
+                        emailError = "*Please enter your date of birth"
+                    } else if let existingUsernames = existingUserData["email"] as? [String] {
+                        if existingUsernames.contains(email) {
+                            emailError = "Email already registered"
                         }
                     }
+                    if username.isEmpty {
+                        usernameError = "*Please enter a username"
+                    } else if let existingUsernames = existingUserData["username"] as? [String] {
+                        if existingUsernames.contains(username) {
+                            usernameError = "*Username already taken"
+                        }
+                    }
+                    if password.isEmpty {
+                        passwordError = "*Please enter a password"
+                    }
+                    if confirmPassword.isEmpty {
+                        confirmPasswordError = "*Please confirm password"
+                    } else if confirmPassword != password {
+                        confirmPasswordError = "Password confirmation doesn't match"
+                    }
+                    
+                    focused = nil
+                    
+                    // frontend error checking
+                    if nameError == nil && birthDateError == nil && emailError == nil && usernameError == nil && passwordError == nil {
+                        // submits registration data to backend
+                        submitRegistration { fault in
+                            // backend errror checking
+                            if !fault {
+                                withAnimation(.easeInOut) {
+                                    showRegisterView.toggle()
+                                }
+                            }
+                        }
+                    }
+
                 }) {
                     Text("Register")
                         .font(.system(size: 15, weight: .bold))
@@ -311,7 +350,7 @@ struct RegisterView: View {
         }
     }
     
-    func submitRegistration() {
+    func submitRegistration(completion: @escaping (Bool) -> Void) {
         guard let url = URL(string: "http://127.0.0.1:5000/register") else {
             print("Invalid URL")
             return
@@ -324,11 +363,26 @@ struct RegisterView: View {
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("Error \(error)")
-                return
+                print("Error: \(error)")
             }
             if let data = data {
-                print("response \(String(data: data, encoding: .utf8) ?? "No response")")
+                if let httpResponse = response as? HTTPURLResponse {
+                    if httpResponse.statusCode >= 400 {
+                        DispatchQueue.main.async {
+                            message = String(data: data, encoding: .utf8) ?? "No response"
+                            errorCode = "\(httpResponse.statusCode)"
+                            fault = true
+                            completion(fault)
+                        }
+                    } else {
+                        // Handle successful response
+                        completion(fault)
+                    }
+                }
+                
+            } else if let error = error {
+                print("HTTP Request Failed \(error)")
+                completion(fault)
             }
         }.resume()
     }
@@ -391,7 +445,7 @@ extension View {
 }
 
 #Preview {
-    RegisterView(showLoginView: .constant(false), showRegisterView: .constant(true), currentDate: .constant(Date()))
+    RegisterView(showLoginView: .constant(false), showRegisterView: .constant(true), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false))
 }
 
 // CODE TO MAKE AN ERROR VIEW PAGE

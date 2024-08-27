@@ -12,13 +12,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>207</string>
+					<string>211</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>206</string>
+					<string>210</string>
 					<key>Timestamp</key>
-					<string>746300727.4505939</string>
+					<string>746427423.6956871</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -57,13 +57,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>418</string>
+					<string>422</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>417</string>
+					<string>421</string>
 					<key>Timestamp</key>
-					<string>746300727.450646</string>
+					<string>746427423.6955529</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -102,13 +102,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>641</string>
+					<string>645</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>640</string>
+					<string>644</string>
 					<key>Timestamp</key>
-					<string>746300727.4506119</string>
+					<string>746427423.695628</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -147,13 +147,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>660</string>
+					<string>664</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>659</string>
+					<string>663</string>
 					<key>Timestamp</key>
-					<string>746300727.450629</string>
+					<string>746427423.69566</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -192,13 +192,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>823</string>
+					<string>827</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>822</string>
+					<string>826</string>
 					<key>Timestamp</key>
-					<string>746300727.450534</string>
+					<string>746427423.695713</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -228,6 +228,195 @@
 			</dict>
 			<key>type</key>
 			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>children</key>
+			<array>
+				<dict>
+					<key>destination</key>
+					<dict>
+						<key>location-parameters</key>
+						<dict>
+							<key>EndingColumnNumber</key>
+							<string>0</string>
+							<key>EndingLineNumber</key>
+							<string>201</string>
+							<key>StartingColumnNumber</key>
+							<string>0</string>
+							<key>StartingLineNumber</key>
+							<string>200</string>
+							<key>Timestamp</key>
+							<string>746430437.216522</string>
+						</dict>
+						<key>rebasable-url</key>
+						<dict>
+							<key>base</key>
+							<string>workspace</string>
+							<key>payload</key>
+							<dict>
+								<key>relative-path</key>
+								<string>pokedata/RegisterView.swift</string>
+							</dict>
+						</dict>
+					</dict>
+					<key>text-context</key>
+					<dict>
+						<key>focused</key>
+						<string>            // displays email error message
+</string>
+						<key>leading</key>
+						<string>                }
+            
+</string>
+						<key>trailing</key>
+						<string>            if let error = emailError {
+                Text(error).foregroundStyle(Color.red)
+            }
+</string>
+					</dict>
+					<key>type</key>
+					<string>bookmark</string>
+				</dict>
+				<dict>
+					<key>destination</key>
+					<dict>
+						<key>location-parameters</key>
+						<dict>
+							<key>EndingColumnNumber</key>
+							<string>0</string>
+							<key>EndingLineNumber</key>
+							<string>224</string>
+							<key>StartingColumnNumber</key>
+							<string>0</string>
+							<key>StartingLineNumber</key>
+							<string>223</string>
+							<key>Timestamp</key>
+							<string>746430437.2165509</string>
+						</dict>
+						<key>rebasable-url</key>
+						<dict>
+							<key>base</key>
+							<string>workspace</string>
+							<key>payload</key>
+							<dict>
+								<key>relative-path</key>
+								<string>pokedata/RegisterView.swift</string>
+							</dict>
+						</dict>
+					</dict>
+					<key>text-context</key>
+					<dict>
+						<key>focused</key>
+						<string>            // displays username error message
+</string>
+						<key>leading</key>
+						<string>                }
+
+</string>
+						<key>trailing</key>
+						<string>            if let error = usernameError {
+                Text(error).foregroundStyle(Color.red)
+            }
+</string>
+					</dict>
+					<key>type</key>
+					<string>bookmark</string>
+				</dict>
+				<dict>
+					<key>destination</key>
+					<dict>
+						<key>location-parameters</key>
+						<dict>
+							<key>EndingColumnNumber</key>
+							<string>0</string>
+							<key>EndingLineNumber</key>
+							<string>249</string>
+							<key>StartingColumnNumber</key>
+							<string>0</string>
+							<key>StartingLineNumber</key>
+							<string>248</string>
+							<key>Timestamp</key>
+							<string>746430854.354095</string>
+						</dict>
+						<key>rebasable-url</key>
+						<dict>
+							<key>base</key>
+							<string>workspace</string>
+							<key>payload</key>
+							<dict>
+								<key>relative-path</key>
+								<string>pokedata/RegisterView.swift</string>
+							</dict>
+						</dict>
+					</dict>
+					<key>text-context</key>
+					<dict>
+						<key>focused</key>
+						<string>            // displays password error message
+</string>
+						<key>leading</key>
+						<string>                }
+            
+</string>
+						<key>trailing</key>
+						<string>            if let error = passwordError {
+                Text(error).foregroundStyle(Color.red)
+            }
+</string>
+					</dict>
+					<key>type</key>
+					<string>bookmark</string>
+				</dict>
+				<dict>
+					<key>destination</key>
+					<dict>
+						<key>location-parameters</key>
+						<dict>
+							<key>EndingColumnNumber</key>
+							<string>0</string>
+							<key>EndingLineNumber</key>
+							<string>273</string>
+							<key>StartingColumnNumber</key>
+							<string>0</string>
+							<key>StartingLineNumber</key>
+							<string>272</string>
+							<key>Timestamp</key>
+							<string>746430857.369387</string>
+						</dict>
+						<key>rebasable-url</key>
+						<dict>
+							<key>base</key>
+							<string>workspace</string>
+							<key>payload</key>
+							<dict>
+								<key>relative-path</key>
+								<string>pokedata/RegisterView.swift</string>
+							</dict>
+						</dict>
+					</dict>
+					<key>text-context</key>
+					<dict>
+						<key>focused</key>
+						<string>            // displays confirmation password error message
+</string>
+						<key>leading</key>
+						<string>                }
+            
+</string>
+						<key>trailing</key>
+						<string>            if let error = confirmPasswordError {
+                Text(error).foregroundStyle(Color.red)
+            }
+</string>
+					</dict>
+					<key>type</key>
+					<string>bookmark</string>
+				</dict>
+			</array>
+			<key>title</key>
+			<string>registration textfields</string>
+			<key>type</key>
+			<string>group</string>
 		</dict>
 	</array>
 </dict>

@@ -9,15 +9,15 @@ import SwiftUI
 
 struct ProfileTabView: View {
     @State private var username: String = ""
-    @Binding var date: Date
+//    @Binding var date: Date
     @Binding var showLoginView: Bool
     
     let collectionCount: Int
-    var shortMonthName: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM"
-        return dateFormatter.string(from: date)
-    }
+//    var shortMonthName: String {
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "MMM"
+//        return dateFormatter.string(from: date)
+//    }
     var body: some View {
         GeometryReader { geometry in
             VStack {
@@ -35,11 +35,11 @@ struct ProfileTabView: View {
                 Text(username)
                     .font(.title)
                     .fontWeight(.bold)
-                let calendar = Calendar.current
-                let components = calendar.dateComponents([.year, .month], from: date)
-                let year = components.year
-                Text("Joined \(shortMonthName) \(String(format: "%i", year!))")
-                    .padding(.bottom, 8)
+//                let calendar = Calendar.current
+//                let components = calendar.dateComponents([.year, .month], from: date)
+//                let year = components.year
+//                Text("Joined \(shortMonthName) \(String(format: "%i", year!))")
+//                    .padding(.bottom, 8)
                 
                                     
 //                    Text("Total Views: ")
@@ -88,5 +88,5 @@ struct ProfileTabView: View {
 }
 
 #Preview {
-    ProfileTabView(date: .constant(Date()), showLoginView: .constant(false), collectionCount: 0)
+    ProfileTabView(showLoginView: .constant(false), collectionCount: 0)
 }

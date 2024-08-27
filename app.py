@@ -91,6 +91,8 @@ def register():
         password = request.form.get("password")
         confirmation = request.form.get("confirmPassword")
 
+        # MORE ENHANCED ERROR CHECKING (DO THE SAME AS THE FRONTEND)
+        # also if you want add a gender option to the registration
         # checks if all has been provided or not
         if not first_name and last_name and date_of_birth and email and username and password and confirmation:
             print("Data Missing")
@@ -140,5 +142,40 @@ def register():
 
         return jsonify(data), 200
     
+@app.route("/login", methods = ["GET", "POST"])
+def login(): 
+    """ Login User """
+    if request.method == "POST":
+        account = request.form.get("account")
+        password = request.form.get("password")
+        
+        # checks if all has been provided or not
+        if not account and password:
+            return "Login Incomplete", 400
+        else: 
+            print("Data Received Successfully")
 
+        # query database for username
+        result = db.execute("SELECT id, password_hash FROM users WHERE email = ? OR username = ?", account, account)
+
+        # checks if password matches password_hash
+        if len(result) != 1 or not check_password_hash(
+            result[0]["password_hash"], password):
+            return "Password Incorrect", 400
+        
+        # assigns found user_id
+        user_id = result[0]["id"]
+
+        return jsonify(user_id), 200
+
+    else:
+        usernames = [row['username'] for row in db.execute("SELECT username FROM users")]
+        emails = [row['email'] for row in db.execute("SELECT email FROM users")]
+
+        data = {
+            "username": usernames,
+            "email": emails
+        }
+
+        return jsonify(data), 200
 

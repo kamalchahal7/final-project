@@ -10,7 +10,7 @@ import pytz
 utc_time = datetime.now(pytz.timezone('UTC'))
 est_time = utc_time.astimezone(pytz.timezone('US/Eastern'))
 
-from functions import lookup, search, find, date_formatter
+from functions import lookup, search, find, date_formatter, date_shift
 
 import re
 pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
@@ -178,4 +178,21 @@ def login():
         }
 
         return jsonify(data), 200
+    
+@app.route("/profile", methods = ["GET"])
+def fetch(): 
+    if request.method == "GET":
+        user_id = request.args.get('user_id')
+
+        data = db.execute("SELECT id, username, email, first_name, last_name, date_of_birth, registration_time_EST, collection FROM users WHERE id = ?", user_id)
+
+        data[0]["date_of_birth"] = date_shift(data[0]["date_of_birth"])
+        if not data:
+            return "Invalid ID. Cannot fetch data", 400
+        else:
+            print(data)
+            return jsonify(data), 200
+
+
+
 

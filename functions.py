@@ -192,9 +192,13 @@ def find(value):
     return names
 
 def date_formatter(time):
-    print(time)
     time = time.strip().split()[0]
     return time
+
+def date_shift(date):
+    date_obj = datetime.strptime(date, "%Y-%m-%d")
+    new_date_str = date_obj.strftime("%m/%d/%Y")
+    return new_date_str
 
 
 # def serialize(obj):

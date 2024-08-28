@@ -135,7 +135,21 @@ struct PokemonCard: Decodable, Identifiable, Equatable, Hashable {
     let setImagesLogo: String?
 }
 
+struct UserInfo: Decodable, Identifiable, Hashable {
+    let id: Int
+    let username: String
+    let email: String
+    let first_name: String
+    let last_name: String
+    let date_of_birth: String
+    let registration_time_EST: String
+    let collection: Int
+}
+
+
 struct ContentView: View {
+    // Global user id
+    @AppStorage("user_id") var user_id: Int?
     // Inputed Data on Search Tab Bar
     @State private var pokedata: String = ""
     // Inputed Data on Cards Tab Bar
@@ -144,6 +158,8 @@ struct ContentView: View {
     @State private var fetchedData: [Pokemon] = []
     // Returned Data from TCG API
     @State private var cardData: [PokemonCard] = []
+    // Returned Data from accounts.db
+    @State private var userData = UserInfo(id: 0, username: "", email: "", first_name: "", last_name: "", date_of_birth: "", registration_time_EST: "", collection: 0)
     // Initial Tab
     @State private var selectedTab = 4
     // Checks if search bar is active or not
@@ -185,6 +201,14 @@ struct ContentView: View {
     @State private var showRegisterView = false
     // Checks whether loginview should be shown or not
     @State private var showLoginView = true
+    // Checks whether personalview should be shown or not
+    @State private var showPersonalView = false
+    // Checks whether passwordchangeview should be shown or not
+    @State private var showPasswordChangeView = false
+    // Checks whether historyview should be shown or not
+    @State private var showHistoryView = false
+    // Checks whether creditsview should be shown or not
+    @State private var showCreditsView = false
     // backend error message
     @State private var message: String = ""
     // backend error code
@@ -828,7 +852,7 @@ struct ContentView: View {
             GeometryReader { geometry in
 //                let isNotchDevice = geometry.safeAreaInsets.top
                 VStack {
-                    if showLoginView || showRegisterView {
+                    if user_id == nil {
                         if showLoginView {
                             LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault)
                         }
@@ -838,10 +862,52 @@ struct ContentView: View {
                         }
                     }
                     else {
-                        ProfileTabView(showLoginView: $showLoginView, collectionCount: $collection.count)
+                        ZStack {
+                            if showPersonalView {
+                                PersonalView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, userData: $userData, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: {
+                                    withAnimation(.easeInOut) {
+                                        showPersonalView.toggle()
+                                    }
+                                })
+                                .transition(.move(edge: .trailing))
+                                .edgesIgnoringSafeArea(.all)
+                            } else if showPasswordChangeView {
+                                PasswordChangeView(onDismiss: {
+                                    withAnimation(.easeInOut) {
+                                        showPasswordChangeView.toggle()
+                                    }
+                                })
+                                .transition(.move(edge: .trailing))
+                                .edgesIgnoringSafeArea(.all)
+                                
+                            } else if showHistoryView {
+                                HistoryView(onDismiss: {
+                                    withAnimation(.easeInOut) {
+                                        showHistoryView.toggle()
+                                    }
+                                })
+                                .transition(.move(edge: .trailing))
+                                .edgesIgnoringSafeArea(.all)
+                                
+                            } else if showCreditsView {
+                                CreditsView(onDismiss: {
+                                    withAnimation(.easeInOut) {
+                                        showCreditsView.toggle()
+                                    }
+                                })
+                                .transition(.move(edge: .trailing))
+                                .edgesIgnoringSafeArea(.all)
+                                
+                            } else {
+                                ProfileTabView(showLoginView: $showLoginView, showPersonalView: $showPersonalView, showPasswordChangeView: $showPasswordChangeView, showHistoryView: $showHistoryView, showCreditsView: $showCreditsView, userData: $userData, collectionCount: $collection.count)
+                                    .onAppear {
+                                        fetchUserData()
+                                    }
+                            }
+                        }
                     }
                 }
-                .padding(showRegisterView ? 0 : 16)
+                .padding(showRegisterView || showPersonalView ? 0 : 16)
             }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {
@@ -953,6 +1019,66 @@ struct ContentView: View {
                 }
             } else if let error = error {
                 print("HTTP Request Failed \(error)")
+            }
+        }.resume()
+    }
+    
+    func fetchUserData() {
+        guard let userId = user_id else {
+            print("No user ID provided")
+            return
+        }
+        
+        let urlString = "http://127.0.0.1:5000/profile?user_id=\(userId)"
+        
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("Invalid response")
+                return
+            }
+            
+            if httpResponse.statusCode >= 400 {
+                DispatchQueue.main.async {
+                    // FIX THIS PELAESEESAESAESAEESEESEEEESESESE
+                    print("SUM TING WONG")
+                    print("VEE TOO LOW")
+                    print("HOE LEE FUQ")
+                    print("BANG DING OW")
+    //                message = String(data: data, encoding: .utf8) ?? "No response"
+    //                errorCode = "\(httpResponse.statusCode)"
+    //                fault = true
+    //                completion(fault)
+                }
+            } else if let data = data {
+                print("Data: \(String(data: data, encoding: .utf8) ?? "No data")")
+                if let response = response {
+                    print("Response: \(response)")
+                } else {
+                    print("No response")
+                }
+                do {
+                    let info = try JSONDecoder().decode([UserInfo].self, from: data)
+                    DispatchQueue.main.async {
+                        if let user = info.first {
+                            userData = user
+                        }
+                    }
+                } catch {
+                    print("Decoding error: \(error.localizedDescription)")
+                }
             }
         }.resume()
     }

@@ -57,7 +57,7 @@ struct PokemonInfo: View {
                         Spacer()
                     }
                     .padding(.top, 40)
-                    
+                    // make this dynamic for touch id iphone
                     
                     Spacer()
                     

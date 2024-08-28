@@ -93,6 +93,7 @@ struct RegisterView: View {
             HStack {
                 TextField("First Name", text: $firstName)
                     .padding()
+                    .background(Color.white)
                     .cornerRadius(10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
@@ -104,6 +105,7 @@ struct RegisterView: View {
                     }
                 TextField("Last Name", text: $lastName)
                     .padding()
+                    .background(Color.white)
                     .cornerRadius(10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
@@ -117,7 +119,6 @@ struct RegisterView: View {
             .multilineTextAlignment(.leading)
             .autocorrectionDisabled(true)
             .font(.system(size: 20, weight: .medium))
-            .background(Color.white)
             
             // displays name error message
             if let error = nameError {
@@ -346,7 +347,7 @@ struct RegisterView: View {
             .padding(.top, 8)
         }
         .onAppear {
-            fetchUserData()
+            getUserData()
         }
     }
     
@@ -387,7 +388,7 @@ struct RegisterView: View {
         }.resume()
     }
     
-    func fetchUserData() {
+    func getUserData() {
         guard let url = URL(string: "http://127.0.0.1:5000/register") else {
             print("Invalid URL")
             return

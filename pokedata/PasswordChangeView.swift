@@ -1,29 +1,13 @@
 //
-//  LoginView.swift
+//  PasswordChangeView.swift
 //  pokedata
 //
-//  Created by Kamal on 2024-08-23.
+//  Created by Kamal on 2024-08-27.
 //
 
 import SwiftUI
 
-enum LoginField {
-    case account
-    case password
-}
-
-struct LoginView: View {
-    @AppStorage("user_id") var user_id: Int?
-    
-    @Binding var showLoginView: Bool
-    @Binding var showRegisterView: Bool
-    // backend error message
-    @Binding var message: String
-    // backend error code
-    @Binding var errorCode: String
-    // checks if backend pciked up a fault
-    @Binding var fault: Bool
-    
+struct PasswordChangeView: View {
     @State private var account: String = ""
     @State private var password: String = ""
     
@@ -38,14 +22,23 @@ struct LoginView: View {
     
     @FocusState private var focused: LoginField?
     
+    let onDismiss: () -> Void
+    
     var body: some View {
         GeometryReader { geometry in
             VStack {
+                HStack {
+                    Button("Back") {
+                        onDismiss()
+                    }
+                    .padding()
+                    Spacer()
+                }
                 Spacer()
                 ZStack {
                     GroupBox {
                         HStack {
-                            Text("Login")
+                            Text("Password Change")
                                 .font(.largeTitle)
                                 .fontWeight(.heavy)
                                 .foregroundStyle(Color.black)
@@ -91,14 +84,54 @@ struct LoginView: View {
                             Text(error).foregroundStyle(Color.red)
                         }
                         
+                        SecureField("New Password", text: $password)
+                            .font(.system(size: 20, weight: .medium))
+                            .autocapitalization(.none)
+                            .padding()
+                            .multilineTextAlignment(.leading)
+                            .background(Color.white)
+                            .cornerRadius(15)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.black, lineWidth: 3)
+                            )
+                            .textContentType(.oneTimeCode)
+                            .focused($focused, equals: .password)
+                            .onChange (of: password) {
+                                passwordError = nil
+                            }
+                        if let error = passwordError {
+                            Text(error).foregroundStyle(Color.red)
+                        }
+                        
+                        SecureField("Confirm New Password", text: $password)
+                            .font(.system(size: 20, weight: .medium))
+                            .autocapitalization(.none)
+                            .padding()
+                            .multilineTextAlignment(.leading)
+                            .background(Color.white)
+                            .cornerRadius(15)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.black, lineWidth: 3)
+                            )
+                            .textContentType(.oneTimeCode)
+                            .focused($focused, equals: .password)
+                            .onChange (of: password) {
+                                passwordError = nil
+                            }
+                        if let error = passwordError {
+                            Text(error).foregroundStyle(Color.red)
+                        }
+                        
                         HStack {
                             Button(action: {
                                 withAnimation(.easeInOut(duration: 0.5)) {
-                                    showRegisterView.toggle()
-                                    showLoginView.toggle()
+//                                    showRegisterView.toggle()
+//                                    showLoginView.toggle()
                                 }
                             }) {
-                                Text("Don't Have an Account?")
+                                Text("Revert Changes")
                                     .font(.system(size: 15, weight: .bold))
                                     .padding([.top, .bottom])
                                     .foregroundStyle(Color.blue)
@@ -119,19 +152,19 @@ struct LoginView: View {
                                 }
                                 
                                 if accountError == nil && passwordError == nil {
-                                    submitLogin { fault in
-                                        if fault {
-                                            passwordError = "*Password Incorrect"
-                                        } else {
-                                        // backend errror checking
-                                            withAnimation(.easeInOut) {
-                                                showLoginView.toggle()
-                                            }
-                                        }
-                                    }
+//                                    submitLogin { fault in
+//                                        if fault {
+//                                            passwordError = "*Password Incorrect"
+//                                        } else {
+//                                        // backend errror checking
+//                                            withAnimation(.easeInOut) {
+//                                                showLoginView.toggle()
+//                                            }
+//                                        }
+//                                    }
                                 }
                             }) {
-                                Text("Log In")
+                                Text("Update")
                                     .font(.system(size: 15, weight: .bold))
                                     .padding()
                                     .background(Color.blue)
@@ -147,84 +180,13 @@ struct LoginView: View {
                 .shadow(radius: 10)
                 Spacer()
             }
-            .onAppear {
-                getData()
-            }
+//            .onAppear {
+//                getData()
+//            }
         }
-    }
-    
-    func submitLogin(completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://127.0.0.1:5000/login") else {
-            print("Invalid URL")
-            return
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        let bodyData = "account=\(account)&password=\(password)"
-        request.httpBody = bodyData.data(using: String.Encoding.utf8)
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Error: \(error)")
-            }
-            if let data = data {
-                if let httpResponse = response as? HTTPURLResponse {
-                    if httpResponse.statusCode >= 400 {
-                        DispatchQueue.main.async {
-                            message = String(data: data, encoding: .utf8) ?? "No response"
-                            errorCode = "\(httpResponse.statusCode)"
-                            fault = true
-                            completion(fault)
-                        }
-                    } else {
-                        // Handle successful response
-                        if let userID = try? JSONDecoder().decode(Int.self, from: data) {
-                            fault = false
-                            user_id = userID
-                        }
-                        completion(fault)
-                    }
-                }
-                
-            } else if let error = error {
-                print("HTTP Request Failed \(error)")
-                completion(fault)
-            }
-        }.resume()
-    }
-    
-    func getData() {
-        guard let url = URL(string: "http://127.0.0.1:5000/login") else {
-            print("Invalid URL")
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let data = data {
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                        DispatchQueue.main.async {
-                            existingUserData = json
-                            print(existingUserData)
-                        }
-                    }
-                } catch {
-                    print("Error \(error)")
-                    DispatchQueue.main.async {
-                        existingUserData = [:]
-                    }
-                }
-            } else if let error = error {
-                print("HTTP Request Failed \(error)")
-            }
-        }.resume()
     }
 }
 
 #Preview {
-    LoginView(showLoginView: .constant(true), showRegisterView: .constant(false), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false))
+    PasswordChangeView(onDismiss: {})
 }

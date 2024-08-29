@@ -1,6 +1,7 @@
 from cs50 import SQL
 from pokemontcgsdk import Card, Set, Type, Supertype, Subtype, Rarity, RestClient, PokemonTcgException
 from datetime import datetime
+import pytz
 # import pokemontcgsdk
 
 
@@ -199,6 +200,12 @@ def date_shift(date):
     date_obj = datetime.strptime(date, "%Y-%m-%d")
     new_date_str = date_obj.strftime("%m/%d/%Y")
     return new_date_str
+
+def timezone(time):
+    date = datetime.combine(time, datetime.min.time())
+    utc_zone = pytz.utc
+    utc_time = date.astimezone(utc_zone)
+    return utc_time.strftime("%Y-%m-%d")
 
 
 # def serialize(obj):

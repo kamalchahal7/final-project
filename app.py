@@ -5,12 +5,12 @@ from flask import Flask, flash, redirect, render_template, request, session, jso
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from datetime import datetime
+from datetime import datetime, date
 import pytz
 utc_time = datetime.now(pytz.timezone('UTC'))
 est_time = utc_time.astimezone(pytz.timezone('US/Eastern'))
 
-from functions import lookup, search, find, date_formatter, date_shift
+from functions import lookup, search, find, date_formatter, date_shift, timezone
 
 import re
 pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
@@ -149,6 +149,7 @@ def login():
         account = request.form.get("account")
         password = request.form.get("password")
         
+        # BUFF UP ERROR CHECKING (look at /change for more info)
         # checks if all has been provided or not
         if not account and password:
             return "Login Incomplete", 400
@@ -192,6 +193,80 @@ def fetch():
         else:
             print(data)
             return jsonify(data), 200
+
+
+
+
+@app.route("/personal", methods = ["GET", "POST"])
+def personal_change(): 
+    if request.method == "POST":
+        user_id = request.form.get('user_id')
+        print(user_id)
+        password = request.form.get("password")
+        first_name = request.form.get("firstName")
+        last_name = request.form.get("lastName")
+        date_of_birth = request.form.get("birthDate")
+        email = request.form.get("email")
+        username = request.form.get("username")
+
+        initial_view = not (first_name or last_name or date_of_birth or email or username)
+        if not user_id:
+            return "Invalid ID", 400
+        
+        user_id = int(user_id)
+
+        if not password and initial_view:
+            return "Missing password", 400
+        elif password and initial_view:
+            data = db.execute("SELECT * FROM users WHERE id = ?", user_id)
+            if len(data) != 1 or not check_password_hash(
+                data[0]["password_hash"], password):
+                return "Password Incorrect", 400
+        if not initial_view:
+            values = {}
+            if first_name:
+                values["first_name"] = first_name
+            if last_name: 
+                values["last_name"] = last_name
+            if date_of_birth:
+                date_of_birth = date_formatter(date_of_birth)
+                if date_of_birth == str(timezone(date.today())):
+                    date_of_birth = None
+                values["date_of_birth"] = date_of_birth
+            if email:
+                if not re.match(pattern, email):
+                    return "Invalid Email", 400
+                emails = db.execute("SELECT email FROM users")
+                for user in emails:
+                    if user['email'] == email:
+                        return "Email is already Registered With an Existing Account", 400
+                    
+                values["email"] = email
+            if username: 
+                usernames = db.execute("SELECT username FROM users")
+                for user in usernames:
+                    if user['username'] == username:
+                            return "Username Already Taken", 400
+                values["username"] = username
+
+            for key, value in values.items():
+                if value is not None and value != "":
+                    db.execute("UPDATE users SET ? = ? WHERE id = ?", key, value, user_id)
+
+        return jsonify ({}), 200
+    else:
+        usernames = [row['username'] for row in db.execute("SELECT username FROM users")]
+        emails = [row['email'] for row in db.execute("SELECT email FROM users")]
+
+        data = {
+            "username": usernames,
+            "email": emails
+        }
+
+        return jsonify(data), 200
+
+
+
 
 
 

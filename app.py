@@ -194,7 +194,49 @@ def fetch():
             print(data)
             return jsonify(data), 200
 
+@app.route("/change", methods = ["GET", "POST"])
+def change(): 
+    if request.method == "POST":
+        user_id = request.form.get('user_id')
+        email = request.form.get("email")
+        password = request.form.get("password")
+        new_password = request.form.get("newPassword")
+        confirmation = request.form.get("confirmNewPassword")
 
+        if not user_id:
+            return "Invalid ID", 400
+        
+        if not email:
+            return "Missing email", 400
+        if not re.match(pattern, email):
+            return "Invalid Email", 400
+        emails = db.execute("SELECT email FROM users WHERE id = ?", user_id)
+        if len(emails) != 1 or email != emails[0]["email"]:
+            return "Incorrect email provided", 400
+            
+        if not password:
+            return "Missing password", 400
+        else:
+            data = db.execute("SELECT * FROM users WHERE email = ? AND id = ?", email, user_id)
+            if len(data) != 1 or not check_password_hash(
+                data[0]["password_hash"], password):
+                return "Password Incorrect", 400
+        
+        if not new_password:
+            return "Missing new password", 400
+        if password == new_password:
+            return "New password must be different from orginal", 400
+        
+        if not confirmation:
+            return "New password confirmation missing", 400
+        if new_password != confirmation:
+            return "New passwords don't match", 400
+        
+        db.execute("UPDATE users SET password_hash = ? WHERE email = ? AND id = ?", generate_password_hash(new_password), email, user_id)
+        
+        return jsonify({}), 200
+    else:
+        return jsonify({}), 200
 
 
 @app.route("/personal", methods = ["GET", "POST"])

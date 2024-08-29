@@ -279,8 +279,8 @@ struct RegisterView: View {
             HStack {
                 Button(action: {
                     withAnimation(.easeInOut(duration: 0.5)) {
-                        showRegisterView.toggle()
-                        showLoginView.toggle()
+                        showRegisterView = false
+                        showLoginView = true
                     }
                 }) {
                     Text("Already Have an Account?")
@@ -298,7 +298,7 @@ struct RegisterView: View {
                         birthDateError = "*Please enter your date of birth"
                     }
                     if !isValidEmail(email) {
-                        emailError = "*Please enter your date of birth"
+                        emailError = "*Please enter a valid email"
                     } else if let existingUsernames = existingUserData["email"] as? [String] {
                         if existingUsernames.contains(email) {
                             emailError = "Email already registered"
@@ -329,7 +329,8 @@ struct RegisterView: View {
                             // backend errror checking
                             if !fault {
                                 withAnimation(.easeInOut) {
-                                    showRegisterView.toggle()
+                                    showRegisterView = false
+                                    showLoginView = true
                                 }
                             }
                         }
@@ -420,13 +421,11 @@ struct RegisterView: View {
     }
 }
 
-func dateClipper(_ date: Date) -> Date? {
-    let calendar = Calendar.current
-    var components = calendar.dateComponents([.year, .month, .day], from: date)
-    components.hour = 0
-    components.minute = 0
-    components.second = 0
-    return calendar.date(from: components)
+func dateClipper(_ date: Date) -> String? {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "MM/dd/yyyy"
+    let dateString = dateFormatter.string(from: date)
+    return dateString
 }
 
 func isValidEmail(_ email: String) -> Bool {

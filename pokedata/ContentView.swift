@@ -149,7 +149,7 @@ struct UserInfo: Decodable, Identifiable, Hashable {
 
 struct ContentView: View {
     // Global user id
-    @AppStorage("user_id") var user_id: Int?
+    @AppStorage("user_id") var user_id: Int = 0
     // Inputed Data on Search Tab Bar
     @State private var pokedata: String = ""
     // Inputed Data on Cards Tab Bar
@@ -852,7 +852,8 @@ struct ContentView: View {
             GeometryReader { geometry in
 //                let isNotchDevice = geometry.safeAreaInsets.top
                 VStack {
-                    if user_id == nil {
+                    let user_id = fetchUserID()
+                    if user_id == 0 {
                         if showLoginView {
                             LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault)
                         }
@@ -862,52 +863,50 @@ struct ContentView: View {
                         }
                     }
                     else {
-                        ZStack {
-                            if showPersonalView {
-                                PersonalView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, userData: $userData, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: {
-                                    withAnimation(.easeInOut) {
-                                        showPersonalView.toggle()
-                                    }
-                                })
-                                .transition(.move(edge: .trailing))
-                                .edgesIgnoringSafeArea(.all)
-                            } else if showPasswordChangeView {
-                                PasswordChangeView(onDismiss: {
-                                    withAnimation(.easeInOut) {
-                                        showPasswordChangeView.toggle()
-                                    }
-                                })
-                                .transition(.move(edge: .trailing))
-                                .edgesIgnoringSafeArea(.all)
-                                
-                            } else if showHistoryView {
-                                HistoryView(onDismiss: {
-                                    withAnimation(.easeInOut) {
-                                        showHistoryView.toggle()
-                                    }
-                                })
-                                .transition(.move(edge: .trailing))
-                                .edgesIgnoringSafeArea(.all)
-                                
-                            } else if showCreditsView {
-                                CreditsView(onDismiss: {
-                                    withAnimation(.easeInOut) {
-                                        showCreditsView.toggle()
-                                    }
-                                })
-                                .transition(.move(edge: .trailing))
-                                .edgesIgnoringSafeArea(.all)
-                                
-                            } else {
-                                ProfileTabView(showLoginView: $showLoginView, showPersonalView: $showPersonalView, showPasswordChangeView: $showPasswordChangeView, showHistoryView: $showHistoryView, showCreditsView: $showCreditsView, userData: $userData, collectionCount: $collection.count)
-                                    .onAppear {
-                                        fetchUserData()
-                                    }
-                            }
+                        if showPersonalView {
+                            PersonalView(userData: $userData, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: {
+                                withAnimation(.easeInOut) {
+                                    showPersonalView.toggle()
+                                }
+                            })
+                            .transition(.move(edge: .trailing))
+                            .edgesIgnoringSafeArea(.all)
+                        } else if showPasswordChangeView {
+                            PasswordChangeView(userData: $userData, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: {
+                                withAnimation(.easeInOut) {
+                                    showPasswordChangeView.toggle()
+                                }
+                            })
+                            .transition(.move(edge: .trailing))
+                            .edgesIgnoringSafeArea(.all)
+                            
+                        } else if showHistoryView {
+                            HistoryView(onDismiss: {
+                                withAnimation(.easeInOut) {
+                                    showHistoryView.toggle()
+                                }
+                            })
+                            .transition(.move(edge: .trailing))
+                            .edgesIgnoringSafeArea(.all)
+                            
+                        } else if showCreditsView {
+                            CreditsView(onDismiss: {
+                                withAnimation(.easeInOut) {
+                                    showCreditsView.toggle()
+                                }
+                            })
+                            .transition(.move(edge: .trailing))
+                            .edgesIgnoringSafeArea(.all)
+                            
+                        } else {
+                            ProfileTabView(showLoginView: $showLoginView, showPersonalView: $showPersonalView, showPasswordChangeView: $showPasswordChangeView, showHistoryView: $showHistoryView, showCreditsView: $showCreditsView, userData: $userData, collectionCount: $collection.count)
+                                .onAppear {
+                                    fetchUserData()
+                                }
                         }
                     }
                 }
-                .padding(showRegisterView || showPersonalView ? 0 : 16)
+                .padding(showRegisterView || showPersonalView || showPasswordChangeView ? 0 : 16)
             }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {
@@ -1024,12 +1023,12 @@ struct ContentView: View {
     }
     
     func fetchUserData() {
-        guard let userId = user_id else {
+        if user_id == 0 {
             print("No user ID provided")
             return
         }
         
-        let urlString = "http://127.0.0.1:5000/profile?user_id=\(userId)"
+        let urlString = "http://127.0.0.1:5000/profile?user_id=\(user_id)"
         
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
@@ -1074,6 +1073,7 @@ struct ContentView: View {
                     DispatchQueue.main.async {
                         if let user = info.first {
                             userData = user
+                            print(userData)
                         }
                     }
                 } catch {
@@ -1093,6 +1093,18 @@ struct ContentView: View {
 //        } else {
 //            // touch id iphone
 //            return (0.29, 0.15)
+//        }
+//    }
+//    private func checkLogin(value: Int?, bool: Bool) -> Bool {
+//        if value != nil || bool {
+//            withAnimation(.easeInOut) {
+//                return false
+//            }
+//        }
+//        else {
+//            withAnimation(.easeInOut) {
+//                return true
+//            }
 //        }
 //    }
     
@@ -1145,6 +1157,15 @@ struct ContentView: View {
     }
     
     
+}
+
+func fetchUserID() -> Int {
+    // Simulate fetching user_id from UserDefaults
+    if let userID = UserDefaults.standard.value(forKey: "user_id") as? Int {
+        return userID
+    } else {
+        return 0 // Default value if no user_id is stored
+    }
 }
 
 extension Array {

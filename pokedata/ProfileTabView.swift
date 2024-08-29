@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProfileTabView: View {
-    @AppStorage("user_id") var user_id: Int?
+    @AppStorage("user_id") var user_id: Int = 0
     @Environment(\.openURL) var openURL
     @State private var username: String = ""
 //    @Binding var date: Date
@@ -126,9 +126,15 @@ struct ProfileTabView: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     Section {
                         Button(action: {
-                            user_id = nil
+//                            if user_id != 0 {
+////                                print("USER ID: \(user_id)")
+//                            }
+                            user_id = 0
+//                            if user_id == 0 {
+//                                print("USER ID AFTER: \(user_id)")
+//                            }
                             withAnimation(.easeInOut) {
-                                showLoginView.toggle()
+                                showLoginView = true
                             }
                         }) {
                             Text("Sign Out")

@@ -7,9 +7,19 @@
 
 import SwiftUI
 
+enum PersonalField {
+    case password
+    case firstName
+    case lastName
+    case birthDate
+    case email
+    case username
+}
+
 struct PersonalView: View {
-    @Binding var showLoginView: Bool
-    @Binding var showRegisterView: Bool
+    @AppStorage("user_id") var user_id: Int = 0
+    
+    
     @Binding var userData: UserInfo
     @Binding var message: String
     @Binding var errorCode: String
@@ -19,16 +29,26 @@ struct PersonalView: View {
     @State private var birthDate = Date()
     @State private var email: String = ""
     @State private var username: String = ""
+    @State private var password: String = ""
+    
     @State private var nameError: String? = nil
     @State private var birthDateError: String? = nil
     @State private var emailError: String? = nil
     @State private var usernameError: String? = nil
+    @State private var passwordError: String? = nil
+    
     @State private var existingUserData: Dictionary = [:]
     @State private var shown: Bool = false
     @State private var date: String = ""
-    init(showLoginView: Binding<Bool>, showRegisterView: Binding<Bool>, userData: Binding<UserInfo>, message: Binding<String>, errorCode: Binding<String>, fault: Binding<Bool>, onDismiss: @escaping () -> Void) {
-        self._showLoginView = showLoginView
-        self._showRegisterView = showRegisterView
+    
+    @State private var personal: Bool = false
+    @State private var confirmation: Bool = true
+    
+    @State private var showAlert: Bool = false
+    @State private var changed: Bool = false
+    @State private var same: Bool = false
+    
+    init(userData: Binding<UserInfo>, message: Binding<String>, errorCode: Binding<String>, fault: Binding<Bool>, onDismiss: @escaping () -> Void) {
         self._userData = userData
         self._message = message
         self._errorCode = errorCode
@@ -37,7 +57,7 @@ struct PersonalView: View {
         self.onDismiss = onDismiss
     }
     
-    @FocusState private var focused: RegisterField?
+    @FocusState private var focused: PersonalField?
     let startDate = Calendar.current.date(byAdding: .year, value: -129, to: Date())!
     let endDate = Date()
     let onDismiss: () -> Void
@@ -45,35 +65,149 @@ struct PersonalView: View {
         GeometryReader { geometry in
             let isNotchDevice = geometry.safeAreaInsets.top == 24
             
+            ZStack {
+                HStack {
+                    if confirmation {
+                        Button(action: {
+                            onDismiss()
+                        }) {
+                            HStack {
+                                Image(systemName: "chevron.backward")
+                                Text("Profile")
+                                Spacer()
+                            }
+                            .padding([.leading, .top])
+                        }
+                    }
+                }
+            }
             VStack {
                 HStack {
-                    Button("Back") {
-                        onDismiss()
+                    if !confirmation {
+                        Button(action: {
+                            withAnimation(.easeInOut) {
+                                confirmation.toggle()
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: "chevron.backward")
+                                Text("Back")
+                                Spacer()
+                            }
+                            .padding([.leading, .top])
+                        }
                     }
-                    .padding()
-                    Spacer()
                 }
-                
                 Spacer()
                 ZStack {
-                    GroupBox {
-                        formContent
+                    if confirmation {
+                        GroupBox {
+                            confirmationView
+                        }
+                        .cornerRadius(10)
+                        .shadow(radius: 10)
                     }
-                    .cornerRadius(10)
-                    .shadow(radius: 10)
+                    else {
+                        GroupBox {
+                            formContent
+                        }
+                        .cornerRadius(10)
+                        .shadow(radius: 10)
+                    }
                 }
                 .padding()
                 Spacer()
             }
-            .alert(isPresented: $fault) {
+            .onChange(of: fault) {
+                showAlert = fault && passwordError != "*Password Incorrect"
+            }
+            .alert(isPresented: $showAlert) {
                 Alert(
                     title: Text("Status Code: \(errorCode)"),
                     message: Text("Something went wrong: \(message)"),
-                    dismissButton: .default(Text("OK"))
+                    dismissButton: .default(Text("OK"), action : {
+                        fault = false
+                    })
                 )
             }
             .if(!isNotchDevice) { view in
-                ScrollView { view }
+                Group {
+                    if !confirmation {
+                        ScrollView { view }
+                    }
+                    else {
+                        view
+                    }
+                }
+            }
+        }
+        .onAppear {
+            fetchInfo()
+        }
+    }
+    
+    @ViewBuilder
+    var confirmationView: some View {
+        VStack {
+            HStack {
+                Text("Confirm Password")
+                    .font(.title)
+                    .fontWeight(.bold)
+                Spacer()
+            }
+            SecureField("Password", text: $password)
+                .font(.system(size: 20, weight: .medium))
+                .autocapitalization(.none)
+                .autocorrectionDisabled(true)
+                .padding()
+                .multilineTextAlignment(.leading)
+                .background(Color.white)
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.black, lineWidth: 3)
+                )
+                .padding(.top, 8)
+                .padding(.bottom, 8)
+                .textContentType(.oneTimeCode)
+                .focused($focused, equals: .password)
+                .onChange(of: password) {
+                    passwordError = nil
+                }
+            
+            if let error = passwordError {
+                Text(error).foregroundStyle(Color.red)
+            }
+
+            Button(action: {
+                if password.isEmpty {
+                    passwordError = "*Please enter your password"
+                }
+                focused = nil
+                // front end checking
+                if passwordError == nil {
+                    submitConfirmation { fault in
+                    // backend errror checking
+                        print(fault)
+                        if fault {
+                            passwordError = "*Password Incorrect"
+                        } else {
+                            withAnimation(.easeInOut) {
+                                confirmation.toggle()
+                            }
+                        }
+                    }
+                }
+            }) {
+                HStack {
+                    Spacer()
+                    Text("Confirm")
+                        .font(.system(size: 15, weight: .bold))
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundStyle(Color.white)
+                        .cornerRadius(50)
+                }
             }
         }
     }
@@ -126,11 +260,15 @@ struct PersonalView: View {
             .autocorrectionDisabled(true)
             .font(.system(size: 20, weight: .medium))
             .padding(.top, -8)
-            .padding(.bottom, 8)
+            
             
             // displays name error message
             if let error = nameError {
-                Text(error).foregroundStyle(Color.red)
+                if same {
+                    Text(error).foregroundStyle(Color.blue)
+                } else {
+                    Text(error).foregroundStyle(Color.red)
+                }
             }
             
             HStack {
@@ -140,6 +278,7 @@ struct PersonalView: View {
                 // maybe make fully capitlized
                 Spacer()
             }
+            .padding(.top, 1)
             GroupBox {
                 HStack {
                     Text(dateShift(date))
@@ -179,6 +318,7 @@ struct PersonalView: View {
                         date = "\(month)/\(day)/\(String(format: "%i", year))"
                         // Handle the submission of the selected date
 //                        print("Selected date: \(birthDate)")
+                        changed = true
                         withAnimation(.easeInOut) {
                             shown.toggle()
                         }
@@ -197,11 +337,14 @@ struct PersonalView: View {
                     .stroke(Color.black, lineWidth: 3)
             )
             .padding(.top, -8)
-            .padding(.bottom, 8)
             
             // displays birthdate error message
             if let error = birthDateError {
-                Text(error).foregroundStyle(Color.red)
+                if same {
+                    Text(error).foregroundStyle(Color.blue)
+                } else {
+                    Text(error).foregroundStyle(Color.red)
+                }
             }
             
             HStack {
@@ -210,6 +353,7 @@ struct PersonalView: View {
                     .fontWeight(.heavy)
                 Spacer()
             }
+            .padding(.top, 1)
             TextField(userData.email, text: $email)
                 .font(.system(size: 20, weight: .medium))
                 .autocapitalization(.none)
@@ -223,7 +367,6 @@ struct PersonalView: View {
                         .stroke(Color.black, lineWidth: 3)
                 )
                 .padding(.top, -8)
-                .padding(.bottom, 8)
                 .focused($focused, equals: .email)
                 .onChange(of: email) {
                     emailError = nil
@@ -231,7 +374,11 @@ struct PersonalView: View {
             
             // displays email error message
             if let error = emailError {
-                Text(error).foregroundStyle(Color.red)
+                if same {
+                    Text(error).foregroundStyle(Color.blue)
+                } else {
+                    Text(error).foregroundStyle(Color.red)
+                }
             }
             
             HStack {
@@ -240,6 +387,7 @@ struct PersonalView: View {
                     .fontWeight(.heavy)
                 Spacer()
             }
+            .padding(.top, 1)
             TextField(userData.username, text: $username)
                 .font(.system(size: 20, weight: .medium))
                 .autocapitalization(.none)
@@ -260,33 +408,12 @@ struct PersonalView: View {
 
             // displays username error message
             if let error = usernameError {
-                Text(error).foregroundStyle(Color.red)
+                if same {
+                    Text(error).foregroundStyle(Color.blue)
+                } else {
+                    Text(error).foregroundStyle(Color.red)
+                }
             }
-            
-            
-//            SecureField("Password", text: $password)
-//                .font(.system(size: 20, weight: .medium))
-//                .autocapitalization(.none)
-//                .autocorrectionDisabled(true)
-//                .padding()
-//                .multilineTextAlignment(.leading)
-//                .background(Color.white)
-//                .cornerRadius(10)
-//                .overlay(
-//                    RoundedRectangle(cornerRadius: 10)
-//                        .stroke(Color.black, lineWidth: 3)
-//                )
-//                .padding(.top, 8)
-//                .textContentType(.oneTimeCode)
-//                .focused($focused, equals: .password)
-//                .onChange(of: password) {
-//                    passwordError = nil
-//                }
-//            
-//            // displays password error message
-//            if let error = passwordError {
-//                Text(error).foregroundStyle(Color.red)
-//            }
             
 //            SecureField("Confirm Password", text: $confirmPassword)
 //                .font(.system(size: 20, weight: .medium))
@@ -314,10 +441,7 @@ struct PersonalView: View {
             
             HStack {
                 Button(action: {
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        showRegisterView.toggle()
-                        showLoginView.toggle()
-                    }
+                    resetFields()
                 }) {
                     Text("Revert Changes")
                         .font(.system(size: 15, weight: .bold))
@@ -327,49 +451,59 @@ struct PersonalView: View {
                 }
                 Spacer()
                 Button(action: {
-                    if firstName.isEmpty || lastName.isEmpty {
-                        nameError = "*Please enter your first & last Name"
+                    same = false
+                    print(userData.date_of_birth)
+                    if firstName == userData.first_name && lastName == userData.last_name {
+                        nameError = "*First & last name are unchanged"
+                        same = true
+                    } else if firstName == userData.first_name {
+                        nameError = "*First name is unchanged"
+                        same = true
+                    } else if lastName == userData.last_name {
+                        nameError = "*Last name is unchanged"
+                        same = true
                     }
-                    if dateClipper(birthDate) == dateClipper(Date()) {
-                        birthDateError = "*Please enter your date of birth"
+                    if dateClipper(birthDate) == userData.date_of_birth {
+                        birthDateError = "*Date of birth is unchanged"
+                        same = true
+                    } else if dateClipper(birthDate) == dateClipper(Date()) && changed {
+                        birthDateError = "*Must be older than 1 day"
                     }
-                    if !isValidEmail(email) {
-                        emailError = "*Please enter your date of birth"
+                    if email == userData.email {
+                        emailError = "*Email is unchanged"
+                        same = true
+                    } else if !isValidEmail(email) && !email.isEmpty {
+                        emailError = "*Please enter a valid email"
                     } else if let existingUsernames = existingUserData["email"] as? [String] {
                         if existingUsernames.contains(email) {
-                            emailError = "Email already registered"
+                            emailError = "*Email already registered"
                         }
                     }
-                    if username.isEmpty {
-                        usernameError = "*Please enter a username"
+                    if username == userData.username {
+                        usernameError = "*Username is unchanged"
+                        same = true
                     } else if let existingUsernames = existingUserData["username"] as? [String] {
                         if existingUsernames.contains(username) {
                             usernameError = "*Username already taken"
                         }
                     }
-//                    if password.isEmpty {
-//                        passwordError = "*Please enter a password"
-//                    }
-//                    if confirmPassword.isEmpty {
-//                        confirmPasswordError = "*Please confirm password"
-//                    } else if confirmPassword != password {
-//                        confirmPasswordError = "Password confirmation doesn't match"
-//                    }
-//                    
+
 //                    focused = nil
-//                    
-//                    // frontend error checking
-//                    if nameError == nil && birthDateError == nil && emailError == nil && usernameError == nil && passwordError == nil {
-//                        // submits registration data to backend
-//                        submitRegistration { fault in
-//                            // backend errror checking
-//                            if !fault {
-//                                withAnimation(.easeInOut) {
-//                                    showRegisterView.toggle()
-//                                }
-//                            }
-//                        }
-//                    }
+                    
+                    // frontend error checking
+                    if nameError == nil && birthDateError == nil && emailError == nil && usernameError == nil && !same {
+                        print("Global: \(user_id)")
+                        print("Local: \(userData.id)")
+                        // submits registration data to backend
+                        submitChange { fault in
+                            // backend errror checking
+                            if !fault {
+                                withAnimation(.easeInOut(duration: 0.5)) {
+                                    onDismiss()
+                                }
+                            }
+                        }
+                    }
 
                 }) {
                     Text("Update")
@@ -382,14 +516,132 @@ struct PersonalView: View {
             }
             .padding(.top, 8)
         }
-//        .onAppear {
-//            getUserData()
-//        }
     }
+    func submitConfirmation(completion: @escaping (Bool) -> Void) {
+        guard let url = URL(string: "http://127.0.0.1:5000/personal") else {
+            print("Invalid URL")
+            return
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        var bodyData = ""
+        if user_id != 0 {
+            bodyData = "user_id=\(user_id)&password=\(password)"
+        }
+        request.httpBody = bodyData.data(using: String.Encoding.utf8)
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error: \(error)")
+            }
+            if let data = data {
+                if let httpResponse = response as? HTTPURLResponse {
+                    if httpResponse.statusCode >= 400 {
+                        DispatchQueue.main.async {
+                            message = String(data: data, encoding: .utf8) ?? "No response"
+                            errorCode = "\(httpResponse.statusCode)"
+                            fault = true
+                            completion(fault)
+                        }
+                    } else {
+                        // Handle successful response
+                        fault = false
+                        completion(fault)
+                    }
+                }
+            } else if let error = error {
+                print("HTTP Request Failed \(error)")
+                completion(fault)
+            }
+        }.resume()
+    }
+    
+    func submitChange(completion: @escaping (Bool) -> Void) {
+        guard let url = URL(string: "http://127.0.0.1:5000/personal") else {
+            print("Invalid URL")
+            return
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        var bodyData = ""
+        if user_id != 0 {
+            bodyData = "user_id=\(user_id)&firstName=\(firstName)&lastName=\(lastName)&birthDate=\(birthDate)&email=\(email)&username=\(username)"
+        }
+        request.httpBody = bodyData.data(using: String.Encoding.utf8)
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error: \(error)")
+            }
+            if let data = data {
+                if let httpResponse = response as? HTTPURLResponse {
+                    if httpResponse.statusCode >= 400 {
+                        DispatchQueue.main.async {
+                            message = String(data: data, encoding: .utf8) ?? "No response"
+                            errorCode = "\(httpResponse.statusCode)"
+                            fault = true
+                            completion(fault)
+                        }
+                    } else {
+                        // Handle successful response
+                        fault = false
+                        completion(fault)
+                    }
+                }
+                
+            } else if let error = error {
+                print("HTTP Request Failed \(error)")
+                completion(fault)
+            }
+        }.resume()
+    }
+    
+    func fetchInfo() {
+        guard let url = URL(string: "http://127.0.0.1:5000/personal") else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let data = data {
+                do {
+                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                        DispatchQueue.main.async {
+                            existingUserData = json
+                            print(existingUserData)
+                        }
+                    }
+                } catch {
+                    print("Error \(error)")
+                    DispatchQueue.main.async {
+                        existingUserData = [:]
+                    }
+                }
+                print("response \(String(data: data, encoding: .utf8) ?? "No response")")
+            } else if let error = error {
+                print("HTTP Request Failed \(error)")
+            }
+        }.resume()
+    }
+    
+    func resetFields() {
+        firstName = ""
+        lastName = ""
+        date = userData.date_of_birth
+        birthDate = Date()
+        email = ""
+        username = ""
+    }
+    
 }
 
 #Preview {
-    PersonalView(showLoginView: .constant(false), showRegisterView: .constant(true), userData: .constant(UserInfo(id: 0, username: "kamal7", email: "kamalxchahal@gmail.com", first_name: "Kamal", last_name: "Chahal", date_of_birth: "2/22/2007", registration_time_EST: "2024-08-26 00:18:51", collection: 0)), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false), onDismiss: {})
+    PersonalView(userData: .constant(UserInfo(id: 0, username: "kamal7", email: "kamalxchahal@gmail.com", first_name: "Kamal", last_name: "Chahal", date_of_birth: "2/22/2007", registration_time_EST: "2024-08-26 00:18:51", collection: 0)), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false), onDismiss: {})
 }
 
 func dateShift(_ dateString: String) -> String {

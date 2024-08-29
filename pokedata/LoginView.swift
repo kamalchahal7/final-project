@@ -13,7 +13,7 @@ enum LoginField {
 }
 
 struct LoginView: View {
-    @AppStorage("user_id") var user_id: Int?
+    @AppStorage("user_id") var user_id: Int = 0
     
     @Binding var showLoginView: Bool
     @Binding var showRegisterView: Bool
@@ -94,8 +94,8 @@ struct LoginView: View {
                         HStack {
                             Button(action: {
                                 withAnimation(.easeInOut(duration: 0.5)) {
-                                    showRegisterView.toggle()
-                                    showLoginView.toggle()
+                                    showRegisterView = true
+                                    showLoginView = false
                                 }
                             }) {
                                 Text("Don't Have an Account?")
@@ -108,7 +108,7 @@ struct LoginView: View {
                             Spacer()
                             Button(action: {
                                 if account.isEmpty {
-                                    accountError = "*Missing username"
+                                    accountError = "*Missing username/email"
                                 } else if let existingUsernames = existingUserData["username"] as? [String], let existingEmails = existingUserData["email"] as? [String] {
                                     if !(existingUsernames.contains(account) || existingEmails.contains(account)) {
                                         accountError = "*Username/email not registered"
@@ -125,7 +125,7 @@ struct LoginView: View {
                                         } else {
                                         // backend errror checking
                                             withAnimation(.easeInOut) {
-                                                showLoginView.toggle()
+                                                showLoginView = false
                                             }
                                         }
                                     }
@@ -141,10 +141,9 @@ struct LoginView: View {
                         }
                         .padding(.top, 8)
                     }
+                    .cornerRadius(10) // Optional: to match the GroupBox's shape
+                    .shadow(radius: 10)
                 }
-                .background(Color.white) // Ensure the background is set
-                .cornerRadius(10) // Optional: to match the GroupBox's shape
-                .shadow(radius: 10)
                 Spacer()
             }
             .onAppear {
@@ -209,7 +208,7 @@ struct LoginView: View {
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                         DispatchQueue.main.async {
                             existingUserData = json
-                            print(existingUserData)
+//                            print(existingUserData)
                         }
                     }
                 } catch {

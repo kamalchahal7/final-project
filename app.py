@@ -4,13 +4,14 @@ from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session, jsonify, send_from_directory
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
+from collections import OrderedDict
 
 from datetime import datetime, date
 import pytz
 utc_time = datetime.now(pytz.timezone('UTC'))
 est_time = utc_time.astimezone(pytz.timezone('US/Eastern'))
 
-from functions import lookup, search, find, date_formatter, date_shift, timezone
+from functions import lookup, search, find, date_formatter, date_shift, timezone, generate_uuid, set_call, find_set
 
 import re
 pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
@@ -72,8 +73,8 @@ def tcg():
         pokecard = find(pokecard)
         if not pokecard:
             return "Oops! Please enter the name/id of a Valid Pokemon Card", 400
-        
-        print(pokecard[1])
+        for card in pokecard:
+            print(card["id"])
         # pokecard = serialize(pokecard)
         return jsonify(pokecard), 200
     else: 
@@ -244,7 +245,7 @@ def change():
 def personal_change(): 
     if request.method == "POST":
         user_id = request.form.get('user_id')
-        print(user_id)
+        # print(user_id)
         password = request.form.get("password")
         first_name = request.form.get("firstName")
         last_name = request.form.get("lastName")
@@ -305,12 +306,75 @@ def personal_change():
             "username": usernames,
             "email": emails
         }
-
         return jsonify(data), 200
 
+@app.route("/history", methods = ["GET", "POST"])
+def track(): 
+    if request.method == "POST":
+        delete = request.form.get("delete")
+        return jsonify({}), 200
+    else:
+        return jsonify({}), 200
 
+@app.route("/collection", methods = ["GET", "POST"])
+def collect(): 
+    if request.method == "POST":
+        user_id = request.form.get("user_id")
+        card_id = request.form.get("id")
+        add_request = request.form.get("add").lower() == "true"
 
+        # print(add_request)
+        if not user_id:
+            return "Invalid User ID", 400
+        if not card_id:
+            return "Missing ID", 400
+        if add_request is None: 
+            return "Missing request type", 400
+        
+        try:
+            if add_request:
+                db.execute("INSERT INTO collection (id, user_id, card_id) VALUES (?, ?, ?)", generate_uuid(), user_id, card_id)
+            else:
+                db.execute("DELETE FROM collection WHERE user_id = ? AND card_id = ?", user_id, card_id)
+        except Exception as e:
+            return str(e), 500
 
+        return jsonify({}), 200
+    else:
+        user_id = request.args.get('user_id')
+        # print(user_id)
+        if not user_id:
+            # print("1")
+            return "Invalid User ID", 400
 
+        collection = db.execute("SELECT card_id FROM collection WHERE user_id = ?", user_id)
 
+        cards = []
 
+        if not collection:
+            # print("2")
+            return "User has no collection available", 400
+
+        for card in collection:
+            data = find(card["card_id"])
+            cards.append(data[0])
+
+        # for index in cards:
+        #     print(index)
+        return jsonify(cards), 200
+    
+@app.route("/sets", methods = ["GET", "POST"])
+def sets():
+    if request.method == "GET":
+        user_id = request.args.get("user_id")
+        if not user_id:
+            return "Invalid ID", 400
+        
+        valid_sets = find_set(user_id)
+        sets = set_call(valid_sets)
+        # print(sets)
+        ordered_sets = [{"series": key, "sets": value} for key, value in sets.items()]
+        # print(ordered_sets)
+        return jsonify(ordered_sets), 200
+    else:
+         return jsonify({}), 200

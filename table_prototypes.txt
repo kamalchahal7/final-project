@@ -1,0 +1,67 @@
+sqlite> .schema items
+CREATE TABLE items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+    user_id INTEGER NOT NULL,
+    item_id VARCHAR(16) NOT NULL,
+    type TEXT NOT NULL,
+    in_collection BOOLEAN NOT NULL,
+    in_history BOOLEAN NOT NULL
+);
+
+sqlite> .schema collection
+CREATE TABLE collection (
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+    user_id INTEGER NOT NULL,
+    item_id VARCHAR(16) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (item_id) REFERENCES items(item_id)
+);
+CREATE TRIGGER after_insert_collection
+    AFTER INSERT ON collection
+    FOR EACH ROW
+    BEGIN
+        UPDATE items
+        SET in_collection = TRUE
+        WHERE item_id = NEW.item_id AND user_id = NEW.user_id;
+    END;
+CREATE TRIGGER after_delete_collection
+    AFTER DELETE ON collection
+    FOR EACH ROW
+    BEGIN
+        UPDATE items
+        SET in_collection = FALSE
+        WHERE item_id = OLD.item_id AND user_id = OLD.user_id;
+    END;
+sqlite> .schema view_history
+
+CREATE TABLE view_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+    user_id INTEGER NOT NULL,
+    item_id VARCHAR(16) NOT NULL,
+    view_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (item_id) REFERENCES items(item_id)
+);
+CREATE TRIGGER after_insert_history
+    AFTER INSERT ON view_history
+    FOR EACH ROW
+    BEGIN
+        UPDATE items
+        SET in_history = TRUE
+        WHERE item_id = NEW.item_id AND user_id = NEW.user_id;
+    END;
+CREATE TRIGGER after_delete_history
+    AFTER DELETE ON view_history
+    FOR EACH ROW
+    BEGIN
+        UPDATE items
+        SET in_history = FALSE
+        WHERE item_id = OLD.item_id AND user_id = OLD.user_id;
+    END;
+
+CREATE TABLE collection (
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+    user_id INTEGER NOT NULL,
+    card_id VARCHAR(16) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);

@@ -1,3 +1,4 @@
+import uuid
 from cs50 import SQL
 from pokemontcgsdk import Card, Set, Type, Supertype, Subtype, Rarity, RestClient, PokemonTcgException
 from datetime import datetime
@@ -6,7 +7,8 @@ import pytz
 
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///pokedex.db")
+poke_db = SQL("sqlite:///pokedex.db")
+db = SQL("sqlite:///accounts.db")
 
 # Configure Pokemon TCG API
 RestClient.configure('caf82b57-d30e-4832-a51b-0476d920d363')
@@ -17,14 +19,14 @@ def lookup(value):
     try: 
         value = int(value)
     except ValueError:
-        pokemon = db.execute("SELECT * FROM pokemon WHERE REPLACE(REPLACE(name, '(', ''), ')', '') LIKE '%' || REPLACE(REPLACE(?, '(', ''), ')', '') || '%' COLLATE NOCASE", (value,))
+        pokemon = poke_db.execute("SELECT * FROM pokemon WHERE REPLACE(REPLACE(name, '(', ''), ')', '') LIKE '%' || REPLACE(REPLACE(?, '(', ''), ')', '') || '%' COLLATE NOCASE", (value,))
         pokemon = sorted(pokemon, key=lambda x: x['name'].lower().find(value.lower()))
         return pokemon
-    pokemon = db.execute("SELECT * FROM pokemon WHERE pokedex_num = ?", (value,))
+    pokemon = poke_db.execute("SELECT * FROM pokemon WHERE pokedex_num = ?", (value,))
     return pokemon
 
 def search():
-    pokelist = db.execute("SELECT id, pokedex_num, name FROM pokemon")
+    pokelist = poke_db.execute("SELECT id, pokedex_num, name FROM pokemon")
     return pokelist
 
 def find(value):
@@ -33,8 +35,12 @@ def find(value):
         return None
     names = []
 
+# cards = Card.find(f'{value}')
     try:
         cards = Card.where(q=f'name:{value}*')
+        if not cards: 
+            cards = Card.where(q=f'id:{value}')
+            
     except PokemonTcgException:
         print("Failed to find pokemon card.")
         return None
@@ -206,6 +212,83 @@ def timezone(time):
     utc_zone = pytz.utc
     utc_time = date.astimezone(utc_zone)
     return utc_time.strftime("%Y-%m-%d")
+
+def generate_uuid():
+    full_uuid = uuid.uuid4()  # Generates a 128-bit UUID
+    return full_uuid.int >> 64  # Use the upper 64 bits of the UUID
+
+def set_call(valid_sets):
+    # if not valid_sets:
+    #     return None
+
+    # Retrieve all sets
+    set_data = Set.all()
+
+    # Filter the sets to include only those with set_ids in valid_sets
+    valid_set_data = [s for s in set_data if s.id in valid_sets]
+
+    # Sort the sets by release date in descending order
+    library = sorted(valid_set_data, key=lambda s: s.releaseDate, reverse=True)
+
+    # Extract unique series names while preserving order
+    set_series = []
+    seen_series = set()
+    for s in library:
+        if hasattr(s, 'series') and s.series not in seen_series:
+            set_series.append(s.series)
+            seen_series.add(s.series)
+
+    # Ensure "Other" is moved to the end of the list
+    if "Other" in set_series: 
+        set_series.remove("Other")
+        set_series.append("Other")
+
+    # Extract unique series names while preserving order
+    set_series = []
+    seen_series = set()
+
+    for s in library:
+        if hasattr(s, 'series') and s.series not in seen_series:
+            set_series.append(s.series)
+            seen_series.add(s.series)
+
+    # Ensure "Other" is moved to the end of the list
+    if "Other" in set_series: 
+        set_series.remove("Other")
+        set_series.append("Other")
+
+    sets = {}
+    for serie in set_series:
+        set_details = [
+            {
+                'id': s.id,
+                'name': s.name,
+                'total': s.total,
+                'printedTotal': s.printedTotal,
+                'releaseDate': s.releaseDate,
+                'logo': s.images.logo,
+                'symbol': s.images.symbol
+            }
+            for s in library if s.series == serie
+        ]
+        sets[serie] = set_details
+    return sets
+
+def find_set(user_id):
+    card_ids = db.execute("SELECT card_id FROM collection WHERE user_id = ?", user_id)
+    ids = []
+    set_ids = []
+    for id in card_ids:
+        ids.append((id["card_id"]))
+    
+    for id in ids:
+        card = Card.find(id)
+        set_ids.append(card.set.id)
+    
+    # for _ in set_ids:
+    #     print(_)
+    return set_ids
+
 
 
 # def serialize(obj):

@@ -2,7 +2,7 @@ import sqlite3
 import csv
 
 csv_file = 'pokemon.csv'
-sql_file = 'pokedex.db'
+sql_file = 'accounts.db'
 
 conn = sqlite3.connect(sql_file)
 cursor = conn.cursor()

@@ -11,9 +11,32 @@ struct HistoryView: View {
     let onDismiss: () -> Void
     var body: some View {
         GeometryReader { geometry in
-            VStack {
-                Button("Dismiss", action: onDismiss)
-                Text("View History")
+            ScrollView {
+                HStack {
+                    Button("Back") {
+                        onDismiss()
+                    }
+                    Spacer()
+                }
+                .padding([.leading, .top])
+                VStack {
+                    ZStack {
+                        GroupBox {
+                            HStack {
+                                Text("View History")
+                                    .font(.largeTitle)
+                                    .fontWeight(.bold)
+                                Spacer()
+                            }
+                            Divider()
+                            List {
+                                
+                            }
+                        }
+                    }
+                    
+                }
+                .padding()
             }
         }
     }

@@ -135,6 +135,21 @@ struct PokemonCard: Decodable, Identifiable, Equatable, Hashable {
     let setImagesLogo: String?
 }
 
+struct Set: Codable {
+    let id: String
+    let name: String
+    let total: Int
+    let printedTotal: Int
+    let releaseDate: String
+    let logo: String
+    let symbol: String
+}
+
+struct Series: Codable {
+    let series: String
+    let sets: [Set]
+}
+
 struct UserInfo: Decodable, Identifiable, Hashable {
     let id: Int
     let username: String
@@ -161,7 +176,7 @@ struct ContentView: View {
     // Returned Data from accounts.db
     @State private var userData = UserInfo(id: 0, username: "", email: "", first_name: "", last_name: "", date_of_birth: "", registration_time_EST: "", collection: 0)
     // Initial Tab
-    @State private var selectedTab = 4
+    @State private var selectedTab = 2
     // Checks if search bar is active or not
     @State private var isSearchActive: Bool = false
     // Checks if someone has submitted a search
@@ -170,9 +185,9 @@ struct ContentView: View {
     // Checks if input field is in focus or not
     @FocusState private var isSearchFieldFocused: Bool
     // Background for Search Bar
-//    @State private var offsetY: CGFloat = -UIScreen.main.bounds.height
+    //    @State private var offsetY: CGFloat = -UIScreen.main.bounds.height
     // Checks if it is the first time searching
-//    @State private var isFirstTime = true
+    //    @State private var isFirstTime = true
     // Used for selected pokemon
     @State private var selected: Pokemon? = nil
     // Used for selected card
@@ -188,7 +203,7 @@ struct ContentView: View {
     // Checks if search view is shown or not
     @State private var hasAnimated = false
     // Holds the market value of each card
-//    @State private var marketPrices: [String] = []
+    //    @State private var marketPrices: [String] = []
     // Holds market value of selected card
     @State private var market: String = ""
     // holds all the collected pokemon cards
@@ -216,48 +231,50 @@ struct ContentView: View {
     // checks if backend pciked up a fault
     @State private var fault: Bool = false
     
-//    init() {
-//            setupNavigationBarAppearance()
-//        }
+    @State private var notLoggedIn: Bool = false
+    
+    //    init() {
+    //            setupNavigationBarAppearance()
+    //        }
     
     var body: some View {
         
         // Header
         
-//        Image(systemName: "globe")
-//            .imageScale(.large)
-//            .foregroundStyle(.tint)
-//        Text("Hello World")
-//        Image(systemName: "house")
+        //        Image(systemName: "globe")
+        //            .imageScale(.large)
+        //            .foregroundStyle(.tint)
+        //        Text("Hello World")
+        //        Image(systemName: "house")
         
         // Footer
-       
+        
         // SEARCH TAB BAR
         TabView (selection: $selectedTab){
             GeometryReader { geometry in
                 ZStack {
                     // Background that slides in
-//                    let safeAreaTop = geometry.safeAreaInsets.top
-//                    var heightMultiplier = 0.0
-//                    var offsetMultiplier = 0.0
-//
-//                    if isSearchActive {
-//
-//                        if safeAreaTop > 25 {
-//                            heightMultiplier = 0.17
-//                            offsetMultiplier = 0.1
-//                        } else if safeAreaTop > 20 {
-//                            heightMultiplier = 0.17
-//                            offsetMultiplier = 0.1
-//                        } else {
-//                            heightMultiplier = 0.29
-//                            offsetMultiplier = 0.15
-//                        }
+                    //                    let safeAreaTop = geometry.safeAreaInsets.top
+                    //                    var heightMultiplier = 0.0
+                    //                    var offsetMultiplier = 0.0
+                    //
+                    //                    if isSearchActive {
+                    //
+                    //                        if safeAreaTop > 25 {
+                    //                            heightMultiplier = 0.17
+                    //                            offsetMultiplier = 0.1
+                    //                        } else if safeAreaTop > 20 {
+                    //                            heightMultiplier = 0.17
+                    //                            offsetMultiplier = 0.1
+                    //                        } else {
+                    //                            heightMultiplier = 0.29
+                    //                            offsetMultiplier = 0.15
+                    //                        }
                     if isSearchActive {
                         let isNotchDevice = geometry.safeAreaInsets.top > 20
                         let heightMultiplier = isNotchDevice ? 0.17 : 0.29
                         let offsetMultiplier = isNotchDevice ? 0.1 : 0.15
-
+                        
                         Rectangle()
                             .foregroundColor(Color.white.opacity(0.5))
                             .frame(height: geometry.safeAreaInsets.top + (geometry.size.height * heightMultiplier))
@@ -312,6 +329,7 @@ struct ContentView: View {
                                 .font(.system(size: 25, weight: .medium))
                                 .focused($isSearchFieldFocused)
                                 .autocapitalization(.none)
+                                .autocorrectionDisabled(true)
                                 .padding(.leading, 40)
                                 .padding()
                                 .multilineTextAlignment(.leading)
@@ -325,17 +343,17 @@ struct ContentView: View {
                                 .onAppear {
                                     withAnimation(.easeInOut) {
                                         // Trigger the animation
-//                                        fetchPokedata()
+                                        //                                        fetchPokedata()
                                     }
                                     
                                 }
                                 .onChange(of: pokedata) {
-//                                    if pokedata.isEmpty {
-//                                        fetchPokedata()
-//                                    }
-//                                    else {
-                                        submitPokedata()
-//                                    }
+                                    //                                    if pokedata.isEmpty {
+                                    //                                        fetchPokedata()
+                                    //                                    }
+                                    //                                    else {
+                                    submitPokedata()
+                                    //                                    }
                                 }
                                 .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
                             }
@@ -402,29 +420,29 @@ struct ContentView: View {
                                 .zIndex(1)
                             }
                         }
-
-                        
-                                                    
-                        
-                        
-                            
-                            // Hide default background
-                            
-                            
                         
                         
                         
-//                        ForEach(fetchedData, id: \.id) { pokemon in
-//                            Text("Name: \(pokemon.name), Pokedex Number: \(pokemon.pokedex_num)")
-//                        }
-//                        .padding(2)
                         
-                            
-                            //                        if fetchedData.isEmpty {
-                            //                            if is2ndTime {
-                            //                                Text("No Results Found")
-                            //                            }
-                            //                        }
+                        
+                        
+                        // Hide default background
+                        
+                        
+                        
+                        
+                        
+                        //                        ForEach(fetchedData, id: \.id) { pokemon in
+                        //                            Text("Name: \(pokemon.name), Pokedex Number: \(pokemon.pokedex_num)")
+                        //                        }
+                        //                        .padding(2)
+                        
+                        
+                        //                        if fetchedData.isEmpty {
+                        //                            if is2ndTime {
+                        //                                Text("No Results Found")
+                        //                            }
+                        //                        }
                         
                     }
                     
@@ -447,27 +465,27 @@ struct ContentView: View {
             GeometryReader { geometry in
                 ZStack {
                     // Background that slides in
-//                    let safeAreaTop = geometry.safeAreaInsets.top
-//                    var heightMultiplier = 0.0
-//                    var offsetMultiplier = 0.0
-//
-//                    if isSearchActive {
-//
-//                        if safeAreaTop > 25 {
-//                            heightMultiplier = 0.17
-//                            offsetMultiplier = 0.1
-//                        } else if safeAreaTop > 20 {
-//                            heightMultiplier = 0.17
-//                            offsetMultiplier = 0.1
-//                        } else {
-//                            heightMultiplier = 0.29
-//                            offsetMultiplier = 0.15
-//                        }
+                    //                    let safeAreaTop = geometry.safeAreaInsets.top
+                    //                    var heightMultiplier = 0.0
+                    //                    var offsetMultiplier = 0.0
+                    //
+                    //                    if isSearchActive {
+                    //
+                    //                        if safeAreaTop > 25 {
+                    //                            heightMultiplier = 0.17
+                    //                            offsetMultiplier = 0.1
+                    //                        } else if safeAreaTop > 20 {
+                    //                            heightMultiplier = 0.17
+                    //                            offsetMultiplier = 0.1
+                    //                        } else {
+                    //                            heightMultiplier = 0.29
+                    //                            offsetMultiplier = 0.15
+                    //                        }
                     if search {
                         let isNotchDevice = geometry.safeAreaInsets.top > 20
                         let heightMultiplier = isNotchDevice ? 0.17 : 0.29
                         let offsetMultiplier = isNotchDevice ? 0.1 : 0.15
-
+                        
                         Rectangle()
                             .foregroundColor(Color.white.opacity(0.5))
                             .frame(height: geometry.safeAreaInsets.top + (geometry.size.height * heightMultiplier))
@@ -517,6 +535,7 @@ struct ContentView: View {
                                     .font(.system(size: 25, weight: .medium))
                                     .focused($isSearchFieldFocused)
                                     .autocapitalization(.none)
+                                    .autocorrectionDisabled(true)
                                     .padding(.leading, 40)
                                     .padding()
                                     .multilineTextAlignment(.leading)
@@ -534,9 +553,9 @@ struct ContentView: View {
                                         
                                     }
                                     .onSubmit {
-    //                                    if pokecard.!isEmpty {
-    //                                        submitPokecard()
-    //                                    }
+                                        //                                    if pokecard.!isEmpty {
+                                        //                                        submitPokecard()
+                                        //                                    }
                                         search = true
                                         submitPokecard()
                                     }
@@ -603,7 +622,7 @@ struct ContentView: View {
                                     
                                     // Compute the market price inside the view builder
                                     let marketPrice = calculateMarketPrice(for: pokemoncard)
-
+                                    
                                     Button(action: {
                                         withAnimation(.easeInOut) {
                                             selectedCard = pokemoncard
@@ -621,7 +640,7 @@ struct ContentView: View {
                                                 // Placeholder view (Optional)
                                                 Color.gray.frame(height: 200)
                                             }
-
+                                            
                                             VStack(alignment: .leading) {
                                                 Text(pokemoncard.name)
                                                     .font(.system(size: 20))
@@ -643,9 +662,9 @@ struct ContentView: View {
                                 .foregroundStyle(Color.black)
                                 .padding(.horizontal, -16)
                             }
-
+                            
                             if showCardDetail, let selectedCard = selectedCard {
-                                PokemonCardInfo(market: $market, collection: $collection, pokemonCard: selectedCard, onDismiss: {
+                                PokemonCardInfo(market: $market, collection: $collection, pokemonCard: selectedCard, showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: {
                                     withAnimation(.easeInOut) {
                                         showCardDetail = false
                                     }
@@ -669,47 +688,55 @@ struct ContentView: View {
             // HISTORY TAB BAR (may get rid of this)
             GeometryReader { geometry in
                 VStack {
-                    Spacer()
-                    
-                    
-                    Spacer()
+                    CollectionTabView(
+                        selectedCard: $selectedCard,
+                        market: $market,
+                        showLoginView: $showLoginView,
+                        showRegisterView: $showRegisterView,
+                        message: $message,
+                        errorCode: $errorCode,
+                        fault: $fault,
+                        onDismiss: {
+                            withAnimation(.easeInOut) {
+                                showCardDetail = false
+                            }
+                        }
+                    )
                 }
-            
             }
-            .padding()
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
-                
-                
-                .tabItem {
-                    Label("History", systemImage: "gobackward")
-                }
-                .tag(2)
-        
+            
+            
+            .tabItem {
+                Label("History", systemImage: "gobackward")
+            }
+            .tag(2)
+            
             // COLLECTION TAB BAR
             GeometryReader { geometry in
                 ZStack {
                     // Background that slides in
-//                    let safeAreaTop = geometry.safeAreaInsets.top
-//                    var heightMultiplier = 0.0
-//                    var offsetMultiplier = 0.0
-//
-//                    if isSearchActive {
-//
-//                        if safeAreaTop > 25 {
-//                            heightMultiplier = 0.17
-//                            offsetMultiplier = 0.1
-//                        } else if safeAreaTop > 20 {
-//                            heightMultiplier = 0.17
-//                            offsetMultiplier = 0.1
-//                        } else {
-//                            heightMultiplier = 0.29
-//                            offsetMultiplier = 0.15
-//                        }
+                    //                    let safeAreaTop = geometry.safeAreaInsets.top
+                    //                    var heightMultiplier = 0.0
+                    //                    var offsetMultiplier = 0.0
+                    //
+                    //                    if isSearchActive {
+                    //
+                    //                        if safeAreaTop > 25 {
+                    //                            heightMultiplier = 0.17
+                    //                            offsetMultiplier = 0.1
+                    //                        } else if safeAreaTop > 20 {
+                    //                            heightMultiplier = 0.17
+                    //                            offsetMultiplier = 0.1
+                    //                        } else {
+                    //                            heightMultiplier = 0.29
+                    //                            offsetMultiplier = 0.15
+                    //                        }
                     
                     let isNotchDevice = geometry.safeAreaInsets.top > 20
                     let heightMultiplier = isNotchDevice ? 0.135 : 0.25
                     let offsetMultiplier = isNotchDevice ? 0.1 : 0.15
-
+                    
                     Rectangle()
                         .foregroundColor(Color.blue.opacity(0.7))
                         .frame(height: geometry.safeAreaInsets.top + (geometry.size.height * heightMultiplier))
@@ -761,16 +788,17 @@ struct ContentView: View {
                             }
                         }
                     }
-                    if showCollectionDetail, let selectedCard = selectedCard {
-                        PokemonCardInfo(market: $market, collection: $collection, pokemonCard: selectedCard, onDismiss: {
-                            withAnimation(.easeInOut) {
-                                showCollectionDetail = false
-                            }
-                        })
-                        .transition(.move(edge: .trailing))
-                        .edgesIgnoringSafeArea(.all)
-                        .zIndex(1)
-                    }
+                    //                    if showCollectionDetail, let selectedCard = selectedCard {
+                    //                        PokemonCardInfo(market: $market, collection: $collection, pokemonCard: selectedCard, showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: { $collection, pokemonCard: selectedCard, onDismiss: {
+                    //                            withAnimation(.easeInOut) {
+                    //                                showCollectionDetail = false
+                    //                            }
+                    //                        })
+                    //                        .transition(.move(edge: .trailing))
+                    //                        .edgesIgnoringSafeArea(.all)
+                    //                        .zIndex(1)
+                    //                    }
+                    
                     
                     
                     
@@ -828,38 +856,38 @@ struct ContentView: View {
                 Label("Collection", systemImage: "square.on.square")
             }
             .tag(3)
-//            NavigationStack {
-//                Text("<Collection>")
-//                    .navigationTitle("Collection")
-//                    .toolbar {
-//                        ToolbarItem (placement: .topBarLeading) {
-//                            Text("PokeData")
-//                        }
-//                        ToolbarItem(placement: .topBarTrailing) {
-//                            Button(action: {
-//                                //todo
-//                            }, label: {
-//                                /*@START_MENU_TOKEN@*/Text("Button")/*@END_MENU_TOKEN@*/
-//                            })
-//                        }
-//                    }
-//            }
-//            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
-
-                
+            //            NavigationStack {
+            //                Text("<Collection>")
+            //                    .navigationTitle("Collection")
+            //                    .toolbar {
+            //                        ToolbarItem (placement: .topBarLeading) {
+            //                            Text("PokeData")
+            //                        }
+            //                        ToolbarItem(placement: .topBarTrailing) {
+            //                            Button(action: {
+            //                                //todo
+            //                            }, label: {
+            //                                /*@START_MENU_TOKEN@*/Text("Button")/*@END_MENU_TOKEN@*/
+            //                            })
+            //                        }
+            //                    }
+            //            }
+            //            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
+            
+            
             
             // PROFILE TAB BAR
             GeometryReader { geometry in
-//                let isNotchDevice = geometry.safeAreaInsets.top
+                //                let isNotchDevice = geometry.safeAreaInsets.top
                 VStack {
                     let user_id = fetchUserID()
                     if user_id == 0 {
                         if showLoginView {
-                            LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault)
+                            LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault, onLoginSuccess: { notLoggedIn = false })
                         }
                         if showRegisterView {
                             RegisterView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault)
-//                                .padding(.top, isNotchDevice > 25 ? 35 : 0)
+                            //                                .padding(.top, isNotchDevice > 25 ? 35 : 0)
                         }
                     }
                     else {
@@ -906,7 +934,7 @@ struct ContentView: View {
                         }
                     }
                 }
-                .padding(showRegisterView || showPersonalView || showPasswordChangeView ? 0 : 16)
+                .padding(showRegisterView || showPersonalView || showPasswordChangeView || showCreditsView || showHistoryView ? 0 : 16)
             }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {
@@ -923,52 +951,52 @@ struct ContentView: View {
         
     }
     
-//    private func setupNavigationBarAppearance() {
-//            let appearance = UINavigationBarAppearance()
-//            appearance.configureWithTransparentBackground()
-//            appearance.backgroundColor = .clear // Set background color to clear
-//            appearance.titleTextAttributes = [.foregroundColor: UIColor.white] // Customize title color if needed
-//            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white] // Customize large title color if needed
-//            
-//            UINavigationBar.appearance().standardAppearance = appearance
-//            UINavigationBar.appearance().scrollEdgeAppearance = appearance
-//            UINavigationBar.appearance().compactAppearance = appearance
-//            UINavigationBar.appearance().tintColor = .clear // Customize tint color if needed
-//    }
-
+    //    private func setupNavigationBarAppearance() {
+    //            let appearance = UINavigationBarAppearance()
+    //            appearance.configureWithTransparentBackground()
+    //            appearance.backgroundColor = .clear // Set background color to clear
+    //            appearance.titleTextAttributes = [.foregroundColor: UIColor.white] // Customize title color if needed
+    //            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white] // Customize large title color if needed
+    //
+    //            UINavigationBar.appearance().standardAppearance = appearance
+    //            UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    //            UINavigationBar.appearance().compactAppearance = appearance
+    //            UINavigationBar.appearance().tintColor = .clear // Customize tint color if needed
+    //    }
+    
     
     
     func submitPokedata() {
-            guard let url = URL(string: "http://127.0.0.1:5000/") else {
-                print("Invalid URL")
-                return
-            }
-
-            var request = URLRequest(url: url)
-        
-            request.httpMethod = "POST"
-            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            let bodyData = "pokedata=\(pokedata)"
-            request.httpBody = bodyData.data(using: .utf8)
-            
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                if let data = data {
-                    do {
-                        let pokemonArray = try JSONDecoder().decode([Pokemon].self, from: data)
-                        DispatchQueue.main.async {
-                            fetchedData = pokemonArray
-                        }
-                    } catch {
-                        print("Error converting data to JSON: \(error)")
-                        DispatchQueue.main.async {
-                            fetchedData = []
-                        }
-                    }
-                } else if let error = error {
-                    print("HTTP Request Failed \(error)")
-                }
-            }.resume()
+        guard let url = URL(string: "http://127.0.0.1:5000/") else {
+            print("Invalid URL")
+            return
         }
+        
+        var request = URLRequest(url: url)
+        
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        let bodyData = "pokedata=\(pokedata)"
+        request.httpBody = bodyData.data(using: .utf8)
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let data = data {
+                do {
+                    let pokemonArray = try JSONDecoder().decode([Pokemon].self, from: data)
+                    DispatchQueue.main.async {
+                        fetchedData = pokemonArray
+                    }
+                } catch {
+                    print("Error converting data to JSON: \(error)")
+                    DispatchQueue.main.async {
+                        fetchedData = []
+                    }
+                }
+            } else if let error = error {
+                print("HTTP Request Failed \(error)")
+            }
+        }.resume()
+    }
     
     func fetchImage(for pokemon: Pokemon) {
         guard let imageUrl = URL(string: "http://127.0.0.1:5000/images/\(pokemon.name)_new.png") else {
@@ -990,7 +1018,7 @@ struct ContentView: View {
             print("Invalid URL")
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
@@ -1002,9 +1030,9 @@ struct ContentView: View {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let data = data {
                 do {
-//                    // Print the raw JSON data as a string
-//                    let jsonString = String(data: data, encoding: .utf8)
-//                    print("Received JSON: \(String(describing: jsonString))")
+                    //                    // Print the raw JSON data as a string
+                    //                    let jsonString = String(data: data, encoding: .utf8)
+                    //                    print("Received JSON: \(String(describing: jsonString))")
                     
                     let pokemonCard = try JSONDecoder().decode([PokemonCard].self, from: data)
                     DispatchQueue.main.async {
@@ -1056,10 +1084,10 @@ struct ContentView: View {
                     print("VEE TOO LOW")
                     print("HOE LEE FUQ")
                     print("BANG DING OW")
-    //                message = String(data: data, encoding: .utf8) ?? "No response"
-    //                errorCode = "\(httpResponse.statusCode)"
-    //                fault = true
-    //                completion(fault)
+                    //                message = String(data: data, encoding: .utf8) ?? "No response"
+                    //                errorCode = "\(httpResponse.statusCode)"
+                    //                fault = true
+                    //                completion(fault)
                 }
             } else if let data = data {
                 print("Data: \(String(data: data, encoding: .utf8) ?? "No data")")
@@ -1083,80 +1111,81 @@ struct ContentView: View {
         }.resume()
     }
     
-//    func calculateMultipliers(safeAreaTop: CGFloat) -> (Double, Double) {
-//        if safeAreaTop > 25 {
-//            // notch iphone
-//            return (0.164, 0.1)
-//        } else if safeAreaTop > 20 {
-//            // ipad
-//            return (0.178, 0.1)
-//        } else {
-//            // touch id iphone
-//            return (0.29, 0.15)
-//        }
-//    }
-//    private func checkLogin(value: Int?, bool: Bool) -> Bool {
-//        if value != nil || bool {
-//            withAnimation(.easeInOut) {
-//                return false
-//            }
-//        }
-//        else {
-//            withAnimation(.easeInOut) {
-//                return true
-//            }
-//        }
-//    }
+    //    func calculateMultipliers(safeAreaTop: CGFloat) -> (Double, Double) {
+    //        if safeAreaTop > 25 {
+    //            // notch iphone
+    //            return (0.164, 0.1)
+    //        } else if safeAreaTop > 20 {
+    //            // ipad
+    //            return (0.178, 0.1)
+    //        } else {
+    //            // touch id iphone
+    //            return (0.29, 0.15)
+    //        }
+    //    }
+    //    private func checkLogin(value: Int?, bool: Bool) -> Bool {
+    //        if value != nil || bool {
+    //            withAnimation(.easeInOut) {
+    //                return false
+    //            }
+    //        }
+    //        else {
+    //            withAnimation(.easeInOut) {
+    //                return true
+    //            }
+    //        }
+    //    }
     
-    private func calculateMarketPrice(for pokemoncard: PokemonCard) -> String {
-        let error = "N/A"
-        let priceTypes = [
-            "normal",
-            "holofoil",
-            "firstEditionHolofoil",
-            "firstEditionNormal",
-            "reverseHolofoil"
-        ]
-        
-        for type in priceTypes {
-            if let price = pokemoncard.tcgPricesMarket[type], let unwrappedPrice = price {
-                return String(format: "%.2f USD", unwrappedPrice)
-            }
+    
+    //        let error = "No Market Price Available"
+    //        if let normalPrice = pokemoncard.tcgPricesMarket["normal"] {
+    //            if let price = normalPrice {
+    //                return String(format: "$%.2f USD", normalPrice!)
+    //            }
+    //            else if let holofoilPrice = pokemoncard.tcgPricesMarket["holofoil"] {
+    //                if let price = holofoilPrice {
+    //                    return String(format: "$%.2f USD", holofoilPrice!)
+    //                }
+    //                else if let firstEditionHolofoilPrice = pokemoncard.tcgPricesMarket["firstEditionHolofoil"] {
+    //                    if let price = firstEditionHolofoilPrice {
+    //                        return String(format: "$%.2f USD", firstEditionHolofoilPrice!)
+    //                    }
+    //                    else if let firstEditionNormalPrice = pokemoncard.tcgPricesMarket["firstEditionNormal"] {
+    //                        if let price = firstEditionNormalPrice {
+    //                            return String(format: "$%.2f USD", firstEditionNormalPrice!)
+    //                        }
+    //                       else if let reverseHolofoilPrice = pokemoncard.tcgPricesMarket["reverseHolofoil"] {
+    //                            if let price = reverseHolofoilPrice {
+    //                                return String(format: "$%.2f USD", reverseHolofoilPrice!)
+    //                            }
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        }
+    //        return error
+}
+    
+    
+
+
+func calculateMarketPrice(for pokemoncard: PokemonCard) -> String {
+    let error = "N/A"
+    let priceTypes = [
+        "normal",
+        "holofoil",
+        "firstEditionHolofoil",
+        "firstEditionNormal",
+        "reverseHolofoil"
+    ]
+    
+    for type in priceTypes {
+        if let price = pokemoncard.tcgPricesMarket[type], let unwrappedPrice = price {
+            return String(format: "%.2f USD", unwrappedPrice)
         }
-        
-        return error
-    
-//        let error = "No Market Price Available"
-//        if let normalPrice = pokemoncard.tcgPricesMarket["normal"] {
-//            if let price = normalPrice {
-//                return String(format: "$%.2f USD", normalPrice!)
-//            }
-//            else if let holofoilPrice = pokemoncard.tcgPricesMarket["holofoil"] {
-//                if let price = holofoilPrice {
-//                    return String(format: "$%.2f USD", holofoilPrice!)
-//                }
-//                else if let firstEditionHolofoilPrice = pokemoncard.tcgPricesMarket["firstEditionHolofoil"] {
-//                    if let price = firstEditionHolofoilPrice {
-//                        return String(format: "$%.2f USD", firstEditionHolofoilPrice!)
-//                    }
-//                    else if let firstEditionNormalPrice = pokemoncard.tcgPricesMarket["firstEditionNormal"] {
-//                        if let price = firstEditionNormalPrice {
-//                            return String(format: "$%.2f USD", firstEditionNormalPrice!)
-//                        }
-//                       else if let reverseHolofoilPrice = pokemoncard.tcgPricesMarket["reverseHolofoil"] {
-//                            if let price = reverseHolofoilPrice {
-//                                return String(format: "$%.2f USD", reverseHolofoilPrice!)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return error
-        
     }
     
-    
+    return error
 }
 
 func fetchUserID() -> Int {

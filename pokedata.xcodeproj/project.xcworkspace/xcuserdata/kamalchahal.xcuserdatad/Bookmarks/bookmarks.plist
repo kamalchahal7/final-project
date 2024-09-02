@@ -12,13 +12,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>235</string>
+					<string>252</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>234</string>
+					<string>251</string>
 					<key>Timestamp</key>
-					<string>746577591.466944</string>
+					<string>746837554.631434</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -38,7 +38,7 @@
 </string>
 				<key>leading</key>
 				<string>        // Footer
-       
+        
 </string>
 				<key>trailing</key>
 				<string>        TabView (selection: $selectedTab){
@@ -57,13 +57,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>446</string>
+					<string>464</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>445</string>
+					<string>463</string>
 					<key>Timestamp</key>
-					<string>746577591.46724</string>
+					<string>746837554.631368</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -102,13 +102,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>669</string>
+					<string>688</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>668</string>
+					<string>687</string>
 					<key>Timestamp</key>
-					<string>746577591.467201</string>
+					<string>746837554.631478</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -133,7 +133,7 @@
 				<key>trailing</key>
 				<string>            GeometryReader { geometry in
                 VStack {
-                    Spacer()
+                    CollectionTabView(
 </string>
 			</dict>
 			<key>type</key>
@@ -147,13 +147,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>688</string>
+					<string>715</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>687</string>
+					<string>714</string>
 					<key>Timestamp</key>
-					<string>746577591.467276</string>
+					<string>746837554.631192</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -172,8 +172,8 @@
 				<string>            // COLLECTION TAB BAR
 </string>
 				<key>leading</key>
-				<string>                .tag(2)
-        
+				<string>            .tag(2)
+            
 </string>
 				<key>trailing</key>
 				<string>            GeometryReader { geometry in
@@ -192,13 +192,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>851</string>
+					<string>879</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>850</string>
+					<string>878</string>
 					<key>Timestamp</key>
-					<string>746577591.467128</string>
+					<string>746837554.6315171</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -217,12 +217,12 @@
 				<string>            // PROFILE TAB BAR
 </string>
 				<key>leading</key>
-				<string>                
+				<string>            
             
 </string>
 				<key>trailing</key>
 				<string>            GeometryReader { geometry in
-//                let isNotchDevice = geometry.safeAreaInsets.top
+                //                let isNotchDevice = geometry.safeAreaInsets.top
                 VStack {
 </string>
 			</dict>

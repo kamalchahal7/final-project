@@ -36,6 +36,8 @@ struct LoginView: View {
     @State private var existingUserData: Dictionary = [:]
     @State private var usernameError: Bool = false
     
+    var onLoginSuccess: () -> Void
+    
     @FocusState private var focused: LoginField?
     
     var body: some View {
@@ -48,12 +50,12 @@ struct LoginView: View {
                             Text("Login")
                                 .font(.largeTitle)
                                 .fontWeight(.heavy)
-                                .foregroundStyle(Color.black)
                             Spacer()
                         }
                         TextField("Username/Email", text: $account)
                             .font(.system(size: 20, weight: .medium))
                             .autocapitalization(.none)
+                            .autocorrectionDisabled(true)
                             .padding()
                             .multilineTextAlignment(.leading)
                             .background(Color.white)
@@ -74,6 +76,7 @@ struct LoginView: View {
                         SecureField("Password", text: $password)
                             .font(.system(size: 20, weight: .medium))
                             .autocapitalization(.none)
+                            .autocorrectionDisabled(true)
                             .padding()
                             .multilineTextAlignment(.leading)
                             .background(Color.white)
@@ -126,6 +129,7 @@ struct LoginView: View {
                                         // backend errror checking
                                             withAnimation(.easeInOut) {
                                                 showLoginView = false
+                                                onLoginSuccess()
                                             }
                                         }
                                     }
@@ -225,5 +229,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView(showLoginView: .constant(true), showRegisterView: .constant(false), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false))
+    LoginView(showLoginView: .constant(true), showRegisterView: .constant(false), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false), onLoginSuccess: {})
 }

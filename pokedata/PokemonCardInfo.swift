@@ -8,19 +8,31 @@
 import SwiftUI
 
 struct PokemonCardInfo: View {
-    // Indicates whether a section is shown or not
-    @State private var shown: [Bool] = [true, true, true, true, true, true]
-    @State private var collected: Bool
+    @AppStorage("user_id") var user_id: Int = 0
     @Binding var market: String
     @Binding var collection: [PokemonCard]
     var pokemonCard: PokemonCard
+    @Binding var showLoginView: Bool
+    @Binding var showRegisterView: Bool
+    @Binding var message: String
+    @Binding var errorCode: String
+    @Binding var fault: Bool
     let onDismiss: () -> Void
-    init(market: Binding<String>, collection: Binding<[PokemonCard]>, pokemonCard: PokemonCard, onDismiss: @escaping () -> Void) {
+    // Indicates whether a section is shown or not
+    @State private var shown: [Bool] = [true, true, true, true, true, true]
+    @State private var collectRequest: Bool = false
+    @State private var notLoggedIn: Bool = false
+    init(market: Binding<String>, collection: Binding<[PokemonCard]>, pokemonCard: PokemonCard, showLoginView: Binding<Bool>, showRegisterView: Binding<Bool>, message: Binding<String>, errorCode: Binding<String>, fault: Binding<Bool>, onDismiss: @escaping () -> Void) {
         self.pokemonCard = pokemonCard
         self._market = market
         self._collection = collection
+        self._showLoginView = showLoginView
+        self._showRegisterView = showRegisterView
+        self._message = message
+        self._errorCode = errorCode
+        self._fault = fault
         self.onDismiss = onDismiss
-        _collected = State(initialValue: UserDefaults.standard.bool(forKey: "collected_\(pokemonCard.id)"))
+        _collectRequest = State(initialValue: UserDefaults.standard.bool(forKey: "collectRequest_\(pokemonCard.id)"))
     }
     var body: some View {
         GeometryReader { geometry in
@@ -37,19 +49,24 @@ struct PokemonCardInfo: View {
                         Spacer()
                         Button {
                             withAnimation {
-                                collected.toggle()
-                                UserDefaults.standard.set(collected, forKey: "collected_\(pokemonCard.id)")
-                                if collected {
-                                    collection.append(pokemonCard)
-                                }
-                                else {
-                                    if let index = collection.firstIndex(of: pokemonCard) {
-                                        collection.remove(at: index)
+                                if user_id == 0 {
+                                    notLoggedIn = true
+                                } else {
+                                    collectRequest.toggle()
+                                    UserDefaults.standard.set(collectRequest, forKey: "collectRequest_\(pokemonCard.id)")
+                                    if collectRequest {
+                                        collection.append(pokemonCard)
                                     }
+                                    else {
+                                        if let index = collection.firstIndex(of: pokemonCard) {
+                                            collection.remove(at: index)
+                                        }
+                                    }
+                                    submitCollect()
                                 }
                             }
                         } label: {
-                            Text (collected ? "Remove" : "Add")
+                            Text (collectRequest && !notLoggedIn && user_id != 0 ? "Remove" : "Add")
 //                                        .symbolVariant(.circle.fill)
                         }
                         .padding(10)
@@ -475,7 +492,51 @@ struct PokemonCardInfo: View {
             }
             .background(VStack(spacing: .zero) { Color.indigo })
             .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+            .sheet(isPresented: $notLoggedIn) {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Button("Close") {
+                            notLoggedIn = false
+                        }
+                        .padding([.top, .trailing], !showRegisterView ? 0 : 16)
+                    }
+                    if showLoginView {
+                        LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault, onLoginSuccess: {
+                            notLoggedIn = false
+                        })
+                    }
+                    if showRegisterView {
+                        RegisterView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault)
+//                                .padding(.top, isNotchDevice > 25 ? 35 : 0)
+                    }
+                }
+                .padding(showRegisterView ? 0 : 16)
+                .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
+            }
         }
+    }
+    func submitCollect() {
+        guard let url = URL(string: "http://127.0.0.1:5000/collection") else {
+            print("Invalid URL")
+            return
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        let bodyData = "user_id=\(user_id)&id=\(pokemonCard.id)&add=\(collectRequest)"
+        
+        request.httpBody = bodyData.data(using: String.Encoding.utf8)
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                return
+            }
+            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+                print("Server error: \(httpResponse.statusCode)")
+                return
+            }
+        }.resume()
     }
     
     func isPriceAvailable(in prices: [String: Double?]) -> Bool {
@@ -485,6 +546,12 @@ struct PokemonCardInfo: View {
             }
         }
         return false
+    }
+    
+    func updateLoginState() {
+        if !showRegisterView && !showLoginView {
+            notLoggedIn = false
+        }
     }
 }
 
@@ -546,5 +613,5 @@ struct PokemonCardInfo: View {
         setUpdatedAt: "2018/09/03 11:49:00",
         setImagesSymbol: "https://images.pokemontcg.io/xy10/symbol.png",
         setImagesLogo: "https://images.pokemontcg.io/xy10/logo.png")
-    ]), pokemonCard: PokemonCard(id: "xy10-78", name: "Lugia", supertype: "Pokémon", subtypes: ["Basic"], hp: "120", types: ["Colorless"], evolvesFrom: "Lugia Jr.", rules: nil, ancientTraitName: nil, ancientTraitText: nil, abilitiesName: ["Pressure"], abilitiesText: ["As long as this Pokémon is your Active Pokémon, any damage done by attacks from your opponent's Active Pokémon is reduced by 20 (before applying Weakness and Resistance)."], abilitiesType: ["Ability"], attacksCost: ["Colorless", "Colorless", "Colorless"], attacksName: ["Intensifying Burn"], attacksText: ["If your opponent's Active Pokémon is a Pokémon-EX, this attack does 60 more damage."], attacksDamage: ["60+"], attacksConvertedEnergyCost: [3], weaknessType: "Lightning", weaknessValue: "×2", resistanceType: "Fighting", resistanceValue: "-20", retreatCost: ["Colorless", "Colorless"], convertedRetreatCost: 2, number: "78", artist: "TOKIYA", rarity: "Rare", flavorText: "It is said to be the guardian of the seas. It is rumored to have been seen on the night of a storm.", nationalPokedexNumbers: [249], legalitiesStandard: "Legal", legalitiesExpanded: "Legal", legalitiesUnlimited: "Legal", regulationMark: nil, lowImageURL: "https://images.pokemontcg.io/xy10/78.png", highImageURL: "https://images.pokemontcg.io/xy10/78_hires.png", tcgURL: "https://prices.pokemontcg.io/tcgplayer/xy10-78", tcgUpdatedAt: "2024/08/18", tcgPricesType: ["normal": "Normal", "reverseHolofoil": "Reverse Holofoil"], tcgPricesLow: ["normal": nil, "reverseHolofoil": nil], tcgPricesMid: ["normal": 0.56, "reverseHolofoil": 1.92], tcgPricesHigh: ["normal": 5.0, "reverseHolofoil": 10.0], tcgPricesMarket: ["normal": 0.55, "reverseHolofoil": 2.39], tcgPricesDirectLow: ["normal": nil, "reverseHolofoil": nil], setId: "xy10", setName: "Fates Collide", setSeries: "XY", setPrintedTotal: 124, setTotal: 129, setLegalitiesStandard: nil, setLegalitiesExpanded: "Legal", setLegalitiesUnlimited: "Legal", setPtcgoCode: "FCO", setReleaseDate: "2016/05/02", setUpdatedAt: "2018/09/03 11:49:00", setImagesSymbol: "https://images.pokemontcg.io/xy10/symbol.png", setImagesLogo: "https://images.pokemontcg.io/xy10/logo.png"), onDismiss: {})
+    ]), pokemonCard: PokemonCard(id: "xy10-78", name: "Lugia", supertype: "Pokémon", subtypes: ["Basic"], hp: "120", types: ["Colorless"], evolvesFrom: "Lugia Jr.", rules: nil, ancientTraitName: nil, ancientTraitText: nil, abilitiesName: ["Pressure"], abilitiesText: ["As long as this Pokémon is your Active Pokémon, any damage done by attacks from your opponent's Active Pokémon is reduced by 20 (before applying Weakness and Resistance)."], abilitiesType: ["Ability"], attacksCost: ["Colorless", "Colorless", "Colorless"], attacksName: ["Intensifying Burn"], attacksText: ["If your opponent's Active Pokémon is a Pokémon-EX, this attack does 60 more damage."], attacksDamage: ["60+"], attacksConvertedEnergyCost: [3], weaknessType: "Lightning", weaknessValue: "×2", resistanceType: "Fighting", resistanceValue: "-20", retreatCost: ["Colorless", "Colorless"], convertedRetreatCost: 2, number: "78", artist: "TOKIYA", rarity: "Rare", flavorText: "It is said to be the guardian of the seas. It is rumored to have been seen on the night of a storm.", nationalPokedexNumbers: [249], legalitiesStandard: "Legal", legalitiesExpanded: "Legal", legalitiesUnlimited: "Legal", regulationMark: nil, lowImageURL: "https://images.pokemontcg.io/xy10/78.png", highImageURL: "https://images.pokemontcg.io/xy10/78_hires.png", tcgURL: "https://prices.pokemontcg.io/tcgplayer/xy10-78", tcgUpdatedAt: "2024/08/18", tcgPricesType: ["normal": "Normal", "reverseHolofoil": "Reverse Holofoil"], tcgPricesLow: ["normal": nil, "reverseHolofoil": nil], tcgPricesMid: ["normal": 0.56, "reverseHolofoil": 1.92], tcgPricesHigh: ["normal": 5.0, "reverseHolofoil": 10.0], tcgPricesMarket: ["normal": 0.55, "reverseHolofoil": 2.39], tcgPricesDirectLow: ["normal": nil, "reverseHolofoil": nil], setId: "xy10", setName: "Fates Collide", setSeries: "XY", setPrintedTotal: 124, setTotal: 129, setLegalitiesStandard: nil, setLegalitiesExpanded: "Legal", setLegalitiesUnlimited: "Legal", setPtcgoCode: "FCO", setReleaseDate: "2016/05/02", setUpdatedAt: "2018/09/03 11:49:00", setImagesSymbol: "https://images.pokemontcg.io/xy10/symbol.png", setImagesLogo: "https://images.pokemontcg.io/xy10/logo.png"), showLoginView: .constant(true), showRegisterView: .constant(false), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false), onDismiss: {})
 }

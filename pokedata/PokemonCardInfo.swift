@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PokemonCardInfo: View {
     @AppStorage("user_id") var user_id: Int = 0
+    @Binding var collectionEdit: Bool
     @Binding var market: String
     @Binding var collection: [PokemonCard]
     var pokemonCard: PokemonCard
@@ -22,8 +23,9 @@ struct PokemonCardInfo: View {
     @State private var shown: [Bool] = [true, true, true, true, true, true]
     @State private var collectRequest: Bool = false
     @State private var notLoggedIn: Bool = false
-    init(market: Binding<String>, collection: Binding<[PokemonCard]>, pokemonCard: PokemonCard, showLoginView: Binding<Bool>, showRegisterView: Binding<Bool>, message: Binding<String>, errorCode: Binding<String>, fault: Binding<Bool>, onDismiss: @escaping () -> Void) {
+    init(collectionEdit: Binding<Bool>, market: Binding<String>, collection: Binding<[PokemonCard]>, pokemonCard: PokemonCard, showLoginView: Binding<Bool>, showRegisterView: Binding<Bool>, message: Binding<String>, errorCode: Binding<String>, fault: Binding<Bool>, onDismiss: @escaping () -> Void) {
         self.pokemonCard = pokemonCard
+        self._collectionEdit = collectionEdit
         self._market = market
         self._collection = collection
         self._showLoginView = showLoginView
@@ -52,6 +54,9 @@ struct PokemonCardInfo: View {
                                 if user_id == 0 {
                                     notLoggedIn = true
                                 } else {
+                                    DispatchQueue.main.async {
+                                        collectionEdit = true
+                                    }
                                     collectRequest.toggle()
                                     UserDefaults.standard.set(collectRequest, forKey: "collectRequest_\(pokemonCard.id)")
                                     if collectRequest {
@@ -489,6 +494,10 @@ struct PokemonCardInfo: View {
 //                    Spacer()
                 }
                 .padding()
+                .onChange(of: pokemonCard) {
+                    // Update the collectRequest when a new card is selected
+                    collectRequest = UserDefaults.standard.bool(forKey: "collectRequest_\(pokemonCard.id)")
+                }
             }
             .background(VStack(spacing: .zero) { Color.indigo })
             .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
@@ -556,7 +565,7 @@ struct PokemonCardInfo: View {
 }
 
 #Preview {
-    PokemonCardInfo(market: .constant("0.55 USD"), collection: .constant([PokemonCard( // Collection list with one element
+    PokemonCardInfo(collectionEdit: .constant(false), market: .constant("0.55 USD"), collection: .constant([PokemonCard( // Collection list with one element
         id: "xy10-78",
         name: "Lugia",
         supertype: "Pokémon",

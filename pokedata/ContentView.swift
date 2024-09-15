@@ -135,7 +135,7 @@ struct PokemonCard: Decodable, Identifiable, Equatable, Hashable {
     let setImagesLogo: String?
 }
 
-struct Set: Codable {
+struct Set: Codable, Equatable {
     let id: String
     let name: String
     let total: Int
@@ -145,7 +145,7 @@ struct Set: Codable {
     let symbol: String
 }
 
-struct Series: Codable {
+struct Series: Codable, Equatable {
     let series: String
     let sets: [Set]
 }
@@ -161,10 +161,25 @@ struct UserInfo: Decodable, Identifiable, Hashable {
     let collection: Int
 }
 
+class cards: ObservableObject {
+    @Published var cards: [PokemonCard] = []
+}
+class series: ObservableObject {
+    @Published var series: [Series] = []
+}
+//class clicked: ObservableObject {
+//    @Published var change: Bool = false
+//}
 
 struct ContentView: View {
     // Global user id
     @AppStorage("user_id") var user_id: Int = 0
+    // Environment object for collection
+    @StateObject var collections = cards()
+    // Environment object for collection
+    @StateObject var activeSeries = series()
+    // Tracks a change in collection
+    @State var collectionEdit: Bool = false
     // Inputed Data on Search Tab Bar
     @State private var pokedata: String = ""
     // Inputed Data on Cards Tab Bar
@@ -176,7 +191,7 @@ struct ContentView: View {
     // Returned Data from accounts.db
     @State private var userData = UserInfo(id: 0, username: "", email: "", first_name: "", last_name: "", date_of_birth: "", registration_time_EST: "", collection: 0)
     // Initial Tab
-    @State private var selectedTab = 2
+    @State private var selectedTab = 0
     // Checks if search bar is active or not
     @State private var isSearchActive: Bool = false
     // Checks if someone has submitted a search
@@ -250,7 +265,7 @@ struct ContentView: View {
         // Footer
         
         // SEARCH TAB BAR
-        TabView (selection: $selectedTab){
+        TabView (selection: $selectedTab) {
             GeometryReader { geometry in
                 ZStack {
                     // Background that slides in
@@ -664,7 +679,7 @@ struct ContentView: View {
                             }
                             
                             if showCardDetail, let selectedCard = selectedCard {
-                                PokemonCardInfo(market: $market, collection: $collection, pokemonCard: selectedCard, showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: {
+                                PokemonCardInfo(collectionEdit: $collectionEdit, market: $market, collection: $collection, pokemonCard: selectedCard, showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: {
                                     withAnimation(.easeInOut) {
                                         showCardDetail = false
                                     }
@@ -685,10 +700,11 @@ struct ContentView: View {
             }
             .tag(1)
             
-            // HISTORY TAB BAR (may get rid of this)
+            // COLLECTION TAB BAR
             GeometryReader { geometry in
                 VStack {
                     CollectionTabView(
+                        collectionEdit: $collectionEdit,
                         selectedCard: $selectedCard,
                         market: $market,
                         showLoginView: $showLoginView,
@@ -705,157 +721,13 @@ struct ContentView: View {
                 }
             }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
-            
-            
             .tabItem {
-                Label("History", systemImage: "gobackward")
+                Label("Collection", systemImage: "square.on.square")
             }
             .tag(2)
             
             // COLLECTION TAB BAR
-            GeometryReader { geometry in
-                ZStack {
-                    // Background that slides in
-                    //                    let safeAreaTop = geometry.safeAreaInsets.top
-                    //                    var heightMultiplier = 0.0
-                    //                    var offsetMultiplier = 0.0
-                    //
-                    //                    if isSearchActive {
-                    //
-                    //                        if safeAreaTop > 25 {
-                    //                            heightMultiplier = 0.17
-                    //                            offsetMultiplier = 0.1
-                    //                        } else if safeAreaTop > 20 {
-                    //                            heightMultiplier = 0.17
-                    //                            offsetMultiplier = 0.1
-                    //                        } else {
-                    //                            heightMultiplier = 0.29
-                    //                            offsetMultiplier = 0.15
-                    //                        }
-                    
-                    let isNotchDevice = geometry.safeAreaInsets.top > 20
-                    let heightMultiplier = isNotchDevice ? 0.135 : 0.25
-                    let offsetMultiplier = isNotchDevice ? 0.1 : 0.15
-                    
-                    Rectangle()
-                        .foregroundColor(Color.blue.opacity(0.7))
-                        .frame(height: geometry.safeAreaInsets.top + (geometry.size.height * heightMultiplier))
-                        .offset(y: -geometry.size.height * offsetMultiplier)
-                        .transition(.move(edge: .top))
-                        .animation(.easeInOut(duration: 1.0), value: search)
-                    
-                    
-                }
-                
-                VStack {
-                    if !showCollectionDetail {
-                        HStack {
-                            Spacer()
-                            Text("Collection")
-                                .font(.largeTitle)
-                                .fontWeight(.heavy)
-                                .foregroundStyle(Color.white)
-                                .shadow(color: .black, radius: 3)
-                                .onAppear {
-                                    print(collection)
-                                }
-                            Spacer()
-                            
-                        }
-                        .padding(.bottom, 28)
-                        
-                        
-                        if !collection.isEmpty {
-                            let rows = collection.chunked(into: 7)
-                            ForEach(rows, id: \.self) { row in
-                                HStack {
-                                    ForEach(row, id: \.id) { pokemonCard in
-                                        Button(action: {
-                                            withAnimation(.easeInOut) {
-                                                selectedCard = pokemonCard
-                                                market = calculateMarketPrice(for: pokemonCard)
-                                                showCollectionDetail = true
-                                            }
-                                        }) {
-                                            AsyncImage(url: URL(string: pokemonCard.lowImageURL)) { image in
-                                                image.resizable().scaledToFit().shadow(color: .white, radius: 2.5).frame(height: geometry.size.width * 0.18)
-                                            } placeholder: {
-                                                Text("Image of Pokemon Card")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    //                    if showCollectionDetail, let selectedCard = selectedCard {
-                    //                        PokemonCardInfo(market: $market, collection: $collection, pokemonCard: selectedCard, showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: { $collection, pokemonCard: selectedCard, onDismiss: {
-                    //                            withAnimation(.easeInOut) {
-                    //                                showCollectionDetail = false
-                    //                            }
-                    //                        })
-                    //                        .transition(.move(edge: .trailing))
-                    //                        .edgesIgnoringSafeArea(.all)
-                    //                        .zIndex(1)
-                    //                    }
-                    
-                    
-                    
-                    
-                    
-                    //                    Image("collection1")
-                    //                        .resizable()
-                    //                        .aspectRatio(contentMode: .fit)
-                    //                        .padding(.bottom)
-                    //
-                    //                    Button(action: {
-                    //                        withAnimation(.easeInOut) {
-                    //                        }
-                    //                    }) {
-                    //                        HStack {
-                    ////                            Image(systemName: "camera")
-                    //                            Text("Pokemon Go Collection")
-                    //                        }
-                    //                        .frame(height: 27)
-                    //                    }
-                    //                    .padding()
-                    //                    .frame(maxWidth: .infinity)
-                    //                    .background(Color.pink)
-                    //                    .cornerRadius(10)
-                    //                    .overlay(
-                    //                        RoundedRectangle(cornerRadius: 10)
-                    //                            .stroke(Color.black, lineWidth: 2)
-                    //                    )
-                    //
-                    //                    Button(action: {
-                    //                        withAnimation(.easeInOut) {
-                    //                        }
-                    //                    }) {
-                    //                        HStack {
-                    ////                            Image(systemName: "camera")
-                    //                            Text("Pokemon Card Collection")
-                    //                        }
-                    //                        .frame(height: 27)
-                    //                    }
-                    //                    .padding()
-                    //                    .frame(maxWidth: .infinity)
-                    //                    .background(Color.green)
-                    //                    .cornerRadius(10)
-                    //                    .overlay(
-                    //                        RoundedRectangle(cornerRadius: 10)
-                    //                            .stroke(Color.black, lineWidth: 2)
-                    //                    )
-                    
-                    
-                    if !showCollectionDetail { Spacer() }
-                }
-                .padding(showCollectionDetail ? 0 : 16)
-            }
-            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
-            .tabItem {
-                Label("Collection", systemImage: "square.on.square")
-            }
-            .tag(3)
+            
             //            NavigationStack {
             //                Text("<Collection>")
             //                    .navigationTitle("Collection")
@@ -940,8 +812,14 @@ struct ContentView: View {
             .tabItem {
                 Label("Profile", systemImage: "person.fill")
             }
-            .tag(4)
+            .tag(3)
         }
+        .environmentObject(collections)
+        .environmentObject(activeSeries)
+        .onAppear {
+            resetSetsOnStart()
+        }
+        
         
         // Changes Colour of Tab Bar
         .onAppear() {
@@ -1108,6 +986,31 @@ struct ContentView: View {
                     print("Decoding error: \(error.localizedDescription)")
                 }
             }
+        }.resume()
+    }
+    
+    func resetSetsOnStart() {
+        if user_id == 0 {
+            print("No user ID provided")
+            return
+        }
+        
+        let urlString = "http://127.0.0.1:5000/reset?user_id=\(user_id)"
+        
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error resetting sets:", error)
+                return
+            }
+            print("Sets reset successfully")
         }.resume()
     }
     

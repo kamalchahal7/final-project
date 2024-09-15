@@ -9,7 +9,9 @@ import SwiftUI
 
 struct CollectionTabView: View {
     @AppStorage("user_id") var user_id: Int = 0
-    
+    @EnvironmentObject var collections: cards
+    @EnvironmentObject var activeSeries: series
+    @Binding var collectionEdit: Bool
     @Binding var selectedCard: PokemonCard?
     @Binding var market: String
     @Binding var showLoginView: Bool
@@ -18,11 +20,10 @@ struct CollectionTabView: View {
     @Binding var errorCode: String
     @Binding var fault: Bool
     let onDismiss: () -> Void
-    
+    @State private var edited: Bool = false
     @State private var isLoading: Bool = false
     @State private var isWaiting: Bool = false
     @State private var shown: [String: Bool] = [:]
-    @State private var activeSeries: [Series] = []
     @State var showCardDetail: Bool = false
     @State private var collection: [PokemonCard] = []
     @State private var buttonWidth: CGFloat = 0
@@ -31,261 +32,193 @@ struct CollectionTabView: View {
     var body: some View {
         GeometryReader { geometry in
             if !showCardDetail {
-                
-                    VStack {
-                        GroupBox {
+                VStack {
+                    GroupBox {
+                        HStack {
+                            Text("Collection")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                            Spacer()
+                        }
+                        
+                        if !isWaiting && !isLoading {
+                            Divider()
+                                .padding(.top, isWaiting ? 0 : -8)
+                            let total = total()
                             HStack {
-                                Text("Collection")
-                                    .font(.largeTitle)
-                                    .fontWeight(.bold)
+                                Spacer()
+                                Text("Estimated Networth:")
+                                    .font(.title3)
+                                    .bold()
                                 Spacer()
                             }
-                            
-                            if !isWaiting {
-                                Divider()
-                                .padding(.top, isWaiting ? 0 : -4)
-                                let total = total()
-                                HStack {
-                                    Spacer()
-                                    Text("Estimated Networth:")
-                                        .font(.title3)
-                                        .bold()
-                                    Spacer()
-                                }
-                                HStack {
-                                    Spacer()
-                                    Text(String(format: "$%.2f USD", total))
-                                        .font(.title)
-                                        .bold()
-                                        .foregroundStyle(Color.green)
-                                    Spacer()
-                                }
-                                .padding(.bottom, -6)
+                            HStack {
+                                Spacer()
+                                Text(String(format: "$%.2f USD", total))
+                                    .font(.title2)
+                                    .bold()
+                                    .foregroundStyle(Color(red: 0.0, green: 0.5, blue: 0.0))
+                                Spacer()
                             }
+                            .padding(.bottom, -6)
                         }
-                        .padding([.leading, .trailing])
-                        .cornerRadius(10) // Optional: to match the GroupBox's shape
-                        .shadow(color: Color.black, radius: 5)
-                        ZStack {
-                            if !isLoading {
-                                ScrollView {
-                                    ForEach(activeSeries.indices, id: \.self) { index in
-                                        let serie = activeSeries[index]
-                                        GroupBox {
-                                            HStack {
-                                                Text(serie.series)
-                                                    .font(.title)
-                                                    .fontWeight(.bold)
-                                                Spacer()
-                                            }
-                                            ForEach(serie.sets, id: \.id) { set in
-                                                GroupBox {
-                                                    HStack {
-                                                        VStack {
-                                                            HStack {
-                                                                Spacer().frame(width: geometry.size.width * 0.07 + 4)
-                                                                Spacer()
-                                                                AsyncImage(url: URL(string: set.logo)) { image in
-                                                                    image.resizable().scaledToFit().frame(height: geometry.size.height * 0.1)
-                                                                } placeholder: {
-                                                                    Text("Image of Set")
-                                                                }
-                                                                Spacer()
+                    }
+                    .padding([.leading, .trailing])
+                    .cornerRadius(10) // Optional: to match the GroupBox's shape
+                    .shadow(color: Color.black, radius: 5)
+                    ZStack {
+                        if !isLoading {
+                            ScrollView {
+                                ForEach(activeSeries.series.indices, id: \.self) { index in
+                                    let serie = activeSeries.series[index]
+                                    GroupBox {
+                                        HStack {
+                                            Text(serie.series)
+                                                .font(.title)
+                                                .fontWeight(.bold)
+                                            Spacer()
+                                        }
+                                        ForEach(serie.sets, id: \.id) { set in
+                                            GroupBox {
+                                                HStack {
+                                                    VStack {
+                                                        HStack {
+                                                            Spacer().frame(width: geometry.size.width * 0.07 + 4)
+                                                            Spacer()
+                                                            AsyncImage(url: URL(string: set.logo)) { image in
+                                                                image.resizable().scaledToFit().frame(height: geometry.size.height * 0.1)
+                                                            } placeholder: {
+                                                                Text("Image of Set")
                                                             }
-                                                            HStack {
-                                                                Spacer().frame(width: geometry.size.width * 0.07 + 4)
-                                                                AsyncImage(url: URL(string: set.symbol)) { image in
-                                                                    image.resizable().scaledToFit().frame(width: geometry.size.width * 0.06)
-                                                                } placeholder: {
-                                                                    Text("Image of Set")
-                                                                }
-                                                                let cardCount = collection.filter { $0.setId == set.id }.count
-                                                                if !isWaiting {
-//                                                                    withAnimation (.easeInOut(duration: 2)) {
-                                                                        Text("\(cardCount)/\(set.total) Collected")
-//                                                                    }
-                                                                }
+                                                            Spacer()
+                                                        }
+                                                        HStack {
+                                                            Spacer().frame(width: geometry.size.width * 0.07 + 4)
+                                                            AsyncImage(url: URL(string: set.symbol)) { image in
+                                                                image.resizable().scaledToFit().frame(width: geometry.size.width * 0.06)
+                                                            } placeholder: {
+                                                                Text("Image of Set")
+                                                            }
+                                                            let cardCount = collections.cards.filter { $0.setId == set.id }.count
+                                                            if !isWaiting {
+                                                                //                                                                    withAnimation (.easeInOut(duration: 2)) {
+                                                                Text("\(cardCount)/\(set.total) Collected")
+                                                                //                                                                    }
                                                             }
                                                         }
-                                                        Button {
-                                                            withAnimation {
-                                                                shown[set.id] = !(shown[set.id] ?? false)
-                                                            }
-                                                        } label: {
-                                                            Image(systemName: shown[set.id] ?? false ? "chevron.up" : "chevron.down")
-                                                                .resizable()
-                                                                .scaledToFit()
-                                                                .frame(width: geometry.size.width * 0.07)
-                                                                .symbolVariant(.circle.fill)
-                                                                .padding(.trailing, -4)
-                                                                .padding(.leading, 8)
-                                                        }
-                                                        .foregroundStyle(.green)
                                                     }
-                                                    
-                                                    if shown[set.id] ?? false {
-                                                        Divider()
-                                                            .padding(.bottom, 4)
-                                                        if !isWaiting {
-                                                            // Filter and sort the cards
-                                                            let filteredAndSortedCards = collection
-                                                                .filter { $0.setId == set.id }
-                                                                .sorted {
-                                                                    if let firstNumber = extract(from: $0.number), let secondNumber = extract(from: $1.number) {
-                                                                        return firstNumber < secondNumber
-                                                                    }
-                                                                    return false
+                                                    Button {
+                                                        withAnimation {
+                                                            shown[set.id] = !(shown[set.id] ?? false)
+                                                        }
+                                                    } label: {
+                                                        Image(systemName: shown[set.id] ?? false ? "chevron.up" : "chevron.down")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: geometry.size.width * 0.07)
+                                                            .symbolVariant(.circle.fill)
+                                                            .padding(.trailing, -4)
+                                                            .padding(.leading, 8)
+                                                    }
+                                                    .foregroundStyle(.green)
+                                                }
+                                                
+                                                if shown[set.id] ?? false {
+                                                    Divider()
+                                                    if !isWaiting {
+                                                        // Filter and sort the cards
+                                                        let filteredAndSortedCards = collections.cards
+                                                            .filter { $0.setId == set.id }
+                                                            .sorted {
+                                                                if let firstNumber = extract(from: $0.number), let secondNumber = extract(from: $1.number) {
+                                                                    return firstNumber < secondNumber
                                                                 }
-                                                            // Chunk the sorted cards into rows of 7
-                                                            let rows = filteredAndSortedCards.chunked(into: 7)
-                                                            
-                                                            // Display the rows in a grid-like format using HStacks
-                                                            ForEach(rows, id: \.self) { row in
-                                                                HStack {
-                                                                    ForEach(row, id: \.id) { pokemonCard in
-                                                                        Button(action: {
-                                                                            withAnimation(.easeInOut) {
-                                                                                selectedCard = pokemonCard
-                                                                                market = calculateMarketPrice(for: pokemonCard)
-                                                                                showCardDetail = true
-                                                                            }
-                                                                        }) {
-//                                                                            ZStack(alignment: .bottomTrailing) {
-                                                                            ZStack {
-                                                                                AsyncImage(url: URL(string: pokemonCard.lowImageURL)) { image in
-                                                                                    image
-                                                                                        .resizable()
-                                                                                        .scaledToFit()
-                                                                                        .opacity(0.6)
-                                                                                        .frame(height: geometry.size.width * 0.18)
-                                                                                } placeholder: {
-                                                                                    Text("Image of Pokemon Card")
-                                                                                }
+                                                                return false
+                                                            }
+                                                        // Chunk the sorted cards into rows of 7
+                                                        let rows = filteredAndSortedCards.chunked(into: 7)
+                                                        
+                                                        // Display the rows in a grid-like format using HStacks
+                                                        ForEach(rows, id: \.self) { row in
+                                                            HStack {
+                                                                ForEach(row, id: \.id) { pokemonCard in
+                                                                    Button(action: {
+                                                                        withAnimation(.easeInOut) {
+                                                                            selectedCard = pokemonCard
+                                                                            market = calculateMarketPrice(for: pokemonCard)
+                                                                            showCardDetail = true
+                                                                        }
+                                                                    }) {
+                                                                        //                                                                            ZStack(alignment: .bottomTrailing) {
+                                                                        ZStack {
+                                                                            AsyncImage(url: URL(string: pokemonCard.lowImageURL)) { image in
+                                                                                image
+                                                                                    .resizable()
+                                                                                    .scaledToFit()
+                                                                                    .opacity(0.6)
+                                                                                    .frame(height: geometry.size.width * 0.18)
                                                                                 
-                                                                                if let num = extract(from: pokemonCard.number) {
-                                                                                    Text("#\(num)")
-                                                                                        .padding(.top, 8)
-                                                                                        .font(.system(size: geometry.size.width * 0.02))
-                                                                                        .fontWeight(.semibold)
-                                                                                        .foregroundStyle(Color.white)
-                                                                                        .shadow(color: Color.black, radius: 2)
-                                                                                        .shadow(color: Color.black, radius: 2)
-                                                                                }
+                                                                            } placeholder: {
+                                                                                Text("Image of Pokemon Card")
+                                                                            }
+                                                                            .padding(.bottom, -10)
+                                                                            
+                                                                            if let num = extract(from: pokemonCard.number) {
+                                                                                Text("#\(num)")
+                                                                                    .padding(.top, 40)
+                                                                                    .font(.system(size: geometry.size.width * 0.0225))
+                                                                                    .fontWeight(.semibold)
+                                                                                    .foregroundStyle(Color.black)
+                                                                                    .shadow(color: Color.white, radius: 1)
+                                                                                    .shadow(color: Color.white, radius: 2)
+                                                                                    .shadow(color: Color.white, radius: 3)
                                                                             }
                                                                         }
                                                                     }
                                                                 }
                                                             }
-                                                        } else {
-                                                            ProgressView()
-                                                                .progressViewStyle(CircularProgressViewStyle())
-                                                                .tint(.indigo)
-                                                                .scaleEffect(1)
                                                         }
+                                                    } else {
+                                                        ProgressView()
+                                                            .progressViewStyle(CircularProgressViewStyle())
+                                                            .tint(.indigo)
+                                                            .scaleEffect(1)
                                                     }
                                                 }
-                                                .padding(.bottom, 4)
-                                                .cornerRadius(15) // Optional: to match the GroupBox's shape
-                                                .shadow(color: Color.black, radius: 2.5)
-//                                                GroupBox {
-//                                                    HStack {
-//                                                        VStack {
-//                                                            HStack {
-//                                                                Spacer().frame(width: geometry.size.width*0.07 + 4)
-//                                                                Spacer()
-//                                                                AsyncImage(url: URL(string: set.logo)) { image in
-//                                                                    image.resizable().scaledToFit().frame(height: geometry.size.height * 0.1)
-//                                                                } placeholder: {
-//                                                                    Text("Image of Set")
-//                                                                }
-//                                                                Spacer()
-//                                                            }
-//                                                            HStack {
-//                                                                Spacer().frame(width: geometry.size.width*0.07 + 4)
-//                                                                AsyncImage(url: URL(string: set.symbol)) { image in
-//                                                                    image.resizable().scaledToFit().frame(width: geometry.size.width * 0.06)
-//                                                                } placeholder: {
-//                                                                    Text("Image of Set")
-//                                                                }
-//                                                                Text("0/\(set.total) Collected")
-//                                                            }
-//                                                        }
-//                                                        Button {
-//                                                            withAnimation {
-//                                                                shown[set.id] = !(shown[set.id] ?? false)
-//                                                            }
-//                                                        } label: {
-//                                                            Image(systemName: shown[set.id] ?? false ? "chevron.up" : "chevron.down")
-//                                                                .resizable()
-//                                                                .scaledToFit()
-//                                                                .frame(width: geometry.size.width*0.07)
-//                                                                .symbolVariant(.circle.fill)
-//                                                                .padding(.trailing, -4)
-//                                                                .padding(.leading, 8)
-//                                                        }
-//                                                        .foregroundStyle(.green)
-//                                                    }
-//                                                    if shown[set.id] ?? false {
-//                                                        Divider()
-//                                                            .padding(.bottom, 4)
-//
-//                                                        ForEach(collection, id: \.self) { collected in
-//                                                            let filteredCards collected.filter { $0.setId == set.id }
-//                                                            sortedCards = filteredCards.sorted {
-//                                                                if let firstNumber = extract(from: $0.number), let secondNumber = extract(from: $1.number) {
-//                                                                    return firstNumber < secondNumber
-//                                                                }
-//                                                                return false
-//                                                            }
-//                                                        }
-//                                                        let rows = sortedCards.chunked(into: 7)
-//                                                        ForEach(rows id: \.self) { row in
-//                                                            HStack {
-//                                                                ForEach(row, id: \.id) { pokemonCard in
-//                                                                    if pokemonCard.setId == set.id {
-//                                                                        Button(action: {
-//                                                                            withAnimation(.easeInOut) {
-//                                                                                selectedCard = pokemonCard
-//                                                                                market = calculateMarketPrice(for: pokemonCard)
-//                                                                                showCardDetail = true
-//                                                                            }
-//                                                                        }) {
-//                                                                            ZStack (alignment: .bottomTrailing){
-//                                                                                AsyncImage(url: URL(string: pokemonCard.lowImageURL)) { image in
-//                                                                                    image.resizable().scaledToFit().opacity(0.7).frame(height: geometry.size.width * 0.18)
-//                                                                                } placeholder: {
-//                                                                                    Text("Image of Pokemon Card")
-//                                                                                }
-//                                                                            }
-//                                                                        }
-//                                                                    }
-//                                                                }
-//                                                            }
-//                                                        }
-//                                                    }
-//                                                }
                                             }
+                                            .padding(.bottom, 4)
+                                            .cornerRadius(15) // Optional: to match the GroupBox's shape
+                                            .shadow(color: Color.black, radius: 2.5)
                                         }
                                     }
                                 }
-                            } else {
-                                VStack {
-                                    Spacer()
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle())
-                                        .tint(.indigo)
-                                        .scaleEffect(2.5)
-                                    Spacer()
-                                }
+                            }
+                        } else {
+                            VStack {
+                                Spacer()
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle())
+                                    .tint(.indigo)
+                                    .scaleEffect(2.5)
+                                Spacer()
                             }
                         }
+                    }
                     
                     .padding()
+                }
+                .onAppear {
+                    if activeSeries.series.isEmpty || collections.cards.isEmpty || collectionEdit {
+                        fetchSets()
+                        fetchCollection()
+                        collectionEdit = false
+                    }
                 }
             }
             VStack {
                 if showCardDetail, let selectedCard = selectedCard {
                     PokemonCardInfo(
+                        collectionEdit: $collectionEdit,
                         market: $market,
                         collection: $collection,
                         pokemonCard: selectedCard,
@@ -307,9 +240,12 @@ struct CollectionTabView: View {
             }
         }
         .onAppear {
-            fetchSets()
-            fetchCollection()
-            for serie in activeSeries {
+            if activeSeries.series.isEmpty {
+                
+            }
+            
+                
+            for serie in activeSeries.series {
                 for set in serie.sets {
                     if shown[set.id] == nil {
                         shown[set.id] = true
@@ -334,23 +270,32 @@ struct CollectionTabView: View {
                 print("HTTP Request Failed: \(error)")
                 return
             }
-            
-            if let data = data {
-                do {
-                    let pokemonCard = try JSONDecoder().decode([PokemonCard].self, from: data)
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 204 {
+                    isWaiting = false
                     DispatchQueue.main.async {
-                        collection = pokemonCard
-                        isWaiting = false
-//                        print(collection)
+                        print("Error Code is 204 FOR COLLECTION")
+                        print(collections)
+                        edited = false
                     }
-                } catch {
-                    print("Error converting data to JSON: \(error)")
+                } else {
+                    if let data = data {
+                        do {
+                            let pokemonCard = try JSONDecoder().decode([PokemonCard].self, from: data)
+                            DispatchQueue.main.async {
+                                isWaiting = false
+                                edited = true
+                                collections.cards = pokemonCard
+                            }
+                        } catch {
+                            print("Error converting data to JSON: \(error)")
+                        }
+                    }
                 }
             }
         }.resume()
     }
     func fetchSets() {
-        isLoading = true
         guard let url = URL(string: "http://127.0.0.1:5000/sets?user_id=\(user_id)") else {
             print("Invalid URL")
             return
@@ -365,20 +310,26 @@ struct CollectionTabView: View {
                 print("HTTP Request Failed: \(error)")
                 return
             }
-            if let response = response as? HTTPURLResponse {
-                print("HTTP Response: \(response)")
-            }
-            if let data = data {
-                print("Raw Data: \(String(data: data, encoding: .utf8) ?? "Unable to convert data to string")")
-                do {
-                    let series = try JSONDecoder().decode([Series].self, from: data)
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 204 {
                     DispatchQueue.main.async {
-                        activeSeries = series
-                        isLoading = false
-//                        print("Active Series Data: \(activeSeries)")
+                        print("Error Code is 204 FOR SETS")
+//                        print(activeSeries.series)
                     }
-                } catch {
-                    print("Error converting data to JSON: \(error)")
+                } else {
+                    isLoading = true
+                    if let data = data {
+                        do {
+                            let series = try JSONDecoder().decode([Series].self, from: data)
+                            DispatchQueue.main.async {
+                                isLoading = false
+                                activeSeries.series = series
+                                //                        print("Active Series Data: \(activeSeries)")
+                            }
+                        } catch {
+                            print("Error converting data to JSON: \(error)")
+                        }
+                    }
                 }
             }
         }.resume()
@@ -392,7 +343,7 @@ struct CollectionTabView: View {
             "reverseHolofoil"
         ]
         var total = 0.0
-        for card in collection {
+        for card in collections.cards {
             for type in priceTypes {
                 if let price = card.tcgPricesMarket[type] {
                     if let num = price {
@@ -419,5 +370,7 @@ func extract(from number: String) -> Int? {
 }
 
 #Preview {
-    CollectionTabView(selectedCard: .constant(nil), market: .constant("0.55 USD"), showLoginView: .constant(true), showRegisterView: .constant(false), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false), onDismiss: {})
+    CollectionTabView(collectionEdit: .constant(false), selectedCard: .constant(nil), market: .constant("0.55 USD"), showLoginView: .constant(true), showRegisterView: .constant(false), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false), onDismiss: {})
+        .environmentObject(cards())
+        .environmentObject(series())
 }

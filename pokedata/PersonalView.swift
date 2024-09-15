@@ -188,7 +188,7 @@ struct PersonalView: View {
                 if passwordError == nil {
                     submitConfirmation { fault in
                     // backend errror checking
-                        print(fault)
+                        //print(fault)
                         if fault {
                             passwordError = "*Password Incorrect"
                         } else {
@@ -452,7 +452,7 @@ struct PersonalView: View {
                 Spacer()
                 Button(action: {
                     same = false
-                    print(userData.date_of_birth)
+                   // print(userData.date_of_birth)
                     if firstName == userData.first_name && lastName == userData.last_name {
                         nameError = "*First & last name are unchanged"
                         same = true
@@ -492,8 +492,8 @@ struct PersonalView: View {
                     
                     // frontend error checking
                     if nameError == nil && birthDateError == nil && emailError == nil && usernameError == nil && !same {
-                        print("Global: \(user_id)")
-                        print("Local: \(userData.id)")
+                       // print("Global: \(user_id)")
+                       // print("Local: \(userData.id)")
                         // submits registration data to backend
                         submitChange { fault in
                             // backend errror checking
@@ -613,7 +613,7 @@ struct PersonalView: View {
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                         DispatchQueue.main.async {
                             existingUserData = json
-                            print(existingUserData)
+                            //print(existingUserData)
                         }
                     }
                 } catch {
@@ -622,7 +622,7 @@ struct PersonalView: View {
                         existingUserData = [:]
                     }
                 }
-                print("response \(String(data: data, encoding: .utf8) ?? "No response")")
+                //print("response \(String(data: data, encoding: .utf8) ?? "No response")")
             } else if let error = error {
                 print("HTTP Request Failed \(error)")
             }

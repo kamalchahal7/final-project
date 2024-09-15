@@ -31,6 +31,12 @@ db = SQL("sqlite:///accounts.db")
 image_folder = 'archive_new/'
 images = os.listdir(image_folder)
 
+# Saves previous collection
+prev_collection = []
+
+# Saves previous sets
+prev_sets = []
+
 @app.after_request
 def after_request(response):
     """Ensure responses aren't cached"""
@@ -318,6 +324,7 @@ def track():
 
 @app.route("/collection", methods = ["GET", "POST"])
 def collect(): 
+    global prev_collection
     if request.method == "POST":
         user_id = request.form.get("user_id")
         card_id = request.form.get("id")
@@ -347,34 +354,75 @@ def collect():
             # print("1")
             return "Invalid User ID", 400
 
-        collection = db.execute("SELECT card_id FROM collection WHERE user_id = ?", user_id)
-
-        cards = []
-
+        collection = db.execute("SELECT card_id, user_id FROM collection WHERE user_id = ?", user_id)
         if not collection:
             # print("2")
             return "User has no collection available", 400
 
+        cards = []
         for card in collection:
             data = find(card["card_id"])
             cards.append(data[0])
 
         # for index in cards:
         #     print(index)
-        return jsonify(cards), 200
+
+        print(f"new: {cards}")
+        print(f"prev: {prev_collection}")
+        
+
+        if prev_collection != cards:
+            prev_collection = cards
+            return jsonify(cards), 200
+        return "Same sets", 204
     
 @app.route("/sets", methods = ["GET", "POST"])
 def sets():
+    global prev_sets
     if request.method == "GET":
         user_id = request.args.get("user_id")
         if not user_id:
             return "Invalid ID", 400
         
         valid_sets = find_set(user_id)
+        if not valid_sets:
+            return "No sets found", 400
         sets = set_call(valid_sets)
+        if not sets:
+            return "No set information found", 400
         # print(sets)
+
+        # generates list of dicts with the keys: series, sets
         ordered_sets = [{"series": key, "sets": value} for key, value in sets.items()]
+        # print(f"prev: {prev_sets}")
+        # print(f"new: {ordered_sets}")
+        if prev_sets != ordered_sets:
+            prev_sets = ordered_sets
+            return jsonify(ordered_sets), 200
+        return "Same sets", 204
         # print(ordered_sets)
-        return jsonify(ordered_sets), 200
+        
     else:
          return jsonify({}), 200
+
+@app.route("/reset", methods=["GET"])
+def reset():
+    if request.method == "GET":
+        user_id = request.args.get("user_id")
+        if not user_id:
+            return "Invalid ID", 400
+        
+        global prev_sets
+        global prev_collection
+
+        # Resets the global variables
+        prev_sets = []  
+        print(prev_sets)
+        print("hello")
+        prev_collection = []
+        print(prev_collection)
+        print("hello2")
+
+        return jsonify({"message": "Sets reset"}), 200
+    else:
+        return jsonify({}), 200

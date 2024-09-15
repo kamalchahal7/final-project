@@ -217,6 +217,7 @@ def generate_uuid():
     full_uuid = uuid.uuid4()  # Generates a 128-bit UUID
     return full_uuid.int >> 64  # Use the upper 64 bits of the UUID
 
+# retrieves all the set info, orders sets and checks whether sets were added or removed from collection
 def set_call(valid_sets):
     # if not valid_sets:
     #     return None
@@ -274,6 +275,7 @@ def set_call(valid_sets):
         sets[serie] = set_details
     return sets
 
+# finds all the valid set ids that are associated with the user's collection
 def find_set(user_id):
     card_ids = db.execute("SELECT card_id FROM collection WHERE user_id = ?", user_id)
     ids = []

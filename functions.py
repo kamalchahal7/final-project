@@ -2,6 +2,7 @@ import uuid
 from cs50 import SQL
 from pokemontcgsdk import Card, Set, Type, Supertype, Subtype, Rarity, RestClient, PokemonTcgException
 from datetime import datetime
+from time import time
 import pytz
 # import pokemontcgsdk
 
@@ -213,6 +214,12 @@ def timezone(time):
     utc_time = date.astimezone(utc_zone)
     return utc_time.strftime("%Y-%m-%d")
 
+def current_time():
+    # Get the current local time
+    current_time = time.localtime()
+
+    # Check if the current time is in daylight savings
+    is_dst = current_time.tm_isdst
 def generate_uuid():
     full_uuid = uuid.uuid4()  # Generates a 128-bit UUID
     return full_uuid.int >> 64  # Use the upper 64 bits of the UUID

@@ -317,10 +317,46 @@ def personal_change():
 @app.route("/history", methods = ["GET", "POST"])
 def track(): 
     if request.method == "POST":
-        delete = request.form.get("delete")
-        return jsonify({}), 200
+        user_id = request.form.get('user_id')
+        if not user_id:
+            return "Invalid User ID", 400
+        tracked_item = request.form.get("item_id")
+        print(tracked_item)
+        delete_req = request.form.get("delete")
+        print(delete_req)
+
+        if tracked_item:
+            
+                db.execute("INSERT INTO view_history (id, user_id, item_id) VALUES (?, ?, ?)", generate_uuid(), user_id, tracked_item)
+                return jsonify(), 200
+            
+        elif delete_req:
+            
+                db.execute("DELETE FROM view_history WHERE id = ?", user_id)
+                return "View History Deleted", 200
+            
+        return jsonify(), 200
     else:
-        return jsonify({}), 200
+        user_id = request.args.get('user_id')
+        if not user_id:
+            print("Invalid id")
+            return "Invalid User ID", 400
+        history = db.execute("SELECT item_id, view_time_EST FROM view_history WHERE user_id = ? ORDER BY view_time_EST DESC;", user_id)
+
+        items = []
+        for item in history:
+            try:
+                # Checks if the item is the the pokedex number
+                int(item["item_id"])
+
+                pokemon = lookup(item["item_id"])
+                items.append(pokemon)
+            except ValueError:
+                card = find(item["item_id"])
+                items.append(card[0])
+
+        print(items)
+        return "cool", 200
 
 @app.route("/collection", methods = ["GET", "POST"])
 def collect(): 
@@ -338,13 +374,18 @@ def collect():
         if add_request is None: 
             return "Missing request type", 400
         
-        try:
+        collection = db.execute("SELECT collection FROM users WHERE id = ?", user_id)
+       
+        try: 
             if add_request:
                 db.execute("INSERT INTO collection (id, user_id, card_id) VALUES (?, ?, ?)", generate_uuid(), user_id, card_id)
+                db.execute("UPDATE users SET collection = ? WHERE id = ?", collection[0]["collection"]+1, user_id)
             else:
                 db.execute("DELETE FROM collection WHERE user_id = ? AND card_id = ?", user_id, card_id)
+                db.execute("UPDATE users SET collection = ? WHERE id = ?", collection[0]["collection"]-1, user_id)
         except Exception as e:
             return str(e), 500
+        
 
         return jsonify({}), 200
     else:

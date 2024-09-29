@@ -187,7 +187,7 @@ struct PasswordChangeView: View {
                                     confirmNewPasswordError = "*New passwords don't match"
                                 }
                                 
-                                if emailError == nil && !password.isEmpty {
+                                if emailError == nil && newPasswordError == nil && confirmNewPasswordError == nil && !password.isEmpty {
                                     submitPasswordChange { fault in
                                         // backend errror checking
                                         if message == "Password Incorrect" {

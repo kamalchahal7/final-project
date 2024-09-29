@@ -33,6 +33,8 @@ let colours: [String: UIColor] = [
 ]
 
 struct PokemonInfo: View {
+    // Global user id
+    @AppStorage("user_id") var user_id: Int = 0
     // Indicates whether a section is shown or not
     @State private var shown: [Bool] = [true, true, true, true, true]
     
@@ -654,6 +656,31 @@ struct PokemonInfo: View {
             .background(VStack(spacing: .zero) { Color.indigo })
             .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
         }
+        .onAppear {
+            trackPokemon()
+        }
+    }
+    func trackPokemon() {
+        guard let url = URL(string: "http://127.0.0.1:5000/history") else {
+            print("Invalid URL")
+            return
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        let bodyData = "user_id=\(user_id)&item_id=\(pokemon.id)"
+        
+        request.httpBody = bodyData.data(using: String.Encoding.utf8)
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                return
+            }
+            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+                print("Server error: \(httpResponse.statusCode)")
+                return
+            }
+        }.resume()
     }
 }
 

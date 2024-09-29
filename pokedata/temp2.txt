@@ -1,0 +1,44 @@
+List(cardData.indices, id: \.self) { index in
+    let pokemoncard = cardData[index]
+    
+    // Compute the market price inside the view builder
+    let marketPrice = calculateMarketPrice(for: pokemoncard)
+    
+    Button(action: {
+        withAnimation(.easeInOut) {
+            selectedCard = pokemoncard
+            market = calculateMarketPrice(for: pokemoncard)
+            showCardDetail = true
+        }
+    }) {
+        HStack {
+            AsyncImage(url: URL(string: pokemoncard.lowImageURL)) { image in
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 200)
+            } placeholder: {
+                // Placeholder view (Optional)
+                Color.gray.frame(height: 200)
+            }
+            
+            VStack(alignment: .leading) {
+                Text(pokemoncard.name)
+                    .font(.system(size: 20))
+                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                Text("\(pokemoncard.setSeries) - \(pokemoncard.setName)")
+                    .font(.system(size: 15))
+                    .padding(.bottom, 1)
+                Text("Market Price: ")
+                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                + Text(marketPrice)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color(red: 0.0, green: 0.5, blue: 0.0))
+            }
+            .padding(.leading)
+        }
+    }
+}
+.scrollContentBackground(.hidden)
+.foregroundStyle(Color.black)
+.padding(.horizontal, -16)

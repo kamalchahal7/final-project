@@ -1,0 +1,39 @@
+List(fetchedData, id: \.id) { pokemon in
+    Button(action: {
+        withAnimation(.easeInOut) {
+            selected = pokemon
+            showDetail = true
+        }
+    }) {
+        HStack {
+            if let image = pokemonImages[pokemon.name] {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(minWidth: 25, idealWidth: 50, maxWidth: 50, minHeight: 50, idealHeight: 50, maxHeight: 50, alignment: .center)
+            }
+            Text(String(format: "#%04d", pokemon.pokedex_num))
+                .font(.system(size: 20))
+                .padding(.leading, 10)
+            Text(pokemon.name)
+                .font(.system(size: 20))
+                .fontWeight(.heavy)
+        }
+        .foregroundColor(Color.purple)
+        .onAppear {
+            fetchImage(for: pokemon)
+        }
+        
+    }
+}
+.scrollContentBackground(.hidden)
+.padding(.horizontal, -16)
+
+List(data, id \.id) { item in
+    if let cardId = Int(data.item_id) {
+    
+    } else {
+        let pokemonId = Int(data.item_id)
+        
+    }
+}

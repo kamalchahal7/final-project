@@ -158,7 +158,7 @@ struct UserInfo: Decodable, Identifiable, Hashable {
     let last_name: String
     let date_of_birth: String
     let registration_time_EST: String
-    let collection: Int
+    var collection: Int
 }
 
 class cards: ObservableObject {
@@ -247,6 +247,7 @@ struct ContentView: View {
     @State private var fault: Bool = false
     
     @State private var notLoggedIn: Bool = false
+    @State private var intialCount: Int = 0
     
     //    init() {
     //            setupNavigationBarAppearance()
@@ -694,6 +695,9 @@ struct ContentView: View {
                 }
                 .padding(showCardDetail ? 0 : 16)
             }
+            .onDisappear {
+                fetchUserData()
+            }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {
                 Label("Cards", systemImage: "doc.text.magnifyingglass")
@@ -704,6 +708,7 @@ struct ContentView: View {
             GeometryReader { geometry in
                 VStack {
                     CollectionTabView(
+                        initialCount: $userData.collection,
                         collectionEdit: $collectionEdit,
                         selectedCard: $selectedCard,
                         market: $market,
@@ -719,6 +724,9 @@ struct ContentView: View {
                         }
                     )
                 }
+            }
+            .onAppear {
+                fetchUserData()
             }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {
@@ -968,12 +976,6 @@ struct ContentView: View {
                     //                completion(fault)
                 }
             } else if let data = data {
-                print("Data: \(String(data: data, encoding: .utf8) ?? "No data")")
-                if let response = response {
-                    print("Response: \(response)")
-                } else {
-                    print("No response")
-                }
                 do {
                     let info = try JSONDecoder().decode([UserInfo].self, from: data)
                     DispatchQueue.main.async {

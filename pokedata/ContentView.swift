@@ -191,7 +191,7 @@ struct ContentView: View {
     // Returned Data from accounts.db
     @State private var userData = UserInfo(id: 0, username: "", email: "", first_name: "", last_name: "", date_of_birth: "", registration_time_EST: "", collection: 0)
     // Initial Tab
-    @State private var selectedTab = 0
+    @State private var selectedTab = 3
     // Checks if search bar is active or not
     @State private var isSearchActive: Bool = false
     // Checks if someone has submitted a search
@@ -246,7 +246,7 @@ struct ContentView: View {
     // checks if backend pciked up a fault
     @State private var fault: Bool = false
     
-    @State private var notLoggedIn: Bool = false
+    @State private var notLoggedIn: Bool = true
     @State private var intialCount: Int = 0
     
     //    init() {
@@ -695,9 +695,6 @@ struct ContentView: View {
                 }
                 .padding(showCardDetail ? 0 : 16)
             }
-            .onDisappear {
-                fetchUserData()
-            }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {
                 Label("Cards", systemImage: "doc.text.magnifyingglass")
@@ -708,7 +705,6 @@ struct ContentView: View {
             GeometryReader { geometry in
                 VStack {
                     CollectionTabView(
-                        initialCount: $userData.collection,
                         collectionEdit: $collectionEdit,
                         selectedCard: $selectedCard,
                         market: $market,
@@ -724,9 +720,6 @@ struct ContentView: View {
                         }
                     )
                 }
-            }
-            .onAppear {
-                fetchUserData()
             }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {
@@ -760,16 +753,17 @@ struct ContentView: View {
             GeometryReader { geometry in
                 //                let isNotchDevice = geometry.safeAreaInsets.top
                 VStack {
-                    let user_id = fetchUserID()
-                    if user_id == 0 {
-                        if showLoginView {
-                            LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault, onLoginSuccess: { notLoggedIn = false })
+//                    let user_id = fetchUserID()
+                  
+                        if user_id == 0 {
+                            if showLoginView {
+                                LoginView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault, onLoginSuccess: { notLoggedIn = false })
+                            }
+                            if showRegisterView {
+                                RegisterView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault)
+                                //                                .padding(.top, isNotchDevice > 25 ? 35 : 0)
+                            }
                         }
-                        if showRegisterView {
-                            RegisterView(showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault)
-                            //                                .padding(.top, isNotchDevice > 25 ? 35 : 0)
-                        }
-                    }
                     else {
                         if showPersonalView {
                             PersonalView(userData: $userData, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: {
@@ -807,10 +801,10 @@ struct ContentView: View {
                             .edgesIgnoringSafeArea(.all)
                             
                         } else {
-                            ProfileTabView(showLoginView: $showLoginView, showPersonalView: $showPersonalView, showPasswordChangeView: $showPasswordChangeView, showHistoryView: $showHistoryView, showCreditsView: $showCreditsView, userData: $userData, collectionCount: $collection.count)
-                                .onAppear {
-                                    fetchUserData()
-                                }
+                            ProfileTabView(showLoginView: $showLoginView, showPersonalView: $showPersonalView, showPasswordChangeView: $showPasswordChangeView, showHistoryView: $showHistoryView, showCreditsView: $showCreditsView, userData: $userData, collectionCount: $collection.count, notLoggedIn: $notLoggedIn)
+                            .onAppear {
+                                fetchUserData()
+                            }
                         }
                     }
                 }

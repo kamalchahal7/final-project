@@ -18,8 +18,8 @@ struct ProfileTabView: View {
     @Binding var showHistoryView: Bool
     @Binding var showCreditsView: Bool
     @Binding var userData: UserInfo
-    
     let collectionCount: Int
+    @Binding var notLoggedIn: Bool
 //    var shortMonthName: String {
 //        let dateFormatter = DateFormatter()
 //        dateFormatter.dateFormat = "MMM"
@@ -133,8 +133,9 @@ struct ProfileTabView: View {
                             if user_id == 0 {
                                 print("USER ID AFTER: \(user_id)")
                             }
+                            showLoginView = true
                             withAnimation(.easeInOut) {
-                                showLoginView = true
+                                notLoggedIn = true
                             }
                         }) {
                             Text("Sign Out")
@@ -153,5 +154,5 @@ struct ProfileTabView: View {
 }
 
 #Preview {
-    ProfileTabView(showLoginView: .constant(false), showPersonalView: .constant(false), showPasswordChangeView: .constant(false), showHistoryView: .constant(false), showCreditsView: .constant(false), userData: .constant(UserInfo(id: 0, username: "kamal7", email: "kamalxchahal@gmail.com", first_name: "Kamal", last_name: "Chahal", date_of_birth: "2007-02-22", registration_time_EST: "2024-08-26 00:18:51", collection: 0)), collectionCount: 0)
+    ProfileTabView(showLoginView: .constant(false), showPersonalView: .constant(false), showPasswordChangeView: .constant(false), showHistoryView: .constant(false), showCreditsView: .constant(false), userData: .constant(UserInfo(id: 0, username: "kamal7", email: "kamalxchahal@gmail.com", first_name: "Kamal", last_name: "Chahal", date_of_birth: "2007-02-22", registration_time_EST: "2024-08-26 00:18:51", collection: 0)), collectionCount: 0, notLoggedIn: .constant(false))
 }

@@ -1,5 +1,6 @@
 import os
 
+from flask_cors import CORS
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session, jsonify, send_from_directory
 from flask_session import Session
@@ -8,6 +9,7 @@ from collections import OrderedDict
 
 from datetime import datetime, date
 import pytz
+import random
 utc_time = datetime.now(pytz.timezone('UTC'))
 est_time = utc_time.astimezone(pytz.timezone('US/Eastern'))
 
@@ -18,6 +20,7 @@ pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 # Configure application
 app = Flask(__name__)
+CORS(app)
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -368,10 +371,13 @@ def collect():
 
         # print(add_request)
         if not user_id:
+            print(" NO USER ID")
             return "Invalid User ID", 400
         if not card_id:
+            print(" CARD ID MISSING")
             return "Missing ID", 400
         if add_request is None: 
+            print(" ACTION WENT THROUGH EVEN THOUGH IT WASNT SUPPOSED TO")
             return "Missing request type", 400
         
         collection = db.execute("SELECT collection FROM users WHERE id = ?", user_id)
@@ -408,14 +414,22 @@ def collect():
         # for index in cards:
         #     print(index)
 
-        print(f"new: {cards}")
-        print(f"prev: {prev_collection}")
+        # print(f"new: {cards}")
+        # print(f"prev: {prev_collection}")
         
-
-        if prev_collection != cards:
+        count = db.execute("SELECT collection FROM users WHERE id = ?", user_id)
+        count = count[0]["collection"]
+        print(count)
+        if count != 1:
+            if prev_collection != cards:
+                prev_collection = cards
+                return jsonify(cards), 200
+            else:
+                return "Same sets", 204
+        else:
             prev_collection = cards
             return jsonify(cards), 200
-        return "Same sets", 204
+
     
 @app.route("/sets", methods = ["GET", "POST"])
 def sets():
@@ -423,11 +437,14 @@ def sets():
     if request.method == "GET":
         user_id = request.args.get("user_id")
         if not user_id:
+            print(" NO USER ID")
             return "Invalid ID", 400
         
         valid_sets = find_set(user_id)
         if not valid_sets:
-            return "No sets found", 400
+            print(" NO SETS FOUND")
+            num = random.randint(1, 5)
+            return jsonify(num), 200
         sets = set_call(valid_sets)
         if not sets:
             return "No set information found", 400
@@ -437,10 +454,19 @@ def sets():
         ordered_sets = [{"series": key, "sets": value} for key, value in sets.items()]
         # print(f"prev: {prev_sets}")
         # print(f"new: {ordered_sets}")
-        if prev_sets != ordered_sets:
+
+        count = db.execute("SELECT collection FROM users WHERE id = ?", user_id)
+        count = count[0]["collection"]
+        print(count)
+        if count != 1:
+            if prev_sets != ordered_sets:
+                prev_sets = ordered_sets
+                return jsonify(ordered_sets), 200
+            else:
+                return "Same sets", 204
+        else:
             prev_sets = ordered_sets
             return jsonify(ordered_sets), 200
-        return "Same sets", 204
         # print(ordered_sets)
         
     else:
@@ -467,3 +493,14 @@ def reset():
         return jsonify({"message": "Sets reset"}), 200
     else:
         return jsonify({}), 200
+    
+@app.route("/count", methods=["GET"])
+def count():
+    if request.method == "GET":
+        user_id = request.args.get("user_id")
+        if not user_id:
+            return "Invalid ID", 400
+        count = db.execute("SELECT collection FROM users WHERE id = ?", user_id)
+        count = count[0]["collection"]
+        print(count)
+        return jsonify(count), 200

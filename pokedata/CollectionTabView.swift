@@ -60,7 +60,7 @@ struct CollectionTabView: View {
                                             Text(String(format: "$%.2f USD", total))
                                                 .font(.title2)
                                                 .bold()
-                                                .foregroundStyle(Color(red: 0.0, green: 0.5, blue: 0.0))
+                                                .foregroundColor(Color(red: 0.0, green: 0.5, blue: 0.0))
                                             Spacer()
                                         }
                                         .padding(.bottom, -6)
@@ -124,7 +124,7 @@ struct CollectionTabView: View {
                                                                         .padding(.trailing, -4)
                                                                         .padding(.leading, 8)
                                                                 }
-                                                                .foregroundStyle(.green)
+                                                                .foregroundColor(.green)
                                                             }
                                                             
                                                             if shown[set.id] ?? false {
@@ -172,7 +172,7 @@ struct CollectionTabView: View {
                                                                                                 .padding(.top, 40)
                                                                                                 .font(.system(size: geometry.size.width * 0.0225))
                                                                                                 .fontWeight(.semibold)
-                                                                                                .foregroundStyle(Color.black)
+                                                                                                .foregroundColor(Color.black)
                                                                                                 .shadow(color: Color.white, radius: 1)
                                                                                                 .shadow(color: Color.white, radius: 2)
                                                                                                 .shadow(color: Color.white, radius: 3)
@@ -333,7 +333,7 @@ struct CollectionTabView: View {
     }
     func fetchCollection() {
         isWaiting = true
-        guard let url = URL(string: "http://127.0.0.1:5000/collection?user_id=\(user_id)") else {
+        guard let url = URL(string: "\(Config.baseURL)/collection?user_id=\(user_id)") else {
             print("Invalid URL")
             return
         }
@@ -374,7 +374,7 @@ struct CollectionTabView: View {
     }
     func fetchSets() {
         isLoading = true
-        guard let url = URL(string: "http://127.0.0.1:5000/sets?user_id=\(user_id)") else {
+        guard let url = URL(string: "\(Config.baseURL)/sets?user_id=\(user_id)") else {
             print("Invalid URL")
             return
         }
@@ -447,7 +447,7 @@ struct CollectionTabView: View {
             return
         }
         
-        let urlString = "http://127.0.0.1:5000/count?user_id=\(user_id)"
+        let urlString = "\(Config.baseURL)/count?user_id=\(user_id)"
         
         guard let url = URL(string: urlString) else {
             print("Invalid URL")

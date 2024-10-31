@@ -100,7 +100,7 @@ struct RegisterView: View {
                             .stroke(Color.black, lineWidth: 3)
                     )
                     .focused($focused, equals: .firstName)
-                    .onChange(of: firstName) {
+                    .onChange(of: firstName) { newValue in
                         nameError = nil
                     }
                 TextField("Last Name", text: $lastName)
@@ -112,7 +112,7 @@ struct RegisterView: View {
                             .stroke(Color.black, lineWidth: 3)
                     )
                     .focused($focused, equals: .lastName)
-                    .onChange(of: lastName) {
+                    .onChange(of: lastName) { newValue in
                         nameError = nil
                     }
             }
@@ -122,7 +122,7 @@ struct RegisterView: View {
             
             // displays name error message
             if let error = nameError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
             
             GroupBox {
@@ -177,7 +177,7 @@ struct RegisterView: View {
             
             // displays birthdate error message
             if let error = birthDateError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
             
             
@@ -195,13 +195,13 @@ struct RegisterView: View {
                 )
                 .padding(.top, 8)
                 .focused($focused, equals: .email)
-                .onChange(of: email) {
+                .onChange(of: email) { newValue in
                     emailError = nil
                 }
             
             // displays email error message
             if let error = emailError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
             
             TextField("Username", text: $username)
@@ -218,13 +218,13 @@ struct RegisterView: View {
                 )
                 .padding(.top, 8)
                 .focused($focused, equals: .username)
-                .onChange(of: username) {
+                .onChange(of: username) { newValue in
                     usernameError = nil
                 }
 
             // displays username error message
             if let error = usernameError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
             
             
@@ -243,13 +243,13 @@ struct RegisterView: View {
                 .padding(.top, 8)
                 .textContentType(.oneTimeCode)
                 .focused($focused, equals: .password)
-                .onChange(of: password) {
+                .onChange(of: password) { newValue in
                     passwordError = nil
                 }
             
             // displays password error message
             if let error = passwordError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
             
             SecureField("Confirm Password", text: $confirmPassword)
@@ -267,13 +267,13 @@ struct RegisterView: View {
                 .padding(.top, 8)
                 .textContentType(.oneTimeCode)
                 .focused($focused, equals: .confirmPassword)
-                .onChange(of: confirmPassword) {
+                .onChange(of: confirmPassword) { newValue in
                     confirmPasswordError = nil
                 }
             
             // displays confirmation password error message
             if let error = confirmPasswordError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
             
             HStack {
@@ -286,7 +286,7 @@ struct RegisterView: View {
                     Text("Already Have an Account?")
                         .font(.system(size: 15, weight: .bold))
                         .padding([.top, .bottom])
-                        .foregroundStyle(Color.blue)
+                        .foregroundColor(Color.blue)
                         .cornerRadius(50)
                 }
                 Spacer()
@@ -341,7 +341,7 @@ struct RegisterView: View {
                         .font(.system(size: 15, weight: .bold))
                         .padding()
                         .background(Color.blue)
-                        .foregroundStyle(Color.white)
+                        .foregroundColor(Color.white)
                         .cornerRadius(50)
                 }
             }
@@ -353,7 +353,7 @@ struct RegisterView: View {
     }
     
     func submitRegistration(completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://127.0.0.1:5000/register") else {
+        guard let url = URL(string: "\(Config.baseURL)/register") else {
             print("Invalid URL")
             return
         }
@@ -390,7 +390,7 @@ struct RegisterView: View {
     }
     
     func getUserData() {
-        guard let url = URL(string: "http://127.0.0.1:5000/register") else {
+        guard let url = URL(string: "\(Config.baseURL)/register") else {
             print("Invalid URL")
             return
         }

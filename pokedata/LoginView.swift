@@ -65,12 +65,12 @@ struct LoginView: View {
                                     .stroke(Color.black, lineWidth: 3)
                             )
                             .focused($focused, equals: .account)
-                            .onChange(of: account) {
+                            .onChange(of: account) { newValue in
                                 accountError = nil
                             }
                         
                         if let error = accountError {
-                            Text(error).foregroundStyle(Color.red)
+                            Text(error).foregroundColor(Color.red)
                         }
                         
                         SecureField("Password", text: $password)
@@ -87,11 +87,11 @@ struct LoginView: View {
                             )
                             .textContentType(.oneTimeCode)
                             .focused($focused, equals: .password)
-                            .onChange (of: password) {
+                            .onChange (of: password) { newValue in
                                 passwordError = nil
                             }
                         if let error = passwordError {
-                            Text(error).foregroundStyle(Color.red)
+                            Text(error).foregroundColor(Color.red)
                         }
                         
                         HStack {
@@ -104,7 +104,7 @@ struct LoginView: View {
                                 Text("Don't Have an Account?")
                                     .font(.system(size: 15, weight: .bold))
                                     .padding([.top, .bottom])
-                                    .foregroundStyle(Color.blue)
+                                    .foregroundColor(Color.blue)
                                     .cornerRadius(50)
                             }
                             
@@ -139,7 +139,7 @@ struct LoginView: View {
                                     .font(.system(size: 15, weight: .bold))
                                     .padding()
                                     .background(Color.blue)
-                                    .foregroundStyle(Color.white)
+                                    .foregroundColor(Color.white)
                                     .cornerRadius(50)
                             }
                         }
@@ -157,7 +157,7 @@ struct LoginView: View {
     }
     
     func submitLogin(completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://127.0.0.1:5000/login") else {
+        guard let url = URL(string: "\(Config.baseURL)/login") else {
             print("Invalid URL")
             return
         }
@@ -198,7 +198,7 @@ struct LoginView: View {
     }
     
     func getData() {
-        guard let url = URL(string: "http://127.0.0.1:5000/login") else {
+        guard let url = URL(string: "\(Config.baseURL)/login") else {
             print("Invalid URL")
             return
         }

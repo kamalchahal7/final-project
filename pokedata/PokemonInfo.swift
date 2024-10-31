@@ -51,7 +51,7 @@ struct PokemonInfo: View {
                         }
                         .padding(10)
                         .background(Color.gray)
-                        .foregroundStyle(Color.white)
+                        .foregroundColor(Color.white)
                         .cornerRadius(10)
                         
                         
@@ -184,7 +184,7 @@ struct PokemonInfo: View {
 //                                        .symbolVariant(.circle.fill)
                                 }
                                 .font(.title2)
-//                                .foregroundStyle(.gray.opacity(0.5))
+//                                .foregroundColor(.gray.opacity(0.5))
                             }
                             if shown[0] {
                                 
@@ -323,7 +323,7 @@ struct PokemonInfo: View {
 //                                        .symbolVariant(.circle.fill)
                                 }
                                 .font(.title2)
-//                                .foregroundStyle(.gray.opacity(0.5))
+//                                .foregroundColor(.gray.opacity(0.5))
                             }
                             .padding(.bottom, shown[1] ? 10 : 0)
                             if shown[1] {
@@ -361,7 +361,7 @@ struct PokemonInfo: View {
 //                                        .symbolVariant(.circle.fill)
                                 }
                                 .font(.title2)
-//                                .foregroundStyle(.gray.opacity(0.5))
+//                                .foregroundColor(.gray.opacity(0.5))
                             }
                             .padding(.bottom, shown[2] ? 10 : 0)
                             if shown[2] {
@@ -400,7 +400,7 @@ struct PokemonInfo: View {
     //                                        .symbolVariant(.circle.fill)
                                     }
                                     .font(.title2)
-    //                                .foregroundStyle(.gray.opacity(0.5))
+    //                                .foregroundColor(.gray.opacity(0.5))
                                 }
                                 .padding(.bottom, shown[3] ? 10 : 0)
                                 
@@ -439,7 +439,7 @@ struct PokemonInfo: View {
     //                                        .symbolVariant(.circle.fill)
                                     }
                                     .font(.title2)
-    //                                .foregroundStyle(.gray.opacity(0.5))
+    //                                .foregroundColor(.gray.opacity(0.5))
                                 }
                                 .padding(.bottom, shown[4] ? 10 : 0)
                                 
@@ -661,7 +661,7 @@ struct PokemonInfo: View {
         }
     }
     func trackPokemon() {
-        guard let url = URL(string: "http://127.0.0.1:5000/history") else {
+        guard let url = URL(string: "\(Config.baseURL)/history") else {
             print("Invalid URL")
             return
         }

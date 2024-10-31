@@ -191,7 +191,7 @@ struct ContentView: View {
     // Returned Data from accounts.db
     @State private var userData = UserInfo(id: 0, username: "", email: "", first_name: "", last_name: "", date_of_birth: "", registration_time_EST: "", collection: 0)
     // Initial Tab
-    @State private var selectedTab = 3
+    @State private var selectedTab = 1
     // Checks if search bar is active or not
     @State private var isSearchActive: Bool = false
     // Checks if someone has submitted a search
@@ -245,9 +245,13 @@ struct ContentView: View {
     @State private var errorCode: String = ""
     // checks if backend pciked up a fault
     @State private var fault: Bool = false
+    @State private var isCameraButtonDisabled = false
     
     @State private var notLoggedIn: Bool = true
     @State private var intialCount: Int = 0
+    @State private var showCamera: Bool = false
+    @State private var showPhotos: Bool = false
+    @State private var image: UIImage?
     
     //    init() {
     //            setupNavigationBarAppearance()
@@ -259,7 +263,7 @@ struct ContentView: View {
         
         //        Image(systemName: "globe")
         //            .imageScale(.large)
-        //            .foregroundStyle(.tint)
+        //            .foregroundColor(.tint)
         //        Text("Hello World")
         //        Image(systemName: "house")
         
@@ -364,7 +368,7 @@ struct ContentView: View {
                                     
                                 }
                                 .onChange(of: pokedata) {
-                                    //                                    if pokedata.isEmpty {
+                                    newvalue in                                     //                                    if pokedata.isEmpty {
                                     //                                        fetchPokedata()
                                     //                                    }
                                     //                                    else {
@@ -586,6 +590,7 @@ struct ContentView: View {
                         HStack {
                             Button(action: {
                                 withAnimation(.easeInOut) {
+                                    showPhotos = true
                                 }
                             }) {
                                 HStack {
@@ -603,7 +608,19 @@ struct ContentView: View {
                                     .stroke(Color.black, lineWidth: 2)
                             )
                             Button(action: {
-                                withAnimation(.easeInOut) {
+                                guard !isCameraButtonDisabled else { return }
+                                isCameraButtonDisabled = true // Disable button temporarily
+                                
+                                // Check if running on a real device or simulator, not in the preview
+                                if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == nil {
+                                    print("Clicked should work.")
+                                    showCamera = true
+                                } else {
+                                    print("Camera not available in preview.")
+                                }
+                                
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    isCameraButtonDisabled = false
                                 }
                             }) {
                                 HStack {
@@ -668,14 +685,14 @@ struct ContentView: View {
                                                     .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
                                                 + Text(marketPrice)
                                                     .fontWeight(.semibold)
-                                                    .foregroundStyle(Color(red: 0.0, green: 0.5, blue: 0.0))
+                                                    .foregroundColor(Color(red: 0.0, green: 0.5, blue: 0.0))
                                             }
                                             .padding(.leading)
                                         }
                                     }
                                 }
                                 .scrollContentBackground(.hidden)
-                                .foregroundStyle(Color.black)
+                                .foregroundColor(Color.black)
                                 .padding(.horizontal, -16)
                             }
                             
@@ -828,9 +845,15 @@ struct ContentView: View {
             UITabBar.appearance().backgroundColor = .white
         }
         // Changes Colour of the Tab Bar Font
-        
+        .fullScreenCover(isPresented: $showCamera, onDismiss: {
+            showCamera = false
+        }) {
+            CameraOverlayView(image: $image, showCamera: $showCamera)
+        }
     }
     
+    
+
     //    private func setupNavigationBarAppearance() {
     //            let appearance = UINavigationBarAppearance()
     //            appearance.configureWithTransparentBackground()
@@ -847,7 +870,7 @@ struct ContentView: View {
     
     
     func submitPokedata() {
-        guard let url = URL(string: "http://127.0.0.1:5000/") else {
+        guard let url = URL(string: "\(Config.baseURL)/") else {
             print("Invalid URL")
             return
         }
@@ -879,7 +902,7 @@ struct ContentView: View {
     }
     
     func fetchImage(for pokemon: Pokemon) {
-        guard let imageUrl = URL(string: "http://127.0.0.1:5000/images/\(pokemon.name)_new.png") else {
+        guard let imageUrl = URL(string: "\(Config.baseURL)/images/\(pokemon.name)_new.png") else {
             print("Invalid URL")
             return
         }
@@ -894,7 +917,7 @@ struct ContentView: View {
     }
     
     func submitPokecard() {
-        guard let url = URL(string: "http://127.0.0.1:5000/cards") else {
+        guard let url = URL(string: "\(Config.baseURL)/cards") else {
             print("Invalid URL")
             return
         }
@@ -936,7 +959,7 @@ struct ContentView: View {
             return
         }
         
-        let urlString = "http://127.0.0.1:5000/profile?user_id=\(user_id)"
+        let urlString = "\(Config.baseURL)/profile?user_id=\(user_id)"
         
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
@@ -991,7 +1014,7 @@ struct ContentView: View {
             return
         }
         
-        let urlString = "http://127.0.0.1:5000/reset?user_id=\(user_id)"
+        let urlString = "\(Config.baseURL)/reset?user_id=\(user_id)"
         
         guard let url = URL(string: urlString) else {
             print("Invalid URL")

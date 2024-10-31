@@ -60,7 +60,7 @@ struct PasswordChangeView: View {
                             Text("Password Change")
                                 .font(.largeTitle)
                                 .fontWeight(.heavy)
-                                .foregroundStyle(Color.black)
+                                .foregroundColor(Color.black)
                             Spacer()
                         }
                         TextField("Email", text: $email)
@@ -76,12 +76,12 @@ struct PasswordChangeView: View {
                                     .stroke(Color.black, lineWidth: 3)
                             )
                             .focused($focused, equals: .email)
-                            .onChange(of: email) {
+                            .onChange(of: email) { newValue in
                                 emailError = nil
                             }
                         
                         if let error = emailError {
-                            Text(error).foregroundStyle(Color.red)
+                            Text(error).foregroundColor(Color.red)
                         }
                         
                         SecureField("Password", text: $password)
@@ -98,11 +98,11 @@ struct PasswordChangeView: View {
                             )
                             .textContentType(.oneTimeCode)
                             .focused($focused, equals: .password)
-                            .onChange (of: password) {
+                            .onChange (of: password) { newValue in
                                 passwordError = nil
                             }
                         if let error = passwordError {
-                            Text(error).foregroundStyle(Color.red)
+                            Text(error).foregroundColor(Color.red)
                                 .onAppear {
                                     message = ""
                                 }
@@ -122,11 +122,11 @@ struct PasswordChangeView: View {
                             )
                             .textContentType(.oneTimeCode)
                             .focused($focused, equals: .newPassword)
-                            .onChange(of: newPassword) {
+                            .onChange(of: newPassword) { newValue in
                                 newPasswordError = nil
                             }
                         if let error = newPasswordError {
-                            Text(error).foregroundStyle(Color.red)
+                            Text(error).foregroundColor(Color.red)
                         }
                         
                         SecureField("Confirm New Password", text: $confirmNewPassword)
@@ -143,11 +143,11 @@ struct PasswordChangeView: View {
                             )
                             .textContentType(.oneTimeCode)
                             .focused($focused, equals: .confirmNewPassword)
-                            .onChange (of: confirmNewPassword) {
+                            .onChange (of: confirmNewPassword) { newValue in
                                 confirmNewPasswordError = nil
                             }
                         if let error = confirmNewPasswordError {
-                            Text(error).foregroundStyle(Color.red)
+                            Text(error).foregroundColor(Color.red)
                         }
                         
                         HStack {
@@ -157,7 +157,7 @@ struct PasswordChangeView: View {
                                 Text("Revert Changes")
                                     .font(.system(size: 15, weight: .bold))
                                     .padding([.top, .bottom])
-                                    .foregroundStyle(Color.blue)
+                                    .foregroundColor(Color.blue)
                                     .cornerRadius(50)
                             }
                             
@@ -209,7 +209,7 @@ struct PasswordChangeView: View {
                                     .font(.system(size: 15, weight: .bold))
                                     .padding()
                                     .background(Color.blue)
-                                    .foregroundStyle(Color.white)
+                                    .foregroundColor(Color.white)
                                     .cornerRadius(50)
                             }
                         }
@@ -221,8 +221,8 @@ struct PasswordChangeView: View {
                 .padding()
                 Spacer()
             }
-            .onChange(of: fault) {
-                showAlert = fault && passwordError != "*Password Incorrect"
+            .onChange(of: fault) { newValue in
+                showAlert = newValue && passwordError != "*Password Incorrect"
             }
             .alert(isPresented: $showAlert) {
                 Alert(
@@ -236,7 +236,7 @@ struct PasswordChangeView: View {
         }
     }
     func submitPasswordChange(completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://127.0.0.1:5000/change") else {
+        guard let url = URL(string: "\(Config.baseURL)/change") else {
             print("Invalid URL")
             return
         }

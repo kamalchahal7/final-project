@@ -46,7 +46,7 @@ struct PokemonCardInfo: View {
                         }
                         .padding(10)
                         .background(Color.gray)
-                        .foregroundStyle(Color.white)
+                        .foregroundColor(Color.white)
                         .cornerRadius(10)
                         Spacer()
                         Button {
@@ -76,7 +76,7 @@ struct PokemonCardInfo: View {
                         }
                         .padding(10)
                         .background(Color.gray)
-                        .foregroundStyle(Color.white)
+                        .foregroundColor(Color.white)
                         .cornerRadius(10)
                     }
                     .padding(.top, 40)
@@ -117,7 +117,7 @@ struct PokemonCardInfo: View {
                                 .fontWeight(.bold)
                             + Text("$\(market)")
                                 .fontWeight(.semibold)
-                                .foregroundStyle(Color(red: 0.0, green: 0.5, blue: 0.0))
+                                .foregroundColor(Color(red: 0.0, green: 0.5, blue: 0.0))
                             Spacer()
                         }
                         .font(.title2)
@@ -138,7 +138,7 @@ struct PokemonCardInfo: View {
 //                                        .symbolVariant(.circle.fill)
                                 }
                                 .font(.title2)
-//                                .foregroundStyle(.gray.opacity(0.5))
+//                                .foregroundColor(.gray.opacity(0.5))
                             }
                             //                            .padding(.bottom, shown[0] ? 10 : 0)
                             if shown[1] {
@@ -293,14 +293,14 @@ struct PokemonCardInfo: View {
                                 if pokemonCard.weaknessType != nil && pokemonCard.weaknessValue != nil {
                                     Text("Weakness: \(pokemonCard.weaknessType!) [\(pokemonCard.weaknessValue!)]")
                                         .font(.title3)
-                                        .foregroundStyle(Color.red)
+                                        .foregroundColor(Color.red)
                                 }
                                 
                                 // resistances
                                 if pokemonCard.resistanceType != nil && pokemonCard.resistanceValue != nil {
                                     Text("Resistance: \(pokemonCard.resistanceType!) [\(pokemonCard.resistanceValue!)]")
                                         .font(.title3)
-                                        .foregroundStyle(Color.green)
+                                        .foregroundColor(Color.green)
                                 }
                                 
                                 // retreat cost
@@ -320,7 +320,7 @@ struct PokemonCardInfo: View {
                                             Text(rules[index])
                                                 .padding(10)
                                                 .background(Color.indigo)
-                                                .foregroundStyle(Color.white)
+                                                .foregroundColor(Color.white)
                                                 .cornerRadius(20)
                                             Spacer()
                                         }
@@ -338,7 +338,7 @@ struct PokemonCardInfo: View {
                                         Text(description)
                                             .padding(10)
                                             .background(Color.indigo)
-                                            .foregroundStyle(Color.white)
+                                            .foregroundColor(Color.white)
                                             .cornerRadius(20)
                                         Spacer()
                                     }
@@ -368,7 +368,7 @@ struct PokemonCardInfo: View {
                                     //                                        .symbolVariant(.circle.fill)
                                 }
                                 .font(.title2)
-                                //                                .foregroundStyle(.gray.opacity(0.5))
+                                //                                .foregroundColor(.gray.opacity(0.5))
                             }
 //                            .padding(.bottom, shown[0] ? 10 : 0)
                             if shown[0] {
@@ -485,7 +485,7 @@ struct PokemonCardInfo: View {
                                 Divider()
                                 Text("Updated: \(pokemonCard.tcgUpdatedAt)")
                                     .padding(.top, 4)
-                                    .foregroundStyle(Color.gray)
+                                    .foregroundColor(Color.gray)
                             }
                         }
                     }
@@ -494,9 +494,9 @@ struct PokemonCardInfo: View {
 //                    Spacer()
                 }
                 .padding()
-                .onChange(of: pokemonCard) {
+                .onChange(of: pokemonCard) { newValue in
                     // Update the collectRequest when a new card is selected
-                    collectRequest = UserDefaults.standard.bool(forKey: "collectRequest_\(pokemonCard.id)")
+                    collectRequest = UserDefaults.standard.bool(forKey: "collectRequest_\(newValue.id)")
                 }
             }
             .background(VStack(spacing: .zero) { Color.indigo })
@@ -532,7 +532,7 @@ struct PokemonCardInfo: View {
         }
     }
     func trackCard() {
-        guard let url = URL(string: "http://127.0.0.1:5000/history") else {
+        guard let url = URL(string: "\(Config.baseURL)/history") else {
             print("Invalid URL")
             return
         }
@@ -554,7 +554,7 @@ struct PokemonCardInfo: View {
         }.resume()
     }
     func submitCollect() {
-        guard let url = URL(string: "http://127.0.0.1:5000/collection") else {
+        guard let url = URL(string: "\(Config.baseURL)/collection") else {
             print("Invalid URL")
             return
         }
@@ -701,7 +701,7 @@ struct PokemonCardInfo: View {
 //                        }
 //                        .padding(10)
 //                        .background(Color.gray)
-//                        .foregroundStyle(Color.white)
+//                        .foregroundColor(Color.white)
 //                        .cornerRadius(10)
 //                        Spacer()
 //                        Button {
@@ -731,7 +731,7 @@ struct PokemonCardInfo: View {
 //                        }
 //                        .padding(10)
 //                        .background(Color.gray)
-//                        .foregroundStyle(Color.white)
+//                        .foregroundColor(Color.white)
 //                        .cornerRadius(10)
 //                    }
 //                    .padding(.top, 40)
@@ -772,7 +772,7 @@ struct PokemonCardInfo: View {
 //                                .fontWeight(.bold)
 //                            + Text("$\(market)")
 //                                .fontWeight(.semibold)
-//                                .foregroundStyle(Color(red: 0.0, green: 0.5, blue: 0.0))
+//                                .foregroundColor(Color(red: 0.0, green: 0.5, blue: 0.0))
 //                            Spacer()
 //                        }
 //                        .font(.title2)
@@ -793,7 +793,7 @@ struct PokemonCardInfo: View {
 ////                                        .symbolVariant(.circle.fill)
 //                                }
 //                                .font(.title2)
-////                                .foregroundStyle(.gray.opacity(0.5))
+////                                .foregroundColor(.gray.opacity(0.5))
 //                            }
 //                            //                            .padding(.bottom, shown[0] ? 10 : 0)
 //                            if shown[1] {
@@ -948,14 +948,14 @@ struct PokemonCardInfo: View {
 //                                if pokemonCard.weaknessType != nil && pokemonCard.weaknessValue != nil {
 //                                    Text("Weakness: \(pokemonCard.weaknessType!) [\(pokemonCard.weaknessValue!)]")
 //                                        .font(.title3)
-//                                        .foregroundStyle(Color.red)
+//                                        .foregroundColor(Color.red)
 //                                }
 //                                
 //                                // resistances
 //                                if pokemonCard.resistanceType != nil && pokemonCard.resistanceValue != nil {
 //                                    Text("Resistance: \(pokemonCard.resistanceType!) [\(pokemonCard.resistanceValue!)]")
 //                                        .font(.title3)
-//                                        .foregroundStyle(Color.green)
+//                                        .foregroundColor(Color.green)
 //                                }
 //                                
 //                                // retreat cost
@@ -975,7 +975,7 @@ struct PokemonCardInfo: View {
 //                                            Text(rules[index])
 //                                                .padding(10)
 //                                                .background(Color.indigo)
-//                                                .foregroundStyle(Color.white)
+//                                                .foregroundColor(Color.white)
 //                                                .cornerRadius(20)
 //                                            Spacer()
 //                                        }
@@ -993,7 +993,7 @@ struct PokemonCardInfo: View {
 //                                        Text(description)
 //                                            .padding(10)
 //                                            .background(Color.indigo)
-//                                            .foregroundStyle(Color.white)
+//                                            .foregroundColor(Color.white)
 //                                            .cornerRadius(20)
 //                                        Spacer()
 //                                    }
@@ -1023,7 +1023,7 @@ struct PokemonCardInfo: View {
 //                                    //                                        .symbolVariant(.circle.fill)
 //                                }
 //                                .font(.title2)
-//                                //                                .foregroundStyle(.gray.opacity(0.5))
+//                                //                                .foregroundColor(.gray.opacity(0.5))
 //                            }
 ////                            .padding(.bottom, shown[0] ? 10 : 0)
 //                            if shown[0] {
@@ -1140,7 +1140,7 @@ struct PokemonCardInfo: View {
 //                                Divider()
 //                                Text("Updated: \(pokemonCard.tcgUpdatedAt)")
 //                                    .padding(.top, 4)
-//                                    .foregroundStyle(Color.gray)
+//                                    .foregroundColor(Color.gray)
 //                            }
 //                        }
 //                    }

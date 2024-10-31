@@ -16,7 +16,9 @@
 		6417E8532C72F06700891615 /* PokemonCardInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6417E8522C72F06700891615 /* PokemonCardInfo.swift */; };
 		6446CF042C9E6D81005D1F8D /* temp1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6446CF032C9E6D76005D1F8D /* temp1.txt */; };
 		6446CF062C9E6D9B005D1F8D /* temp2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6446CF052C9E6D92005D1F8D /* temp2.txt */; };
+		644D8F0A2CB97FE600741D4C /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644D8F092CB97FE600741D4C /* CameraView.swift */; };
 		646E19052C8190E100BC868A /* CollectionTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646E19042C8190E100BC868A /* CollectionTabView.swift */; };
+		648A33332CAB3F8A00AF95CC /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648A33322CAB3F8700AF95CC /* Config.swift */; };
 		649A97722C5DCB3D00917D74 /* pokedataApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A97712C5DCB3D00917D74 /* pokedataApp.swift */; };
 		649A97742C5DCB3D00917D74 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A97732C5DCB3D00917D74 /* ContentView.swift */; };
 		649A97762C5DCB4000917D74 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 649A97752C5DCB4000917D74 /* Assets.xcassets */; };
@@ -56,7 +58,10 @@
 		6417E8522C72F06700891615 /* PokemonCardInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonCardInfo.swift; sourceTree = "<group>"; };
 		6446CF032C9E6D76005D1F8D /* temp1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = temp1.txt; sourceTree = "<group>"; };
 		6446CF052C9E6D92005D1F8D /* temp2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = temp2.txt; sourceTree = "<group>"; };
+		644D8F092CB97FE600741D4C /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		646E19042C8190E100BC868A /* CollectionTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionTabView.swift; sourceTree = "<group>"; };
+		648A33322CAB3F8700AF95CC /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		648A33342CAB4E7100AF95CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		649A976E2C5DCB3D00917D74 /* pokedata.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pokedata.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		649A97712C5DCB3D00917D74 /* pokedataApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pokedataApp.swift; sourceTree = "<group>"; };
 		649A97732C5DCB3D00917D74 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -120,6 +125,9 @@
 		649A97702C5DCB3D00917D74 /* pokedata */ = {
 			isa = PBXGroup;
 			children = (
+				648A33342CAB4E7100AF95CC /* Info.plist */,
+				644D8F092CB97FE600741D4C /* CameraView.swift */,
+				648A33322CAB3F8700AF95CC /* Config.swift */,
 				6446CF052C9E6D92005D1F8D /* temp2.txt */,
 				6446CF032C9E6D76005D1F8D /* temp1.txt */,
 				649A97712C5DCB3D00917D74 /* pokedataApp.swift */,
@@ -230,7 +238,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					649A976D2C5DCB3D00917D74 = {
 						CreatedOnToolsVersion = 15.4;
@@ -304,6 +312,8 @@
 				649A97742C5DCB3D00917D74 /* ContentView.swift in Sources */,
 				6406FB752C7E89E3006F737E /* PasswordChangeView.swift in Sources */,
 				64BFDBB02C79463600C1A186 /* LoginView.swift in Sources */,
+				644D8F0A2CB97FE600741D4C /* CameraView.swift in Sources */,
+				648A33332CAB3F8A00AF95CC /* Config.swift in Sources */,
 				64ABAB142C799E350022118D /* ProfileTabView.swift in Sources */,
 				6406FB732C7E885E006F737E /* PersonalView.swift in Sources */,
 				6406FB772C7E8A0A006F737E /* HistoryView.swift in Sources */,
@@ -402,7 +412,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -459,10 +469,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
@@ -477,8 +488,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"pokedata/Preview Content\"";
+				DEVELOPMENT_TEAM = KUS5L3PSJB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = pokedata/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -505,8 +519,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"pokedata/Preview Content\"";
+				DEVELOPMENT_TEAM = KUS5L3PSJB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = pokedata/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

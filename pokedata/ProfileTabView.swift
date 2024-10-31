@@ -144,7 +144,7 @@ struct ProfileTabView: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
                 .scrollContentBackground(.hidden)
-                .foregroundStyle(Color.black)
+                .foregroundColor(Color.black)
                 .padding(-16)
                 .padding(.top, 16)
                 Spacer()

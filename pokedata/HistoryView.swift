@@ -29,7 +29,7 @@ struct HistoryView: View {
                     }
                     .padding(10)
                     .background(Color.indigo)
-                    .foregroundStyle(Color.white)
+                    .foregroundColor(Color.white)
                     .cornerRadius(10)
 
                 }
@@ -51,7 +51,7 @@ struct HistoryView: View {
                                 }
                                 .padding(10)
                                 .background(Color.red)
-                                .foregroundStyle(Color.white)
+                                .foregroundColor(Color.white)
                                 .cornerRadius(10)
                             }
 //                            Divider()

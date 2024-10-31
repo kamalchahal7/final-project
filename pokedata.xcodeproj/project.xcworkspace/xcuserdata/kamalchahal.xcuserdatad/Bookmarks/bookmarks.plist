@@ -12,13 +12,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>268</string>
+					<string>272</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>267</string>
+					<string>271</string>
 					<key>Timestamp</key>
-					<string>749343804.062827</string>
+					<string>751066376.62102</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -57,13 +57,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>480</string>
+					<string>484</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>479</string>
+					<string>483</string>
 					<key>Timestamp</key>
-					<string>749343804.062755</string>
+					<string>751066376.621057</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -102,13 +102,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>704</string>
+					<string>721</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>703</string>
+					<string>720</string>
 					<key>Timestamp</key>
-					<string>749344406.891293</string>
+					<string>751066525.916959</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -147,13 +147,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>730</string>
+					<string>747</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>729</string>
+					<string>746</string>
 					<key>Timestamp</key>
-					<string>749400458.673817</string>
+					<string>751066525.916986</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -192,13 +192,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>752</string>
+					<string>769</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>751</string>
+					<string>768</string>
 					<key>Timestamp</key>
-					<string>749400458.673764</string>
+					<string>751066525.916903</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -270,7 +270,7 @@
 </string>
 						<key>trailing</key>
 						<string>            if let error = emailError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
 </string>
 					</dict>
@@ -315,7 +315,7 @@
 </string>
 						<key>trailing</key>
 						<string>            if let error = usernameError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
 </string>
 					</dict>
@@ -360,7 +360,7 @@
 </string>
 						<key>trailing</key>
 						<string>            if let error = passwordError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
 </string>
 					</dict>
@@ -405,7 +405,7 @@
 </string>
 						<key>trailing</key>
 						<string>            if let error = confirmPasswordError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
 </string>
 					</dict>

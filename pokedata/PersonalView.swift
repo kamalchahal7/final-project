@@ -118,8 +118,8 @@ struct PersonalView: View {
                 .padding()
                 Spacer()
             }
-            .onChange(of: fault) {
-                showAlert = fault && passwordError != "*Password Incorrect"
+            .onChange(of: fault) { newValue in
+                showAlert = newValue && passwordError != "*Password Incorrect"
             }
             .alert(isPresented: $showAlert) {
                 Alert(
@@ -171,12 +171,12 @@ struct PersonalView: View {
                 .padding(.bottom, 8)
                 .textContentType(.oneTimeCode)
                 .focused($focused, equals: .password)
-                .onChange(of: password) {
+                .onChange(of: password) { newValue in
                     passwordError = nil
                 }
             
             if let error = passwordError {
-                Text(error).foregroundStyle(Color.red)
+                Text(error).foregroundColor(Color.red)
             }
 
             Button(action: {
@@ -205,7 +205,7 @@ struct PersonalView: View {
                         .font(.system(size: 15, weight: .bold))
                         .padding()
                         .background(Color.blue)
-                        .foregroundStyle(Color.white)
+                        .foregroundColor(Color.white)
                         .cornerRadius(50)
                 }
             }
@@ -240,7 +240,7 @@ struct PersonalView: View {
                             .stroke(Color.black, lineWidth: 3)
                     )
                     .focused($focused, equals: .firstName)
-                    .onChange(of: firstName) {
+                    .onChange(of: firstName) { newValue in
                         nameError = nil
                     }
                 TextField(userData.last_name, text: $lastName)
@@ -252,7 +252,7 @@ struct PersonalView: View {
                             .stroke(Color.black, lineWidth: 3)
                     )
                     .focused($focused, equals: .lastName)
-                    .onChange(of: lastName) {
+                    .onChange(of: lastName) { newValue in
                         nameError = nil
                     }
             }
@@ -265,9 +265,9 @@ struct PersonalView: View {
             // displays name error message
             if let error = nameError {
                 if same {
-                    Text(error).foregroundStyle(Color.blue)
+                    Text(error).foregroundColor(Color.blue)
                 } else {
-                    Text(error).foregroundStyle(Color.red)
+                    Text(error).foregroundColor(Color.red)
                 }
             }
             
@@ -341,9 +341,9 @@ struct PersonalView: View {
             // displays birthdate error message
             if let error = birthDateError {
                 if same {
-                    Text(error).foregroundStyle(Color.blue)
+                    Text(error).foregroundColor(Color.blue)
                 } else {
-                    Text(error).foregroundStyle(Color.red)
+                    Text(error).foregroundColor(Color.red)
                 }
             }
             
@@ -368,16 +368,16 @@ struct PersonalView: View {
                 )
                 .padding(.top, -8)
                 .focused($focused, equals: .email)
-                .onChange(of: email) {
+                .onChange(of: email) { newValue in
                     emailError = nil
                 }
             
             // displays email error message
             if let error = emailError {
                 if same {
-                    Text(error).foregroundStyle(Color.blue)
+                    Text(error).foregroundColor(Color.blue)
                 } else {
-                    Text(error).foregroundStyle(Color.red)
+                    Text(error).foregroundColor(Color.red)
                 }
             }
             
@@ -402,16 +402,16 @@ struct PersonalView: View {
                 )
                 .padding(.top, -8)
                 .focused($focused, equals: .username)
-                .onChange(of: username) {
+                .onChange(of: username) { newValue in
                     usernameError = nil
                 }
 
             // displays username error message
             if let error = usernameError {
                 if same {
-                    Text(error).foregroundStyle(Color.blue)
+                    Text(error).foregroundColor(Color.blue)
                 } else {
-                    Text(error).foregroundStyle(Color.red)
+                    Text(error).foregroundColor(Color.red)
                 }
             }
             
@@ -436,7 +436,7 @@ struct PersonalView: View {
 //            
 //            // displays confirmation password error message
 //            if let error = confirmPasswordError {
-//                Text(error).foregroundStyle(Color.red)
+//                Text(error).foregroundColor(Color.red)
 //            }
             
             HStack {
@@ -446,7 +446,7 @@ struct PersonalView: View {
                     Text("Revert Changes")
                         .font(.system(size: 15, weight: .bold))
                         .padding([.top, .bottom])
-                        .foregroundStyle(Color.blue)
+                        .foregroundColor(Color.blue)
                         .cornerRadius(50)
                 }
                 Spacer()
@@ -510,7 +510,7 @@ struct PersonalView: View {
                         .font(.system(size: 15, weight: .bold))
                         .padding()
                         .background(Color.blue)
-                        .foregroundStyle(Color.white)
+                        .foregroundColor(Color.white)
                         .cornerRadius(50)
                 }
             }
@@ -518,7 +518,7 @@ struct PersonalView: View {
         }
     }
     func submitConfirmation(completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://127.0.0.1:5000/personal") else {
+        guard let url = URL(string: "\(Config.baseURL)/personal") else {
             print("Invalid URL")
             return
         }
@@ -558,7 +558,7 @@ struct PersonalView: View {
     }
     
     func submitChange(completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://127.0.0.1:5000/personal") else {
+        guard let url = URL(string: "\(Config.baseURL)/personal") else {
             print("Invalid URL")
             return
         }
@@ -599,7 +599,7 @@ struct PersonalView: View {
     }
     
     func fetchInfo() {
-        guard let url = URL(string: "http://127.0.0.1:5000/personal") else {
+        guard let url = URL(string: "\(Config.baseURL)/personal") else {
             print("Invalid URL")
             return
         }

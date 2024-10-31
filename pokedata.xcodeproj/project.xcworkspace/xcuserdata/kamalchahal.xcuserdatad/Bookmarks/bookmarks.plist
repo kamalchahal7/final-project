@@ -12,13 +12,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>272</string>
+					<string>252</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>271</string>
+					<string>251</string>
 					<key>Timestamp</key>
-					<string>751066376.62102</string>
+					<string>752109175.079265</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -37,7 +37,7 @@
 				<string>        // SEARCH TAB BAR
 </string>
 				<key>leading</key>
-				<string>        // Footer
+				<string>    var body: some View {
         
 </string>
 				<key>trailing</key>
@@ -57,13 +57,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>484</string>
+					<string>411</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>483</string>
+					<string>410</string>
 					<key>Timestamp</key>
-					<string>751066376.621057</string>
+					<string>752109219.711751</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -88,7 +88,7 @@
 				<key>trailing</key>
 				<string>            GeometryReader { geometry in
                 ZStack {
-                    // Background that slides in
+                    if search {
 </string>
 			</dict>
 			<key>type</key>
@@ -102,13 +102,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>721</string>
+					<string>622</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>720</string>
+					<string>621</string>
 					<key>Timestamp</key>
-					<string>751066525.916959</string>
+					<string>752109219.711953</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -147,13 +147,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>747</string>
+					<string>646</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>746</string>
+					<string>645</string>
 					<key>Timestamp</key>
-					<string>751066525.916986</string>
+					<string>752109219.711899</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -169,16 +169,16 @@
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>            // COLLECTION TAB BAR
+				<string>            .tag(2)
 </string>
 				<key>leading</key>
-				<string>            .tag(2)
-            
+				<string>                Label("Collection", systemImage: "square.on.square")
+            }
 </string>
 				<key>trailing</key>
 				<string>            
-            //            NavigationStack {
-            //                Text("&lt;Collection&gt;")
+            
+            // PROFILE TAB BAR
 </string>
 			</dict>
 			<key>type</key>
@@ -192,13 +192,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>769</string>
+					<string>649</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>768</string>
+					<string>648</string>
 					<key>Timestamp</key>
-					<string>751066525.916903</string>
+					<string>752109219.711926</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -222,8 +222,8 @@
 </string>
 				<key>trailing</key>
 				<string>            GeometryReader { geometry in
-                //                let isNotchDevice = geometry.safeAreaInsets.top
                 VStack {
+                        if user_id == 0 {
 </string>
 			</dict>
 			<key>type</key>

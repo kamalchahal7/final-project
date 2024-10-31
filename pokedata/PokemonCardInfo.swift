@@ -524,35 +524,42 @@ struct PokemonCardInfo: View {
                 .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             }
         }
-        .onAppear {
-            trackCard()
-        }
+        
+//  Future Implementation (HistoryView):
+        
+//        .onAppear {
+//            trackCard()
+//        }
+        
         .onDisappear {
             onDismiss()
         }
     }
-    func trackCard() {
-        guard let url = URL(string: "\(Config.baseURL)/history") else {
-            print("Invalid URL")
-            return
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        let bodyData = "user_id=\(user_id)&item_id=\(pokemonCard.id)"
-        
-        request.httpBody = bodyData.data(using: String.Encoding.utf8)
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Error: \(error.localizedDescription)")
-                return
-            }
-            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
-                print("Server error: \(httpResponse.statusCode)")
-                return
-            }
-        }.resume()
-    }
+    
+//  Future Implementation (HistoryView):
+    
+//    func trackCard() {
+//        guard let url = URL(string: "\(Config.baseURL)/history") else {
+//            print("Invalid URL")
+//            return
+//        }
+//        var request = URLRequest(url: url)
+//        request.httpMethod = "POST"
+//        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+//        let bodyData = "user_id=\(user_id)&item_id=\(pokemonCard.id)"
+//        
+//        request.httpBody = bodyData.data(using: String.Encoding.utf8)
+//        URLSession.shared.dataTask(with: request) { data, response, error in
+//            if let error = error {
+//                print("Error: \(error.localizedDescription)")
+//                return
+//            }
+//            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+//                print("Server error: \(httpResponse.statusCode)")
+//                return
+//            }
+//        }.resume()
+//    }
     func submitCollect() {
         guard let url = URL(string: "\(Config.baseURL)/collection") else {
             print("Invalid URL")

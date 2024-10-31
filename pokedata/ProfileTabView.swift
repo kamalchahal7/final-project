@@ -77,13 +77,17 @@ struct ProfileTabView: View {
                         }) {
                             Text("Change Password")
                         }
-                        Button(action: {
-                            withAnimation(.easeInOut) {
-                                showHistoryView.toggle()
-                            }
-                        }) {
-                            Text("View History")
-                        }
+                        
+//  Future Implementation (HistoryView):
+                        
+//                        Button(action: {
+//                            withAnimation(.easeInOut) {
+//                                showHistoryView.toggle()
+//                            }
+//                        }) {
+//                            Text("View History")
+//                        }
+                        
                     }
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     Section(header: Text("Legal")) {

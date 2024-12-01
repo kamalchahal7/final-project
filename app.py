@@ -379,7 +379,7 @@ def sets():
         
         valid_sets = find_set(user_id)
         if not valid_sets:
-            print(" NO SETS FOUND")
+            print("NO SETS FOUND")
             num = random.randint(1, 5)
             return jsonify(num), 200
         sets = set_call(valid_sets)

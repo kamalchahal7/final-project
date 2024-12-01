@@ -6,7 +6,6 @@ from time import time
 import pytz
 # import pokemontcgsdk
 
-
 # Configure CS50 Library to use SQLite database
 poke_db = SQL("sqlite:///pokedex.db")
 db = SQL("sqlite:///accounts.db")
@@ -297,61 +296,3 @@ def find_set(user_id):
     # for _ in set_ids:
     #     print(_)
     return set_ids
-
-
-
-# def serialize(obj):
-#     if hasattr(obj, '__dict__'):
-#         return obj.__dict__
-#     elif isinstance(obj, list):
-#         return [serialize(i) for i in obj]
-#     elif isinstance(obj, dict):
-#         return {k: serialize(v) for k, v in obj.items()}
-#     else:
-#         return obj
-    
-# def find(value):
-#     if value is None: 
-#         print("No value given")
-#         return None
-#     try:
-#         cards = Card.where(q=f'name:{value}* supertype:pokemon')
-#     except PokemonTcgException:
-#         print("Failed to find pokemon card.")
-#         return None
-#     return cards
-
-# export POKEMONTCG_IO_API_KEY='caf82b57-d30e-4832-a51b-0476d920d363'
-
-
-# def lookup(symbol):
-#     """Look up quote for symbol."""
-
-#     # Prepare API request
-#     symbol = symbol.upper()
-#     end = datetime.datetime.now(pytz.timezone("US/Eastern"))
-#     start = end - datetime.timedelta(days=7)
-
-#     # Yahoo Finance API
-#     url = (
-#         f"https://query1.finance.yahoo.com/v7/finance/download/{urllib.parse.quote_plus(symbol)}"
-#         f"?period1={int(start.timestamp())}"
-#         f"&period2={int(end.timestamp())}"
-#         f"&interval=1d&events=history&includeAdjustedClose=true"
-#     )
-
-#     # Query API
-#     try:
-#         response = requests.get(
-#             url,
-#             cookies={"session": str(uuid.uuid4())},
-#             headers={"Accept": "*/*", "User-Agent": request.headers.get("User-Agent")},
-#         )
-#         response.raise_for_status()
-
-#         # CSV header: Date,Open,High,Low,Close,Adj Close,Volume
-#         quotes = list(csv.DictReader(response.content.decode("utf-8").splitlines()))
-#         price = round(float(quotes[-1]["Adj Close"]), 2)
-#         return {"price": price, "symbol": symbol}
-#     except (KeyError, IndexError, requests.RequestException, ValueError):
-#         return None

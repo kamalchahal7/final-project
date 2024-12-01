@@ -34,6 +34,9 @@ db = SQL("sqlite:///accounts.db")
 image_folder = 'archive_new/'
 images = os.listdir(image_folder)
 
+# Configure Pages in a File Directory
+template_folder = 'legal/'
+
 # Saves previous collection
 prev_collection = []
 
@@ -59,7 +62,6 @@ def index():
         
         pokedata = lookup(pokedata)
 
-        print(pokedata)
         if not pokedata:
             return "Oops! Please Enter a Valid Pokemon Name or Pokedex #", 400
         return jsonify(pokedata), 200
@@ -70,6 +72,11 @@ def index():
 def serve_image(filename):
     print(f"Serving file: {filename} from {image_folder}")
     return send_from_directory(image_folder, filename), 200
+
+@app.route("/legal/<page>", methods = ["GET"])
+def serve_page(page):
+    print(f"Serving file: {page} from {template_folder}")
+    return send_from_directory(template_folder, page), 200
 
 @app.route("/cards", methods = ["GET", "POST"])
 def tcg():
@@ -82,9 +89,6 @@ def tcg():
         pokecard = find(pokecard)
         if not pokecard:
             return "Oops! Please enter the name/id of a Valid Pokemon Card", 400
-        for card in pokecard:
-            print(card["id"])
-        # pokecard = serialize(pokecard)
         return jsonify(pokecard), 200
     else: 
         return jsonify({}), 200
@@ -104,16 +108,12 @@ def register():
         # MORE ENHANCED ERROR CHECKING (DO THE SAME AS THE FRONTEND)
         # also if you want add a gender option to the registration
         # checks if all has been provided or not
-        if not first_name and last_name and date_of_birth and email and username and password and confirmation:
-            print("Data Missing")
+        if not first_name and not last_name and not date_of_birth and not email and not username and not password and not confirmation:
             return "Registration Incomplete", 400
         else: 
             print("Data Received Successfully")
 
         # checks that password and confirmation password are the same
-        print(password)
-        print(confirmation)
-        print(date_of_birth)
         if not password == confirmation:
             return "Passwords don't match", 400
         
@@ -122,8 +122,6 @@ def register():
             return "Invalid Email", 400
         
         # Check if username or email already exists
-        print(username)
-        print(email)
         users = db.execute("SELECT username, email FROM users")
 
         for user in users:
@@ -201,7 +199,6 @@ def fetch():
         if not data:
             return "Invalid ID. Cannot fetch data", 400
         else:
-            print(data)
             return jsonify(data), 200
 
 @app.route("/change", methods = ["GET", "POST"])
@@ -254,7 +251,6 @@ def change():
 def personal_change(): 
     if request.method == "POST":
         user_id = request.form.get('user_id')
-        # print(user_id)
         password = request.form.get("password")
         first_name = request.form.get("firstName")
         last_name = request.form.get("lastName")
@@ -317,50 +313,6 @@ def personal_change():
         }
         return jsonify(data), 200
 
-@app.route("/history", methods = ["GET", "POST"])
-def track(): 
-    if request.method == "POST":
-        user_id = request.form.get('user_id')
-        if not user_id:
-            return "Invalid User ID", 400
-        tracked_item = request.form.get("item_id")
-        print(tracked_item)
-        delete_req = request.form.get("delete")
-        print(delete_req)
-
-        if tracked_item:
-            
-                db.execute("INSERT INTO view_history (id, user_id, item_id) VALUES (?, ?, ?)", generate_uuid(), user_id, tracked_item)
-                return jsonify(), 200
-            
-        elif delete_req:
-            
-                db.execute("DELETE FROM view_history WHERE id = ?", user_id)
-                return "View History Deleted", 200
-            
-        return jsonify(), 200
-    else:
-        user_id = request.args.get('user_id')
-        if not user_id:
-            print("Invalid id")
-            return "Invalid User ID", 400
-        history = db.execute("SELECT item_id, view_time_EST FROM view_history WHERE user_id = ? ORDER BY view_time_EST DESC;", user_id)
-
-        items = []
-        for item in history:
-            try:
-                # Checks if the item is the the pokedex number
-                int(item["item_id"])
-
-                pokemon = lookup(item["item_id"])
-                items.append(pokemon)
-            except ValueError:
-                card = find(item["item_id"])
-                items.append(card[0])
-
-        print(items)
-        return "cool", 200
-
 @app.route("/collection", methods = ["GET", "POST"])
 def collect(): 
     global prev_collection
@@ -369,15 +321,11 @@ def collect():
         card_id = request.form.get("id")
         add_request = request.form.get("add").lower() == "true"
 
-        # print(add_request)
         if not user_id:
-            print(" NO USER ID")
             return "Invalid User ID", 400
         if not card_id:
-            print(" CARD ID MISSING")
             return "Missing ID", 400
         if add_request is None: 
-            print(" ACTION WENT THROUGH EVEN THOUGH IT WASNT SUPPOSED TO")
             return "Missing request type", 400
         
         collection = db.execute("SELECT collection FROM users WHERE id = ?", user_id)
@@ -396,30 +344,20 @@ def collect():
         return jsonify({}), 200
     else:
         user_id = request.args.get('user_id')
-        # print(user_id)
         if not user_id:
-            # print("1")
             return "Invalid User ID", 400
 
         collection = db.execute("SELECT card_id, user_id FROM collection WHERE user_id = ?", user_id)
         if not collection:
-            # print("2")
             return "User has no collection available", 400
 
         cards = []
         for card in collection:
             data = find(card["card_id"])
             cards.append(data[0])
-
-        # for index in cards:
-        #     print(index)
-
-        # print(f"new: {cards}")
-        # print(f"prev: {prev_collection}")
         
         count = db.execute("SELECT collection FROM users WHERE id = ?", user_id)
         count = count[0]["collection"]
-        print(count)
         if count != 1:
             if prev_collection != cards:
                 prev_collection = cards
@@ -437,7 +375,6 @@ def sets():
     if request.method == "GET":
         user_id = request.args.get("user_id")
         if not user_id:
-            print(" NO USER ID")
             return "Invalid ID", 400
         
         valid_sets = find_set(user_id)
@@ -448,16 +385,12 @@ def sets():
         sets = set_call(valid_sets)
         if not sets:
             return "No set information found", 400
-        # print(sets)
 
         # generates list of dicts with the keys: series, sets
         ordered_sets = [{"series": key, "sets": value} for key, value in sets.items()]
-        # print(f"prev: {prev_sets}")
-        # print(f"new: {ordered_sets}")
 
         count = db.execute("SELECT collection FROM users WHERE id = ?", user_id)
         count = count[0]["collection"]
-        print(count)
         if count != 1:
             if prev_sets != ordered_sets:
                 prev_sets = ordered_sets
@@ -467,7 +400,6 @@ def sets():
         else:
             prev_sets = ordered_sets
             return jsonify(ordered_sets), 200
-        # print(ordered_sets)
         
     else:
          return jsonify({}), 200
@@ -484,11 +416,7 @@ def reset():
 
         # Resets the global variables
         prev_sets = []  
-        print(prev_sets)
-        print("hello")
         prev_collection = []
-        print(prev_collection)
-        print("hello2")
 
         return jsonify({"message": "Sets reset"}), 200
     else:
@@ -502,5 +430,50 @@ def count():
             return "Invalid ID", 400
         count = db.execute("SELECT collection FROM users WHERE id = ?", user_id)
         count = count[0]["collection"]
-        print(count)
         return jsonify(count), 200
+
+# Future Implementation: History
+
+# @app.route("/history", methods = ["GET", "POST"])
+# def track(): 
+#     if request.method == "POST":
+#         user_id = request.form.get('user_id')
+#         if not user_id:
+#             return "Invalid User ID", 400
+#         tracked_item = request.form.get("item_id")
+#         print(tracked_item)
+#         delete_req = request.form.get("delete")
+#         print(delete_req)
+
+#         if tracked_item:
+            
+#                 db.execute("INSERT INTO view_history (id, user_id, item_id) VALUES (?, ?, ?)", generate_uuid(), user_id, tracked_item)
+#                 return jsonify(), 200
+            
+#         elif delete_req:
+            
+#                 db.execute("DELETE FROM view_history WHERE id = ?", user_id)
+#                 return "View History Deleted", 200
+            
+#         return jsonify(), 200
+#     else:
+#         user_id = request.args.get('user_id')
+#         if not user_id:
+#             print("Invalid id")
+#             return "Invalid User ID", 400
+#         history = db.execute("SELECT item_id, view_time_EST FROM view_history WHERE user_id = ? ORDER BY view_time_EST DESC;", user_id)
+
+#         items = []
+#         for item in history:
+#             try:
+#                 # Checks if the item is the the pokedex number
+#                 int(item["item_id"])
+
+#                 pokemon = lookup(item["item_id"])
+#                 items.append(pokemon)
+#             except ValueError:
+#                 card = find(item["item_id"])
+#                 items.append(card[0])
+
+#         print(items)
+#         return "success", 200

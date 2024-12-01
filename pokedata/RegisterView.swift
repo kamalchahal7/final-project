@@ -100,7 +100,7 @@ struct RegisterView: View {
                             .stroke(Color.black, lineWidth: 3)
                     )
                     .focused($focused, equals: .firstName)
-                    .onChange(of: firstName) { newValue in
+                    .onChange(of: firstName) {
                         nameError = nil
                     }
                 TextField("Last Name", text: $lastName)
@@ -112,7 +112,7 @@ struct RegisterView: View {
                             .stroke(Color.black, lineWidth: 3)
                     )
                     .focused($focused, equals: .lastName)
-                    .onChange(of: lastName) { newValue in
+                    .onChange(of: lastName) {
                         nameError = nil
                     }
             }
@@ -155,7 +155,6 @@ struct RegisterView: View {
                     Divider()
                     Button(action: {
                         // Handle the submission of the selected date
-//                        print("Selected date: \(birthDate)")
                         withAnimation(.easeInOut) {
                             shown.toggle()
                         }
@@ -195,7 +194,7 @@ struct RegisterView: View {
                 )
                 .padding(.top, 8)
                 .focused($focused, equals: .email)
-                .onChange(of: email) { newValue in
+                .onChange(of: email) {
                     emailError = nil
                 }
             
@@ -218,7 +217,7 @@ struct RegisterView: View {
                 )
                 .padding(.top, 8)
                 .focused($focused, equals: .username)
-                .onChange(of: username) { newValue in
+                .onChange(of: username) { 
                     usernameError = nil
                 }
 
@@ -243,7 +242,7 @@ struct RegisterView: View {
                 .padding(.top, 8)
                 .textContentType(.oneTimeCode)
                 .focused($focused, equals: .password)
-                .onChange(of: password) { newValue in
+                .onChange(of: password) {
                     passwordError = nil
                 }
             
@@ -267,7 +266,7 @@ struct RegisterView: View {
                 .padding(.top, 8)
                 .textContentType(.oneTimeCode)
                 .focused($focused, equals: .confirmPassword)
-                .onChange(of: confirmPassword) { newValue in
+                .onChange(of: confirmPassword) {
                     confirmPasswordError = nil
                 }
             
@@ -447,32 +446,3 @@ extension View {
 #Preview {
     RegisterView(showLoginView: .constant(false), showRegisterView: .constant(true), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false))
 }
-
-// CODE TO MAKE AN ERROR VIEW PAGE
-
-
-//@State private var showErrorView = false
-
-//func handleResponse(response: URLResponse?) {
-//    if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 404 {
-//        showErrorView = true
-//    }
-//}
-
-//var body: some View {
-//    VStack {
-//        if showErrorView {
-//            ErrorView() // Your custom error view
-//        } else {
-//            MainView() // Your main content view
-//        }
-//    }
-//}
-
-// MORE ERRORS
-
-//func handleResponse(response: URLResponse?) {
-//    if let httpResponse = response as? HTTPURLResponse, (400...599).contains(httpResponse.statusCode) {
-//        showErrorView = true
-//    }
-

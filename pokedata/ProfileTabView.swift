@@ -11,7 +11,6 @@ struct ProfileTabView: View {
     @AppStorage("user_id") var user_id: Int = 0
     @Environment(\.openURL) var openURL
     @State private var username: String = ""
-//    @Binding var date: Date
     @Binding var showLoginView: Bool
     @Binding var showPersonalView: Bool
     @Binding var showPasswordChangeView: Bool
@@ -20,11 +19,6 @@ struct ProfileTabView: View {
     @Binding var userData: UserInfo
     let collectionCount: Int
     @Binding var notLoggedIn: Bool
-//    var shortMonthName: String {
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "MMM"
-//        return dateFormatter.string(from: date)
-//    }
     var body: some View {
         GeometryReader { geometry in
             VStack {
@@ -42,14 +36,6 @@ struct ProfileTabView: View {
                 Text(userData.username)
                     .font(.title)
                     .fontWeight(.bold)
-//                let calendar = Calendar.current
-//                let components = calendar.dateComponents([.year, .month], from: date)
-//                let year = components.year
-//                Text("Joined \(shortMonthName) \(String(format: "%i", year!))")
-//                    .padding(.bottom, 8)
-                
-                                    
-//                    Text("Total Views: ")
                 Text("Cards Collected: \(userData.collection)")
                     .font(.title3)
                     .fontWeight(.semibold)
@@ -92,28 +78,28 @@ struct ProfileTabView: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     Section(header: Text("Legal")) {
                         Button(action: {
-                            if let url = URL(string: "http://127.0.0.1:5500/legal/terms_and_conditions.html") {
+                            if let url = URL(string: "\(Config.baseURL)/legal/terms_and_conditions.html") {
                                 openURL(url)
                             }
                         }) {
                             Text("Terms and Conditions")
                         }
                         Button(action: {
-                            if let url = URL(string: "http://127.0.0.1:5500/legal/privacy_policy.html") {
+                            if let url = URL(string: "\(Config.baseURL)/legal/privacy_policy.html") {
                                 openURL(url)
                             }
                         }) {
                             Text("Privacy Policy")
                         }
                         Button(action: {
-                            if let url = URL(string: "http://127.0.0.1:5500/legal/eula_agreement.html") {
+                            if let url = URL(string: "\(Config.baseURL)/legal/eula_agreement.html") {
                                 openURL(url)
                             }
                         }) {
                             Text("EULA Agreement")
                         }
                         Button(action: {
-                            if let url = URL(string: "http://127.0.0.1:5500/legal/disclaimer.html") {
+                            if let url = URL(string: "\(Config.baseURL)/legal/disclaimer.html") {
                                 openURL(url)
                             }
                         }) {

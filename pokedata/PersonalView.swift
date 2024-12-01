@@ -19,7 +19,6 @@ enum PersonalField {
 struct PersonalView: View {
     @AppStorage("user_id") var user_id: Int = 0
     
-    
     @Binding var userData: UserInfo
     @Binding var message: String
     @Binding var errorCode: String
@@ -76,7 +75,8 @@ struct PersonalView: View {
                                 Text("Profile")
                                 Spacer()
                             }
-                            .padding([.leading, .top])
+                            .padding([.leading, .top], 20)
+                            .padding(.top, 40)
                         }
                     }
                 }
@@ -85,16 +85,15 @@ struct PersonalView: View {
                 HStack {
                     if !confirmation {
                         Button(action: {
-                            withAnimation(.easeInOut) {
-                                confirmation.toggle()
-                            }
+                            confirmation.toggle()
                         }) {
                             HStack {
                                 Image(systemName: "chevron.backward")
                                 Text("Back")
                                 Spacer()
                             }
-                            .padding([.leading, .top])
+                            .padding([.leading, .top], 20)
+                            .padding(.top, 40)
                         }
                     }
                 }
@@ -118,8 +117,8 @@ struct PersonalView: View {
                 .padding()
                 Spacer()
             }
-            .onChange(of: fault) { newValue in
-                showAlert = newValue && passwordError != "*Password Incorrect"
+            .onChange(of: fault) { 
+                showAlert = fault && passwordError != "*Password Incorrect"
             }
             .alert(isPresented: $showAlert) {
                 Alert(
@@ -171,7 +170,7 @@ struct PersonalView: View {
                 .padding(.bottom, 8)
                 .textContentType(.oneTimeCode)
                 .focused($focused, equals: .password)
-                .onChange(of: password) { newValue in
+                .onChange(of: password) {
                     passwordError = nil
                 }
             
@@ -188,7 +187,6 @@ struct PersonalView: View {
                 if passwordError == nil {
                     submitConfirmation { fault in
                     // backend errror checking
-                        //print(fault)
                         if fault {
                             passwordError = "*Password Incorrect"
                         } else {
@@ -240,7 +238,7 @@ struct PersonalView: View {
                             .stroke(Color.black, lineWidth: 3)
                     )
                     .focused($focused, equals: .firstName)
-                    .onChange(of: firstName) { newValue in
+                    .onChange(of: firstName) {
                         nameError = nil
                     }
                 TextField(userData.last_name, text: $lastName)
@@ -252,7 +250,7 @@ struct PersonalView: View {
                             .stroke(Color.black, lineWidth: 3)
                     )
                     .focused($focused, equals: .lastName)
-                    .onChange(of: lastName) { newValue in
+                    .onChange(of: lastName) {
                         nameError = nil
                     }
             }
@@ -275,7 +273,6 @@ struct PersonalView: View {
                 Text("Date of Birth")
                     .font(.title3)
                     .fontWeight(.heavy)
-                // maybe make fully capitlized
                 Spacer()
             }
             .padding(.top, 1)
@@ -291,16 +288,9 @@ struct PersonalView: View {
                             shown.toggle()
                         }
                     } label: {
-                        
-                        
-                        
                         // old format
-                        
                         Text(date)
                             .font(.system(size: 15, weight: .medium))
-                        
-                        
-                    
                     }
                     .disabled(shown)
                 }
@@ -317,7 +307,6 @@ struct PersonalView: View {
                         let day = calendar.component(.day, from: birthDate)
                         date = "\(month)/\(day)/\(String(format: "%i", year))"
                         // Handle the submission of the selected date
-//                        print("Selected date: \(birthDate)")
                         changed = true
                         withAnimation(.easeInOut) {
                             shown.toggle()
@@ -368,7 +357,7 @@ struct PersonalView: View {
                 )
                 .padding(.top, -8)
                 .focused($focused, equals: .email)
-                .onChange(of: email) { newValue in
+                .onChange(of: email) {
                     emailError = nil
                 }
             
@@ -402,7 +391,7 @@ struct PersonalView: View {
                 )
                 .padding(.top, -8)
                 .focused($focused, equals: .username)
-                .onChange(of: username) { newValue in
+                .onChange(of: username) {
                     usernameError = nil
                 }
 
@@ -414,30 +403,6 @@ struct PersonalView: View {
                     Text(error).foregroundColor(Color.red)
                 }
             }
-            
-//            SecureField("Confirm Password", text: $confirmPassword)
-//                .font(.system(size: 20, weight: .medium))
-//                .autocapitalization(.none)
-//                .autocorrectionDisabled(true)
-//                .padding()
-//                .multilineTextAlignment(.leading)
-//                .background(Color.white)
-//                .cornerRadius(10)
-//                .overlay(
-//                    RoundedRectangle(cornerRadius: 10)
-//                        .stroke(Color.black, lineWidth: 3)
-//                )
-//                .padding(.top, 8)
-//                .textContentType(.oneTimeCode)
-//                .focused($focused, equals: .confirmPassword)
-//                .onChange(of: confirmPassword) {
-//                    confirmPasswordError = nil
-//                }
-//            
-//            // displays confirmation password error message
-//            if let error = confirmPasswordError {
-//                Text(error).foregroundColor(Color.red)
-//            }
             
             HStack {
                 Button(action: {
@@ -452,7 +417,6 @@ struct PersonalView: View {
                 Spacer()
                 Button(action: {
                     same = false
-                   // print(userData.date_of_birth)
                     if firstName == userData.first_name && lastName == userData.last_name {
                         nameError = "*First & last name are unchanged"
                         same = true
@@ -487,13 +451,9 @@ struct PersonalView: View {
                             usernameError = "*Username already taken"
                         }
                     }
-
-//                    focused = nil
                     
                     // frontend error checking
                     if nameError == nil && birthDateError == nil && emailError == nil && usernameError == nil && !same {
-                       // print("Global: \(user_id)")
-                       // print("Local: \(userData.id)")
                         // submits registration data to backend
                         submitChange { fault in
                             // backend errror checking
@@ -613,7 +573,6 @@ struct PersonalView: View {
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                         DispatchQueue.main.async {
                             existingUserData = json
-                            //print(existingUserData)
                         }
                     }
                 } catch {
@@ -622,7 +581,6 @@ struct PersonalView: View {
                         existingUserData = [:]
                     }
                 }
-                //print("response \(String(data: data, encoding: .utf8) ?? "No response")")
             } else if let error = error {
                 print("HTTP Request Failed \(error)")
             }

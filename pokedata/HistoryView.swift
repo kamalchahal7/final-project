@@ -54,10 +54,6 @@ struct HistoryView: View {
                                 .foregroundColor(Color.white)
                                 .cornerRadius(10)
                             }
-//                            Divider()
-//                            List {
-//                                
-//                            }
                         }
                     }
                     

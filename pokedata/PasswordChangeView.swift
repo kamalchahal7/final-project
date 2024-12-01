@@ -44,13 +44,17 @@ struct PasswordChangeView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                HStack {
-                    Button("Back") {
-                        onDismiss()
+                Button(action: {
+                    onDismiss()
+                }) {
+                    HStack {
+                        Image(systemName: "chevron.backward")
+                        Text("Profile")
+                        Spacer()
                     }
-                    Spacer()
+                    .padding([.leading, .top], 20)
+                    .padding(.top, 40)
                 }
-                .padding([.leading, .top])
             }
             VStack {
                 Spacer()
@@ -76,7 +80,7 @@ struct PasswordChangeView: View {
                                     .stroke(Color.black, lineWidth: 3)
                             )
                             .focused($focused, equals: .email)
-                            .onChange(of: email) { newValue in
+                            .onChange(of: email) {
                                 emailError = nil
                             }
                         
@@ -98,7 +102,7 @@ struct PasswordChangeView: View {
                             )
                             .textContentType(.oneTimeCode)
                             .focused($focused, equals: .password)
-                            .onChange (of: password) { newValue in
+                            .onChange (of: password) {
                                 passwordError = nil
                             }
                         if let error = passwordError {
@@ -122,7 +126,7 @@ struct PasswordChangeView: View {
                             )
                             .textContentType(.oneTimeCode)
                             .focused($focused, equals: .newPassword)
-                            .onChange(of: newPassword) { newValue in
+                            .onChange(of: newPassword) {
                                 newPasswordError = nil
                             }
                         if let error = newPasswordError {
@@ -143,7 +147,7 @@ struct PasswordChangeView: View {
                             )
                             .textContentType(.oneTimeCode)
                             .focused($focused, equals: .confirmNewPassword)
-                            .onChange (of: confirmNewPassword) { newValue in
+                            .onChange (of: confirmNewPassword) {
                                 confirmNewPasswordError = nil
                             }
                         if let error = confirmNewPasswordError {
@@ -221,8 +225,8 @@ struct PasswordChangeView: View {
                 .padding()
                 Spacer()
             }
-            .onChange(of: fault) { newValue in
-                showAlert = newValue && passwordError != "*Password Incorrect"
+            .onChange(of: fault) { 
+                showAlert = fault && passwordError != "*Password Incorrect"
             }
             .alert(isPresented: $showAlert) {
                 Alert(

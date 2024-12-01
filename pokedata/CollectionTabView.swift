@@ -12,6 +12,7 @@ struct CollectionTabView: View {
     @EnvironmentObject var collections: cards
     @EnvironmentObject var activeSeries: series
     @Binding var collectionEdit: Bool
+    @Binding var collection: [PokemonCard]
     @Binding var selectedCard: PokemonCard?
     @Binding var market: String
     @Binding var showLoginView: Bool
@@ -19,13 +20,11 @@ struct CollectionTabView: View {
     @Binding var message: String
     @Binding var errorCode: String
     @Binding var fault: Bool
-    let onDismiss: () -> Void
     @State private var edited: Bool = false
     @State private var isLoading: Bool = true
     @State private var isWaiting: Bool = true
     @State private var shown: [String: Bool] = [:]
     @State var showCardDetail: Bool = false
-    @State private var collection: [PokemonCard] = []
     @State private var buttonWidth: CGFloat = 0
     @State private var phrase: Int? = nil
     
@@ -105,9 +104,7 @@ struct CollectionTabView: View {
                                                                         }
                                                                         let cardCount = collections.cards.filter { $0.setId == set.id }.count
                                                                         if !isWaiting {
-                                                                            //                                                                    withAnimation (.easeInOut(duration: 2)) {
                                                                             Text("\(cardCount)/\(set.total) Collected")
-                                                                            //                                                                    }
                                                                         }
                                                                     }
                                                                 }
@@ -392,7 +389,6 @@ struct CollectionTabView: View {
                 if httpResponse.statusCode == 204 {
                     DispatchQueue.main.async {
                         print("Error Code is 204 FOR SETS (SAME SETS)")
-//                        print(activeSeries.series)
                     }
                 } else {
                     if let data = data {
@@ -403,7 +399,6 @@ struct CollectionTabView: View {
                                 phrase = 0
                                 activeSeries.series = series
                                 isLoading = false
-                                //                        print("Active Series Data: \(activeSeries)")
                             }
                         } catch {
                             do {
@@ -430,12 +425,14 @@ struct CollectionTabView: View {
             "reverseHolofoil"
         ]
         var total = 0.0
+        
         for card in collections.cards {
             for type in priceTypes {
                 if let price = card.tcgPricesMarket[type] {
                     if let num = price {
                         total += num
                     }
+                    break
                 }
             }
         }
@@ -495,7 +492,64 @@ func getRandomInteger() -> Int {
 }
 
 #Preview {
-    CollectionTabView(collectionEdit: .constant(false), selectedCard: .constant(nil), market: .constant("0.55 USD"), showLoginView: .constant(true), showRegisterView: .constant(false), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false), onDismiss: {})
+    CollectionTabView(collectionEdit: .constant(false), collection: .constant([PokemonCard(
+        id: "xy10-78",
+        name: "Lugia",
+        supertype: "Pokémon",
+        subtypes: ["Basic"],
+        hp: "120",
+        types: ["Colorless"],
+        evolvesFrom: "Lugia Jr.",
+        rules: nil,
+        ancientTraitName: nil,
+        ancientTraitText: nil,
+        abilitiesName: ["Pressure"],
+        abilitiesText: ["As long as this Pokémon is your Active Pokémon, any damage done by attacks from your opponent's Active Pokémon is reduced by 20 (before applying Weakness and Resistance)."],
+        abilitiesType: ["Ability"],
+        attacksCost: ["Colorless", "Colorless", "Colorless"],
+        attacksName: ["Intensifying Burn"],
+        attacksText: ["If your opponent's Active Pokémon is a Pokémon-EX, this attack does 60 more damage."],
+        attacksDamage: ["60+"],
+        attacksConvertedEnergyCost: [3],
+        weaknessType: "Lightning",
+        weaknessValue: "×2",
+        resistanceType: "Fighting",
+        resistanceValue: "-20",
+        retreatCost: ["Colorless", "Colorless"],
+        convertedRetreatCost: 2,
+        number: "78",
+        artist: "TOKIYA",
+        rarity: "Rare",
+        flavorText: "It is said to be the guardian of the seas. It is rumored to have been seen on the night of a storm.",
+        nationalPokedexNumbers: [249],
+        legalitiesStandard: "Legal",
+        legalitiesExpanded: "Legal",
+        legalitiesUnlimited: "Legal",
+        regulationMark: nil,
+        lowImageURL: "https://images.pokemontcg.io/xy10/78.png",
+        highImageURL: "https://images.pokemontcg.io/xy10/78_hires.png",
+        tcgURL: "https://prices.pokemontcg.io/tcgplayer/xy10-78",
+        tcgUpdatedAt: "2024/08/18",
+        tcgPricesType: ["normal": "Normal", "reverseHolofoil": "Reverse Holofoil"],
+        tcgPricesLow: ["normal": nil, "reverseHolofoil": nil],
+        tcgPricesMid: ["normal": 0.56, "reverseHolofoil": 1.92],
+        tcgPricesHigh: ["normal": 5.0, "reverseHolofoil": 10.0],
+        tcgPricesMarket: ["normal": 0.55, "reverseHolofoil": 2.39],
+        tcgPricesDirectLow: ["normal": nil, "reverseHolofoil": nil],
+        setId: "xy10",
+        setName: "Fates Collide",
+        setSeries: "XY",
+        setPrintedTotal: 124,
+        setTotal: 129,
+        setLegalitiesStandard: nil,
+        setLegalitiesExpanded: "Legal",
+        setLegalitiesUnlimited: "Legal",
+        setPtcgoCode: "FCO",
+        setReleaseDate: "2016/05/02",
+        setUpdatedAt: "2018/09/03 11:49:00",
+        setImagesSymbol: "https://images.pokemontcg.io/xy10/symbol.png",
+        setImagesLogo: "https://images.pokemontcg.io/xy10/logo.png")
+    ]), selectedCard: .constant(nil), market: .constant("0.55 USD"), showLoginView: .constant(true), showRegisterView: .constant(false), message: .constant("OK"), errorCode: .constant("Status Code: 200"), fault: .constant(false))
         .environmentObject(cards())
         .environmentObject(series())
 }

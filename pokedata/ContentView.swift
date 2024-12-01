@@ -177,20 +177,14 @@ struct ContentView: View {
     @State var collectionEdit: Bool = false
     // Inputed Data on Search Tab Bar
     @State private var pokedata: String = ""
-    // Inputed Data on Cards Tab Bar
-    @State private var pokecard: String = ""
     // Returned Data from pokedata.db
     @State private var fetchedData: [Pokemon] = []
-    // Returned Data from TCG API
-    @State private var cardData: [PokemonCard] = []
     // Returned Data from accounts.db
     @State private var userData = UserInfo(id: 0, username: "", email: "", first_name: "", last_name: "", date_of_birth: "", registration_time_EST: "", collection: 0)
     // Initial Tab
     @State private var selectedTab = 0
     // Checks if search bar is active or not
     @State private var isSearchActive: Bool = false
-    // Checks if search bar is active or not
-    @State private var search: Bool = false
     // Checks if input field is in focus or not
     @FocusState private var isSearchFieldFocused: Bool
     // Used for selected pokemon
@@ -205,8 +199,6 @@ struct ContentView: View {
     @State private var showCollectionDetail = false
     // Returned Data from python image database
     @State private var pokemonImages: [String: UIImage] = [:]
-    // Checks if search view is shown or not
-    @State private var hasAnimated = false
     // Holds market value of selected card
     @State private var market: String = ""
     // holds all the collected pokemon cards
@@ -248,155 +240,38 @@ struct ContentView: View {
     @State private var showHistoryView = false
 
     var body: some View {
-        
-        // SEARCH TAB BAR
         TabView (selection: $selectedTab) {
+            // CARDS TAB BAR
             GeometryReader { geometry in
-                ZStack {
-                    if isSearchActive {
-                        let isNotchDevice = geometry.safeAreaInsets.top > 20
-                        let heightMultiplier = isNotchDevice ? 0.17 : 0.29
-                        let offsetMultiplier = isNotchDevice ? 0.1 : 0.15
-                        
-                        Rectangle()
-                            .foregroundColor(Color.white.opacity(0.5))
-                            .frame(height: geometry.safeAreaInsets.top + (geometry.size.height * heightMultiplier))
-                            .offset(y: -geometry.size.height * offsetMultiplier)
-                            .transition(.move(edge: .top))
-                            .animation(.easeInOut(duration: 1.0), value: isSearchActive)
-                    }
-                }
-                .opacity(showDetail ? 0 : 1)
-                
                 VStack {
-                    if !isSearchActive && !showDetail { Spacer() }
-                    if !isSearchActive {
-                        Image("pokeball")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
+                    SearchCardTabView(
+                        showCardDetail: $showCardDetail,
+                        selectedCard: $selectedCard,
+                        collectionEdit: $collectionEdit,
+                        collection: $collection,
+                        market: $market,
+                        showLoginView: $showLoginView,
+                        showRegisterView: $showRegisterView,
+                        message: $message,
+                        errorCode: $errorCode,
+                        fault: $fault
+                    )
+                    .onDisappear {
+                        showCardDetail = false
                     }
-                    // ZStack for the search bar
-                    ZStack(alignment: .leading) {
-                        if !showDetail {
-                            if isSearchActive {
-                                Button(action: {
-                                    withAnimation(.easeInOut(duration: 1.0)) {
-                                        isSearchActive.toggle()
-                                        hasAnimated = false
-                                        isSearchFieldFocused = false
-                                    }
-                                }) {
-                                    Image(systemName: "chevron.backward")
-                                    
-                                        .font(.system(size: 35, weight: .bold))
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            Group {
-                                Image(systemName: "magnifyingglass")
-                                    .font(.system(size: 20, weight: .bold))
-                                    .padding(.leading, 20)
-                                    .zIndex(1.0)
-                                    .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
-                                
-                                TextField("Search Pokemon:", text: $pokedata, onEditingChanged: { editing in
-                                    if editing && !hasAnimated {
-                                        withAnimation {
-                                            isSearchActive = true
-                                        }
-                                        hasAnimated = true
-                                    }
-                                })
-                                .font(.system(size: 25, weight: .medium))
-                                .focused($isSearchFieldFocused)
-                                .autocapitalization(.none)
-                                .autocorrectionDisabled(true)
-                                .padding(.leading, 40)
-                                .padding()
-                                .multilineTextAlignment(.leading)
-                                .background(Color.white)
-                                .cornerRadius(20)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.black, lineWidth: 3)
-                                )
-                                .transition(.move(edge: .top))
-                                .onChange(of: pokedata) {
-                                    newvalue in                                    submitPokedata()
-                                }
-                                .padding(.leading, isSearchActive ? geometry.size.width * 0.1 : 0)
-                            }
-                        }
-                    }
-                    .animation(.easeInOut(duration: 0.5), value: isSearchActive)
-                    .animation(.easeInOut(duration: 0.00000001), value: !showDetail)
-                    
-                    if !isSearchActive {
-                        Text("Enter Pokemon Name or Pokedex #")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 20, weight: .semibold))
-                            .padding(7)
-                            .padding(.bottom, -10)
-                        Text("Supports Gen 1 - 8!")
-                            .foregroundColor(.white)
-                            .font(.system(size: 20, weight: .semibold))
-                    }
-                    
-                    if isSearchActive {
-                        if !showDetail {
-                            Spacer()
-                                .frame(height: geometry.size.height * 0.02)
-                        }
-                        ZStack {
-                            VStack {
-                                List(fetchedData, id: \.id) { pokemon in
-                                    Button(action: {
-                                        withAnimation(.easeInOut) {
-                                            selected = pokemon
-                                            showDetail = true
-                                        }
-                                    }) {
-                                        HStack {
-                                            if let image = pokemonImages[pokemon.name] {
-                                                Image(uiImage: image)
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(minWidth: 25, idealWidth: 50, maxWidth: 50, minHeight: 50, idealHeight: 50, maxHeight: 50, alignment: .center)
-                                            }
-                                            Text(String(format: "#%04d", pokemon.pokedex_num))
-                                                .font(.system(size: 20))
-                                                .padding(.leading, 10)
-                                            Text(pokemon.name)
-                                                .font(.system(size: 20))
-                                                .fontWeight(.heavy)
-                                        }
-                                        .foregroundColor(Color.purple)
-                                        .onAppear {
-                                            fetchImage(for: pokemon)
-                                        }
-                                        
-                                    }
-                                }
-                                .scrollContentBackground(.hidden)
-                                .padding(.horizontal, -16)
-                            }
-                            
-                            // Overlay detail view when an item is selected
-                            if showDetail, let selectedPokemon = selected, let selectedImage = pokemonImages[selectedPokemon.name] {
-                                PokemonInfo(selectedImage: selectedImage, pokemon: selectedPokemon, onDismiss: {
-                                    withAnimation(.easeInOut) {
-                                        showDetail = false
-                                    }
-                                })
-                                .transition(.move(edge: .trailing))
-                                .edgesIgnoringSafeArea(.all)
-                                .zIndex(1)
-                            }
-                        }
-                    }
-                    if !isSearchActive { Spacer() }
                 }
-                .padding(showDetail ? 0 : 16)
+            }
+            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
+            .tabItem {
+                Label("Cards", systemImage: "doc.text.magnifyingglass")
+            }
+            .tag(0)
+        
+            // SEARCH TAB BAR
+            GeometryReader { geometry in
+                VStack {
+                    SearchTabView(pokedata: $pokedata, fetchedData: $fetchedData, isSearchActive: $isSearchActive, selected: $selected, showDetail: $showDetail, pokemonImages: $pokemonImages)
+                }
             }
             .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
             .tabItem {
@@ -405,218 +280,6 @@ struct ContentView: View {
             .onAppear() {
                 UITabBar.appearance().backgroundColor = .white
             }
-            .tag(0)
-            
-            
-            // CARDS TAB BAR
-            GeometryReader { geometry in
-                ZStack {
-                    if search {
-                        let isNotchDevice = geometry.safeAreaInsets.top > 20
-                        let heightMultiplier = isNotchDevice ? 0.17 : 0.29
-                        let offsetMultiplier = isNotchDevice ? 0.1 : 0.15
-                        
-                        Rectangle()
-                            .foregroundColor(Color.white.opacity(0.5))
-                            .frame(height: geometry.safeAreaInsets.top + (geometry.size.height * heightMultiplier))
-                            .offset(y: -geometry.size.height * offsetMultiplier)
-                            .transition(.move(edge: .top))
-                            .animation(.easeInOut(duration: 1.0), value: search)
-                    }
-                    
-                }
-                .opacity(showCardDetail ? 0 : 1)
-                
-                VStack {
-                    if !search && !showCardDetail { Spacer() }
-                    if !search {
-                        Image("pokeicon")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .padding([.leading, .trailing])
-                    }
-                    
-                    ZStack(alignment: .leading) {
-                        if !showCardDetail {
-                            if search {
-                                Button(action: {
-                                    withAnimation(.easeInOut(duration: 1.0)) {
-                                        search.toggle()
-                                        hasAnimated = false
-                                        isSearchFieldFocused = false
-                                    }
-                                }) {
-                                    Image(systemName: "chevron.backward")
-                                    
-                                        .font(.system(size: 35, weight: .bold))
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            Group {
-                                Image(systemName: "magnifyingglass")
-                                    .font(.system(size: 20, weight: .bold))
-                                    .padding(.leading, 20)
-                                    .zIndex(1.0)
-                                    .padding(.leading, search ? geometry.size.width * 0.1 : 0)
-                                
-                                TextField("Search PokeCard:", text: $pokecard)
-                                    .font(.system(size: 25, weight: .medium))
-                                    .focused($isSearchFieldFocused)
-                                    .autocapitalization(.none)
-                                    .autocorrectionDisabled(true)
-                                    .padding(.leading, 40)
-                                    .padding()
-                                    .multilineTextAlignment(.leading)
-                                    .background(Color.white)
-                                    .cornerRadius(20)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 20)
-                                            .stroke(Color.black, lineWidth: 3)
-                                    )
-                                    .transition(.move(edge: .top))
-                                    .onSubmit {
-                                        search = true
-                                        submitPokecard()
-                                    }
-                                    .padding(.leading, search ? geometry.size.width * 0.1 : 0)
-                            }
-                        }
-                    }
-                    .animation(.easeInOut(duration: 0.5), value: search)
-                    .animation(.easeInOut(duration: 0.00000001), value: !showCardDetail)
-                    
-//  Future Implementation (CameraView):
-                    
-//                    if !search {
-//                        HStack {
-//                            Button(action: {
-//                                withAnimation(.easeInOut) {
-//                                    showPhotos = true
-//                                }
-//                            }) {
-//                                HStack {
-//                                    Image(systemName: "square.and.arrow.up")
-//                                    Text("Upload")
-//                                }
-//                                .frame(height: 27)
-//                            }
-//                            .padding()
-//                            .frame(maxWidth: .infinity)
-//                            .background(Color.green)
-//                            .cornerRadius(10)
-//                            .overlay(
-//                                RoundedRectangle(cornerRadius: 10)
-//                                    .stroke(Color.black, lineWidth: 2)
-//                            )
-//                            Button(action: {
-//                                guard !isCameraButtonDisabled else { return }
-//                                isCameraButtonDisabled = true // Disable button temporarily
-//                                
-//                                // Check if running on a real device or simulator, not in the preview
-//                                if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == nil {
-//                                    print("Clicked should work.")
-//                                    showCamera = true
-//                                } else {
-//                                    print("Camera not available in preview.")
-//                                }
-//                                
-//                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//                                    isCameraButtonDisabled = false
-//                                }
-//                            }) {
-//                                HStack {
-//                                    Image(systemName: "camera")
-//                                    Text("Capture")
-//                                }
-//                                .frame(height: 27)
-//                            }
-//                            .padding()
-//                            .frame(maxWidth: .infinity)
-//                            .background(Color.pink)
-//                            .cornerRadius(10)
-//                            .overlay(
-//                                RoundedRectangle(cornerRadius: 10)
-//                                    .stroke(Color.black, lineWidth: 2)
-//                            )
-//                        }
-//                        .padding(.top, 10)
-//                        .foregroundColor(.white)
-//                        .font(.system(size: 20, weight: .bold))
-//                    }
-                    
-                    if search {
-                        if !showCardDetail {
-                            Spacer()
-                                .frame(height: geometry.size.height * 0.02)
-                        }
-                        ZStack {
-                            VStack {
-                                List(cardData.indices, id: \.self) { index in
-                                    let pokemoncard = cardData[index]
-                                    
-                                    // Compute the market price inside the view builder
-                                    let marketPrice = calculateMarketPrice(for: pokemoncard)
-                                    
-                                    Button(action: {
-                                        withAnimation(.easeInOut) {
-                                            selectedCard = pokemoncard
-                                            market = calculateMarketPrice(for: pokemoncard)
-                                            showCardDetail = true
-                                        }
-                                    }) {
-                                        HStack {
-                                            AsyncImage(url: URL(string: pokemoncard.lowImageURL)) { image in
-                                                image
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(height: 200)
-                                            } placeholder: {
-                                                // Placeholder view (Optional)
-                                                Color.gray.frame(height: 200)
-                                            }
-                                            
-                                            VStack(alignment: .leading) {
-                                                Text(pokemoncard.name)
-                                                    .font(.system(size: 20))
-                                                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
-                                                Text("\(pokemoncard.setSeries) - \(pokemoncard.setName)")
-                                                    .font(.system(size: 15))
-                                                    .padding(.bottom, 1)
-                                                Text("Market Price: ")
-                                                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
-                                                + Text(marketPrice)
-                                                    .fontWeight(.semibold)
-                                                    .foregroundColor(Color(red: 0.0, green: 0.5, blue: 0.0))
-                                            }
-                                            .padding(.leading)
-                                        }
-                                    }
-                                }
-                                .scrollContentBackground(.hidden)
-                                .foregroundColor(Color.black)
-                                .padding(.horizontal, -16)
-                            }
-                            
-                            if showCardDetail, let selectedCard = selectedCard {
-                                PokemonCardInfo(collectionEdit: $collectionEdit, market: $market, collection: $collection, pokemonCard: selectedCard, showLoginView: $showLoginView, showRegisterView: $showRegisterView, message: $message, errorCode: $errorCode, fault: $fault, onDismiss: {
-                                    withAnimation(.easeInOut) {
-                                        showCardDetail = false
-                                    }
-                                })
-                                .transition(.move(edge: .trailing))
-                                .edgesIgnoringSafeArea(.all)
-                                .zIndex(1)
-                            }
-                        }
-                    }
-                    if !search { Spacer() }
-                }
-                .padding(showCardDetail ? 0 : 16)
-            }
-            .background(Color(red: 0.82, green: 0.71, blue: 0.55).edgesIgnoringSafeArea(.all))
-            .tabItem {
-                Label("Cards", systemImage: "doc.text.magnifyingglass")
-            }
             .tag(1)
             
             // COLLECTION TAB BAR
@@ -624,18 +287,14 @@ struct ContentView: View {
                 VStack {
                     CollectionTabView(
                         collectionEdit: $collectionEdit,
+                        collection: $collection,
                         selectedCard: $selectedCard,
                         market: $market,
                         showLoginView: $showLoginView,
                         showRegisterView: $showRegisterView,
                         message: $message,
                         errorCode: $errorCode,
-                        fault: $fault,
-                        onDismiss: {
-                            withAnimation(.easeInOut) {
-                                showCardDetail = false
-                            }
-                        }
+                        fault: $fault
                     )
                 }
             }
@@ -717,7 +376,6 @@ struct ContentView: View {
             resetSetsOnStart()
         }
         
-        
         // Changes Colour of Tab Bar
         .onAppear() {
             UITabBar.appearance().backgroundColor = .white
@@ -731,85 +389,6 @@ struct ContentView: View {
 //        }) {
 //            CameraOverlayView(image: $image, showCamera: $showCamera)
 //        }
-    }
-    
-    func submitPokedata() {
-        guard let url = URL(string: "\(Config.baseURL)/") else {
-            print("Invalid URL")
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        let bodyData = "pokedata=\(pokedata)"
-        request.httpBody = bodyData.data(using: .utf8)
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let data = data {
-                do {
-                    let pokemonArray = try JSONDecoder().decode([Pokemon].self, from: data)
-                    DispatchQueue.main.async {
-                        fetchedData = pokemonArray
-                    }
-                } catch {
-                    print("Error converting data to JSON: \(error)")
-                    DispatchQueue.main.async {
-                        fetchedData = []
-                    }
-                }
-            } else if let error = error {
-                print("HTTP Request Failed \(error)")
-            }
-        }.resume()
-    }
-    
-    func fetchImage(for pokemon: Pokemon) {
-        guard let imageUrl = URL(string: "\(Config.baseURL)/images/\(pokemon.name)_new.png") else {
-            print("Invalid URL")
-            return
-        }
-        
-        URLSession.shared.dataTask(with: imageUrl) { data, response, error in
-            if let data = data {
-                DispatchQueue.main.async {
-                    self.pokemonImages[pokemon.name] = UIImage(data: data)
-                }
-            }
-        }.resume()
-    }
-    
-    func submitPokecard() {
-        guard let url = URL(string: "\(Config.baseURL)/cards") else {
-            print("Invalid URL")
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        
-        let bodyData = "pokecard=\(pokecard)"
-        request.httpBody = bodyData.data(using: .utf8)
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let data = data {
-                do {
-                    let pokemonCard = try JSONDecoder().decode([PokemonCard].self, from: data)
-                    DispatchQueue.main.async {
-                        cardData = pokemonCard
-                    }
-                } catch {
-                    print("Error converting data to JSON: \(error)")
-                    DispatchQueue.main.async {
-                        cardData = []
-                    }
-                }
-            } else if let error = error {
-                print("HTTP Request Failed \(error)")
-            }
-        }.resume()
     }
     
     func fetchUserData() {
@@ -884,9 +463,6 @@ struct ContentView: View {
         }.resume()
     }
 }
-    
-    
-
 
 func calculateMarketPrice(for pokemoncard: PokemonCard) -> String {
     let error = "N/A"

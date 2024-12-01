@@ -5,8 +5,6 @@
 //  Created by Kamal on 2024-08-07.
 //
 
-
-// EVERY IF STATEMENT HERE NEEDS TO BE CHECKED WITH RANDOM POKEMON (nil values or empty strings --> will only found using random pokemon
 import SwiftUI
 
 let types = ["Normal", "Fire", "Water", "Electric", "Grass", "Ice", "Fighting", "Poison", "Ground", "Flying", "Psychic", "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"]
@@ -16,19 +14,23 @@ let colours: [String: UIColor] = [
     "Fire": UIColor(hex: "#EE8130"),
     "Water": UIColor(hex: "#6390F0"),
     "Electric": UIColor(hex: "#F7D02C"),
+    "Lightning": UIColor(hex: "#F7D02C"),
     "Grass": UIColor(hex: "#7AC74C"),
     "Ice": UIColor(hex: "#96D9D6"),
     "Fighting": UIColor(hex: "#C22E28"),
     "Poison": UIColor(hex: "#A33EA1"),
     "Ground": UIColor(hex: "#E2BF65"),
     "Flying": UIColor(hex: "#A98FF3"),
+    "Colorless": UIColor(hex: "#D3D3D3"),
     "Psychic": UIColor(hex: "#F95587"),
     "Bug": UIColor(hex: "#A6B91A"),
     "Rock": UIColor(hex: "#B6A136"),
     "Ghost": UIColor(hex: "#735797"),
     "Dragon": UIColor(hex: "#6F35FC"),
     "Dark": UIColor(hex: "#705746"),
+    "Darkness": UIColor(hex: "#705746"),
     "Steel": UIColor(hex: "#B7B7CE"),
+    "Metal": UIColor(hex: "#B7B7CE"),
     "Fairy": UIColor(hex: "#D685AD")
 ]
 
@@ -53,13 +55,9 @@ struct PokemonInfo: View {
                         .background(Color.gray)
                         .foregroundColor(Color.white)
                         .cornerRadius(10)
-                        
-                        
-                        
                         Spacer()
                     }
                     .padding(.top, 40)
-                    // make this dynamic for touch id iphone
                     
                     Spacer()
                     
@@ -181,10 +179,8 @@ struct PokemonInfo: View {
                                     }
                                 } label: {
                                     Image (systemName: shown[0] ? "chevron.up" : "chevron.down")
-//                                        .symbolVariant(.circle.fill)
                                 }
                                 .font(.title2)
-//                                .foregroundColor(.gray.opacity(0.5))
                             }
                             if shown[0] {
                                 
@@ -320,10 +316,8 @@ struct PokemonInfo: View {
                                     }
                                 } label: {
                                     Image (systemName: shown[1] ? "chevron.up" : "chevron.down")
-//                                        .symbolVariant(.circle.fill)
                                 }
                                 .font(.title2)
-//                                .foregroundColor(.gray.opacity(0.5))
                             }
                             .padding(.bottom, shown[1] ? 10 : 0)
                             if shown[1] {
@@ -358,10 +352,8 @@ struct PokemonInfo: View {
                                     }
                                 } label: {
                                     Image (systemName: shown[2] ? "chevron.up" : "chevron.down")
-//                                        .symbolVariant(.circle.fill)
                                 }
                                 .font(.title2)
-//                                .foregroundColor(.gray.opacity(0.5))
                             }
                             .padding(.bottom, shown[2] ? 10 : 0)
                             if shown[2] {
@@ -397,10 +389,8 @@ struct PokemonInfo: View {
                                         }
                                     } label: {
                                         Image (systemName: shown[3] ? "chevron.up" : "chevron.down")
-    //                                        .symbolVariant(.circle.fill)
                                     }
                                     .font(.title2)
-    //                                .foregroundColor(.gray.opacity(0.5))
                                 }
                                 .padding(.bottom, shown[3] ? 10 : 0)
                                 
@@ -415,7 +405,6 @@ struct PokemonInfo: View {
                                         Text("Base Experience: \(pokemon.base_exp!)")
                                     }
                                     
-                                    // can switch format to --> <Medium Slow> Growth Rate
                                     if pokemon.growth_rate != nil {
                                         Text("Growth Rate: \(pokemon.growth_rate!)")
                                     }
@@ -436,22 +425,19 @@ struct PokemonInfo: View {
                                         }
                                     } label: {
                                         Image (systemName: shown[4] ? "chevron.up" : "chevron.down")
-    //                                        .symbolVariant(.circle.fill)
                                     }
                                     .font(.title2)
-    //                                .foregroundColor(.gray.opacity(0.5))
                                 }
                                 .padding(.bottom, shown[4] ? 10 : 0)
                                 
                                 if shown[4] {
-//                                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
+
                                     if pokemon.egg_type_1 != "" && pokemon.egg_type_2 != "" {
                                         Text("Egg Types: \(pokemon.egg_type_1) & \(pokemon.egg_type_2)")
                                     }
                                     else if pokemon.egg_type_1 != "" {
                                         Text("Egg Type: \(pokemon.egg_type_1)")
                                     }
-                                    // this may not function as intended need to check with pokemon that is trans
                                     if pokemon.percent_male != nil {
                                         Text(String(format: "Male Population: %2.1f%%", pokemon.percent_male!))
                                     }
@@ -464,194 +450,9 @@ struct PokemonInfo: View {
                         }
                     }
                     .padding(.bottom, 100)
-                    
-//                    Group {
-//                                            HStack {
-//                    
-//                                                Text("\(pokemon.name)")
-//                                                    .fontWeight(.bold)
-//                                                    .font(.largeTitle)
-//                    
-//                                                Spacer()
-//                                                Text(String(format: "#%04d", pokemon.pokedex_num))
-//                                                    .padding(5)
-//                                                    .foregroundColor(.white)
-//                                                    .font(.headline)
-//                                                    .fontWeight(.semibold)
-//                                                    .background(Color.green)
-//                                                    .cornerRadius(10)
-//                    
-//                    
-//                                            }
-//                    
-//                    
-//                                            Text("\(pokemon.jap_name)")
-//                                                .font(.title)
-//                                                .fontWeight(.semibold)
-//                    
-//                                            Divider()
-//                                                .frame(height: 0.5)
-//                                                .background(Color.black)
-//                    
-//                                            HStack {
-//                                                Text("Gen \(pokemon.generation)")
-//                                                Text("\(pokemon.species)")
-//                                            }
-//                                            .font(.title2)
-//                                            .fontWeight(.medium)
-//                    
-//                                            Text("\(pokemon.status) Status")
-//                                                .font(.title3)
-//                                            if pokemon.type_2 == "" {
-//                                                Text("Type: \(pokemon.type_1)")
-//                                                    .font(.headline)
-//                                            }
-//                                            else {
-//                                                Text("Types: \(pokemon.type_1) & \(pokemon.type_2)")
-//                                                    .font(.headline)
-//                                            }
-//                    
-//                                            HStack {
-//                                                Text(String(format: "Height: %2.1fm", pokemon.height_m))
-//                                                if pokemon.weight_kg != nil {
-//                                                    Text(String(format: "Weight: %2.1fm", pokemon.weight_kg!))
-//                                                }
-//                    
-//                                            }
-//                                            .font(.subheadline)
-//                    
-//                                            if pokemon.ability_2 == "" {
-//                                                Text("Abilities: \(pokemon.ability_1) & \(pokemon.ability_2)")
-//                                                    .font(.body)
-//                                            }
-//                                            else {
-//                                                Text("Ability: \(pokemon.ability_1)")
-//                                                    .font(.body)
-//                                            }
-//                    
-//                                            if pokemon.ability_hidden == "" {
-//                                                Text("Hidden Ability: \(pokemon.ability_hidden)")
-//                                            }
-//                    
-//                                            Text("Stat Total: \(pokemon.stat_total)").bold()
-//                                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())])  {
-//                                                Text("HP: \(pokemon.hp)")
-//                    
-//                                                Text("Attack: \(pokemon.attack)")
-//                    
-//                                                Text("Defense: \(pokemon.defense)")
-//                    
-//                                                Text("Speed: \(pokemon.speed)")
-//                    
-//                    
-//                                                // might remove if statements
-//                                                if pokemon.attack != pokemon.sp_attack {
-//                                                    Text("Special Attack: \(pokemon.sp_attack)")
-//                    
-//                                                }
-//                                                if pokemon.defense != pokemon.sp_defense {
-//                                                    Text("Special Defense: \(pokemon.sp_defense)")
-//                    
-//                                                }
-//                                            }
-//                                            .padding(.bottom)
-//                    
-//                                            let values = [pokemon.against_normal, pokemon.against_fire, pokemon.against_water, pokemon.against_electric, pokemon.against_grass, pokemon.against_ice, pokemon.against_fight, pokemon.against_poison, pokemon.against_ground, pokemon.against_flying, pokemon.against_psychic, pokemon.against_bug, pokemon.against_rock, pokemon.against_ghost, pokemon.against_dragon, pokemon.against_dark, pokemon.against_steel, pokemon.against_fairy]
-//                    
-//                                            Text("Strengths").bold()
-//                                            HStack {
-//                                                ForEach(Array(values.enumerated()), id: \.offset) { index, element in
-//                                                    if element < 1 {
-//                                                        Text("\(types[index]): " + String(format: "%1.2f", element))
-//                                                    }
-//                                                }
-//                                            }
-//                                            .padding(.bottom)
-//                    
-//                                            Text("Weaknesses").bold()
-//                                            HStack {
-//                                                ForEach(Array(values.enumerated()), id: \.offset) { index, element in
-//                                                    if element > 1 {
-//                                                        Text("\(types[index]): " + String(format: "%1.2f", element))
-//                                                    }
-//                                                }
-//                                            }
-//                                            .padding(.bottom)
-//                    
-//                                            if (pokemon.catch_rate != nil || pokemon.base_friendship != nil || pokemon.base_exp != nil || pokemon.growth_rate != nil || pokemon.egg_type_1 != "" || pokemon.egg_type_2 != "" || pokemon.percent_male != nil || pokemon.egg_cycles != nil)
-//                                            {
-//                                                Text("Extra Info").bold()
-//                                                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-//                                                    if pokemon.catch_rate != nil {
-//                                                        Text("Catch Rate: \(pokemon.catch_rate!)")
-//                                                    }
-//                                                    if pokemon.base_friendship != nil {
-//                                                        Text("Base Friendship: \(pokemon.base_friendship!)")
-//                                                    }
-//                                                    if pokemon.base_exp != nil {
-//                                                        Text("Base Experience: \(pokemon.base_exp!)")
-//                                                    }
-//                    
-//                                                    // can switch format to --> <Medium Slow> Growth Rate
-//                                                    if pokemon.growth_rate != nil {
-//                                                        Text("Growth Rate: \(pokemon.growth_rate!)")
-//                                                    }
-//                                                    if pokemon.egg_type_1 != "" && pokemon.egg_type_2 != "" {
-//                                                        Text("Egg Types: \(pokemon.egg_type_1) & \(pokemon.egg_type_2)")
-//                                                    }
-//                                                    else if pokemon.egg_type_1 != "" {
-//                                                        Text("Egg Type: \(pokemon.egg_type_1)")
-//                                                    }
-//                                                    // this may not function as intended need to check with pokemon that is trans
-//                                                    if pokemon.percent_male != nil {
-//                                                        Text(String(format: "Male Population: %2.1f%%", pokemon.percent_male!))
-//                                                    }
-//                                                    if pokemon.egg_cycles != nil {
-//                                                        Text("Egg Cycles: \(pokemon.egg_cycles!)")
-//                                                    }
-//                    
-//                                                }
-//                                            }
-//                                        }
-//                                        .frame(maxWidth: .infinity, alignment: .leading)
-//                                        .padding(-16)
-//                                        .padding(.top)
-//                    
-//                    
-//                    
-//                    
-                    
-                    //                func floatToFraction(_ value: Float) -> String {
-                    //                    let precision = 10000
-                    //                    let numerator = Int(value * Float(precision))
-                    //                    let denominator = precision
-                    //                    let gcd = greatestCommonDivisor(numerator, denominator)
-                    //                    return "\(numerator / gcd)/\(denominator / gcd)"
-                    //                }
-                    //
-                    //                func greatestCommonDivisor(_ a: Int, _ b: Int) -> Int {
-                    //                    return b == 0 ? a : greatestCommonDivisor(b, a % b)
-                    //                }
-                    
-                    //                Text("\(types[index]): \(floatToFraction(element))")
-                    
-                    
-                    
-                    
-                    
-                    
-                    //                let formatter = NumberFormatter()
-                    //                formatter.minimumFractionDigits = 0
-                    //                formatter.maximumFractionDigits = 10 Adjust as needed
-                    //
-                    //                if let formattedNumber = formatter.string(from: NSNumber(value: element)) {
-                    //                    Text("\(types[index]): \(formattedNumber)")
-                    //                }
                     Spacer()
-                    
                 }
                 .padding()
-                
             }
             .background(VStack(spacing: .zero) { Color.indigo })
             .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)

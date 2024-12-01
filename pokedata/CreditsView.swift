@@ -8,22 +8,27 @@
 import SwiftUI
 
 struct CreditsView: View {
+    @Environment(\.openURL) var openURL
     let onDismiss: () -> Void
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                HStack {
-                    Button("Back") {
-                        onDismiss()
+                Button(action: {
+                    onDismiss()
+                }) {
+                    HStack {
+                        Image(systemName: "chevron.backward")
+                        Text("Profile")
+                        Spacer()
                     }
-                    Spacer()
+                    .padding([.leading, .top], 20)
+                    .padding(.top, 40)
                 }
-                .padding([.leading, .top])
             }
             VStack {
                 Spacer()
                 ZStack {
-                    GroupBox { //  to do all the link stuff here go to profile tab view and look at all the legal stuff
+                    GroupBox { 
                         HStack {
                             Text("Credits & Acknowledgement")
                                 .font(.largeTitle)
@@ -36,10 +41,11 @@ struct CreditsView: View {
                             .fontWeight(.semibold)
                         
                         Button(action: {
-                            
+                            if let url = URL(string: "https://www.kaggle.com/datasets/mariotormo/complete-pokemon-dataset-updated-090420") {
+                                openURL(url)
+                            }
                         }) {
                             Text("DataSet")
-                            // url link
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
@@ -50,54 +56,54 @@ struct CreditsView: View {
                         )
                         
                         Button(action: {
-                            
+                            if let url = URL(string: "https://docs.pokemontcg.io/") {
+                                openURL(url)
+                            }
                         }) {
                             Text("Pokemon TCG Api")
-                            // url link
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
-//                        .background(Color.green)
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.black, lineWidth: 2)
                         )
                         
-                        Button(action: {
-                            
-                        }) {
-                            Text("RapiApi/Open AI (Image Comparison)")
-                            // url link
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-//                        .background(Color.green)
-                        .cornerRadius(10)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
+//   Future Implementation (CameraView)
+//                        Button(action: {
+//                            if let url = URL(string: "https://roboflow.com/") {
+//                                openURL(url)
+//                            }
+//                        }) {
+//                            Text("Roboflow")
+//                        }
+//                        .padding()
+//                        .frame(maxWidth: .infinity)
+//                        .cornerRadius(10)
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 10)
+//                                .stroke(Color.black, lineWidth: 2)
+//                        )
                         
                         Text("And of course: ")
                             .padding(.top, 4)
                         
                         Button(action: {
-                            
+                            if let url = URL(string: "https://cs50.harvard.edu/x/2024/") {
+                                openURL(url)
+                            }
                         }) {
                             Text("Harvard CS50x")
-                            // url link
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
-//                        .background(Color.green)
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.black, lineWidth: 2)
                         )
                     }
-                    
                 }
                 Spacer()
             }

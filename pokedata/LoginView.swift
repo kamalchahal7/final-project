@@ -65,7 +65,7 @@ struct LoginView: View {
                                     .stroke(Color.black, lineWidth: 3)
                             )
                             .focused($focused, equals: .account)
-                            .onChange(of: account) { newValue in
+                            .onChange(of: account) {
                                 accountError = nil
                             }
                         
@@ -87,7 +87,7 @@ struct LoginView: View {
                             )
                             .textContentType(.oneTimeCode)
                             .focused($focused, equals: .password)
-                            .onChange (of: password) { newValue in
+                            .onChange (of: password) {
                                 passwordError = nil
                             }
                         if let error = passwordError {
@@ -212,7 +212,6 @@ struct LoginView: View {
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                         DispatchQueue.main.async {
                             existingUserData = json
-//                            print(existingUserData)
                         }
                     }
                 } catch {

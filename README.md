@@ -221,6 +221,8 @@ This setup provides a polished way to present legal information, enhancing the c
 
 pokedex.db and accounts.db are database files that handle two distinct types of information. The db file pokedex.db, surveys over the extensive pokedex information available for each pokemon in pokemon.csv from generation 1-8 —1044 different pokemon (pokedex numbers range from 1 – 898)— which is stored in one detailed table. Conversely, accounts.db is the main database file utilized for fetching user information from personal account information to collection information. Since data.py creates the pokedex found in pokedex.db, the table layout is found there and for accounts.db, I’ve included another file called table_prototypes.txt in which all relevant tables can be found. 
 
+---
+
 ### .gitignore
 
 Includes all files that are not present in my github repo for this project including my personal network information as well as files that might be developed in the future including CameraView.swift and HistoryView.swift. 
@@ -232,17 +234,17 @@ Includes all files that are not present in my github repo for this project inclu
 ### ContentView.swift
 
 #### Key Features:
-##### Structs for Decodable Models
+*Structs for Decodable Models*
 * Pokemon: Represents Pokémon data, including basic stats, abilities, types, and more. This struct adheres to the Decodable and Identifiable protocols for easy integration with SwiftUI lists.
 * PokemonCard: Represents detailed Pokémon card data, including abilities, attacks, prices, and images. It also conforms to Decodable, Identifiable, Equatable, and Hashable.
 * Set and Series: Used to represent card sets and series for organization.
 * UserInfo: Stores information about a logged-in user, such as their username, email, and card collection details.
 
-##### ObservableObjects for Dynamic Updates
+ObservableObjects for Dynamic Updates
 * cards: Stores and updates the Pokémon cards in the user’s collection.
 * series: Tracks all available series and their sets, allowing for dynamic updates in the UI.
 
-##### State Management
+*State Management*
 Various @State and @AppStorage variables manage app-wide data:
 
 * @AppStorage("user_id"): Tracks the global user ID for logged-in users.
@@ -391,7 +393,7 @@ The SearchTabView is a SwiftUI component designed for the Pokémon app, providin
 * Clicking on a Pokémon reveals a detailed view with an image and stats, transitioning smoothly with animations.
 
 ##### Image Handling:
-o* Downloads Pokémon images from a server and caches them locally for immediate display during future interactions.
+* Downloads Pokémon images from a server and caches them locally for immediate display during future interactions.
 
 ##### Search Field:
 * Supports autocomplete-like functionality by fetching and displaying Pokémon data as the user types.
@@ -419,7 +421,7 @@ o* Downloads Pokémon images from a server and caches them locally for immediate
 * Dynamically updates the list view based on the fetched Pokémon data, ensuring a responsive and interactive experience.
 
 ##### Detail View Overlay:
-o	Displays an overlay when a Pokémon is selected, showing detailed information with a smooth slide-in transition.
+* Displays an overlay when a Pokémon is selected, showing detailed information with a smooth slide-in transition.
 
 #### Functions:
 1.	submitPokedata:
@@ -462,7 +464,8 @@ The CollectionTabView is a SwiftUI view designed to display and manage a user's 
 * PokemonCardInfo displays detailed information about selected cards with a dismissable view using an animation.
 ##### Lifecycle Events: 
 * onAppear is used to initialize data fetching and manage state when the view appears. shown state updates for each series ensure a consistent UI.
-Functions:
+
+#### Functions:
 1.	fetchCollection():
     - This function is responsible for retrieving a user's Pokémon card collection from the server. It starts by setting a loading state and constructing a URL for the request. Using URLSession, it makes a GET request to the server. Upon receiving a response, it checks for any error or status code issues. If successful, it decodes the response data into an array of PokemonCard objects and updates the UI state accordingly.
 2.	fetchSets():
@@ -522,7 +525,7 @@ PokemonCardInfo is designed to display detailed information about a specific Pok
 * On changing pokemonCard, collectRequest is updated to store user preferences across sessions.
 ##### Error Handling:
 * Error codes and messages are updated as needed, and the view manages fault states to ensure users are informed when something goes wrong, such as network errors or data processing issues.
-Functions:
+#### Functions::
 1.	submitCollect():
     - This function sends a collection request for a Pokémon card to the server. It validates the URL, sets up an HTTP POST request with the necessary card details, and sends it asynchronously using URLSession. It handles errors and checks if the server response is successful (status code in the 200-299 range).
 2.	isPriceAvailable(in prices: [String: Double?]) -> Bool:
@@ -547,7 +550,7 @@ PokemonInfo view is a SwiftUI view that presents detailed information about a sp
 * Resistances and Weaknesses: These are presented in a DisclosureGroup that allows for easy expansion and contraction. Each type resistance and weakness is clearly labeled and accompanied by a numerical multiplier, providing quick insights into the Pokémon’s strengths and vulnerabilities.
 ##### User Interaction:
 * The view ensures that all elements are easy to interact with. Whether it’s tapping to view more details or swiping through sections, the user interface is designed to provide a smooth and responsive experience.
-Functions:
+#### Functions::
 1.	func calculateWidth(for value: Int, max: Int, columnWidth: CGFloat) -> CGFloat
     - This function calculates the width of a UI element (such as a progress bar) relative to a given value compared to a maximum value. It’s useful for dynamically sizing UI components based on their content, ensuring they are visually proportionate.
 2.	func colorForStat(_ value: Int, max: Int) -> Color
@@ -601,7 +604,7 @@ RegisterView is a SwiftUI view designed for user registration, featuring a form 
 * The view validates all user inputs before sending the registration data to the backend.
 * Upon successful registration, the view transitions between the registration and login views.
 * An alert displays error information if there is a backend fault.
-Functions:
+#### Functions::
 1.	func submitRegistration(completion: @escaping (Bool) -> Void)
     - This function sends a registration request to the server using a POST request with user inputs like first name, last name, birth date, email, username, password, and confirm password. It sets up the request with the appropriate URL and Content-Type, then sends it via URLSession. The function handles server responses, updating the UI with an error message if the response indicates a fault (status code >= 400) and setting a fault flag. For a successful submission, it calls the completion closure with the fault status.
 2.	func getUserData()
@@ -645,7 +648,7 @@ Functions:
 * Error messages are color-coded to distinguish between user-facing (e.g., blue) and critical (e.g., red) messages.
 * Feedback like same tracks if there have been changes to user data and adjusts messages accordingly.
 * Alerts are shown for critical errors during submission, allowing the user to take corrective action.
-Functions:
+#### Functions::
 1.	submitConfirmation(completion: @escaping (Bool) -> Void)
     - This function sends a POST request to confirm user information with the server. It constructs the request with user_id and password, handles server responses, and calls a completion handler with a fault flag indicating success or failure.
 2.	submitChange(completion: @escaping (Bool) -> Void)
@@ -684,7 +687,7 @@ Functions:
 * Utilizes URLSession to handle network requests for updating the password.
 * Constructs the request body using user_id, email, password, newPassword, and confirmNewPassword.
 * Handles errors and successful responses from the server, updating the fault state accordingly.
-Functions:
+#### Functions::
 1.	resetFields()
     - This function clears the user input fields to their default empty state, allowing for a fresh start.
  
@@ -702,7 +705,8 @@ The CreditsView in SwiftUI displays acknowledgments and resources used in the ap
     * A Harvard CS50x link
 ##### Button Styling: 
 * Buttons that link to resources are styled with rounded corners, padding, and a border to improve their visual appeal and user interaction.
-##### Responsive Layout: The layout adjusts for smaller screens, with buttons stacking vertically in a VStack for better usability on mobile devices.
+##### Responsive Layout: 
+* The layout adjusts for smaller screens, with buttons stacking vertically in a VStack for better usability on mobile devices.
  
-Enjoy exploring the world of Pokémon!
+## Enjoy exploring the world of Pokémon!
 

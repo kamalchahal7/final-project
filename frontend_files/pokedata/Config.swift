@@ -12,7 +12,7 @@ struct Config {
     static var baseURL: String {
         switch environment {
         case .development:
-            return "https://192.168.86.24:5000"
+            return "https://192.xxx.xx.xx:5000"
         case .production:
             return "http://127.0.0.1:5000"
         }

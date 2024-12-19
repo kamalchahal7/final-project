@@ -13,7 +13,7 @@ import random
 utc_time = datetime.now(pytz.timezone('UTC'))
 est_time = utc_time.astimezone(pytz.timezone('US/Eastern'))
 
-from functions import lookup, search, find, date_formatter, date_shift, timezone, generate_uuid, set_call, find_set
+from functions import lookup, find, date_formatter, date_shift, timezone, generate_uuid, set_call, find_set
 
 import re
 pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
@@ -105,10 +105,8 @@ def register():
         password = request.form.get("password")
         confirmation = request.form.get("confirmPassword")
 
-        # MORE ENHANCED ERROR CHECKING (DO THE SAME AS THE FRONTEND)
-        # also if you want add a gender option to the registration
         # checks if all has been provided or not
-        if not first_name and not last_name and not date_of_birth and not email and not username and not password and not confirmation:
+        if not first_name or not last_name or not date_of_birth or not email or not username or not password or not confirmation:
             return "Registration Incomplete", 400
         else: 
             print("Data Received Successfully")
@@ -190,6 +188,7 @@ def login():
     
 @app.route("/profile", methods = ["GET"])
 def fetch(): 
+    """ Shows Profile Information """
     if request.method == "GET":
         user_id = request.args.get('user_id')
 
@@ -203,6 +202,7 @@ def fetch():
 
 @app.route("/change", methods = ["GET", "POST"])
 def change(): 
+    """ Changing Profile Information Route """
     if request.method == "POST":
         user_id = request.form.get('user_id')
         email = request.form.get("email")
@@ -249,6 +249,7 @@ def change():
 
 @app.route("/personal", methods = ["GET", "POST"])
 def personal_change(): 
+    """ Registering/Logging In User """
     if request.method == "POST":
         user_id = request.form.get('user_id')
         password = request.form.get("password")
@@ -314,7 +315,8 @@ def personal_change():
         return jsonify(data), 200
 
 @app.route("/collection", methods = ["GET", "POST"])
-def collect(): 
+def collect():
+    """ Creates & Displays Collection """
     global prev_collection
     if request.method == "POST":
         user_id = request.form.get("user_id")
@@ -339,7 +341,6 @@ def collect():
                 db.execute("UPDATE users SET collection = ? WHERE id = ?", collection[0]["collection"]-1, user_id)
         except Exception as e:
             return str(e), 500
-        
 
         return jsonify({}), 200
     else:
@@ -367,10 +368,10 @@ def collect():
         else:
             prev_collection = cards
             return jsonify(cards), 200
-
     
 @app.route("/sets", methods = ["GET", "POST"])
 def sets():
+    """ Provides Order Set """
     global prev_sets
     if request.method == "GET":
         user_id = request.args.get("user_id")
@@ -406,6 +407,7 @@ def sets():
 
 @app.route("/reset", methods=["GET"])
 def reset():
+    """ Resets Set/Collection Upon Opening Application """
     if request.method == "GET":
         user_id = request.args.get("user_id")
         if not user_id:
@@ -424,6 +426,7 @@ def reset():
     
 @app.route("/count", methods=["GET"])
 def count():
+    """ Shows Total Card Collection Count """
     if request.method == "GET":
         user_id = request.args.get("user_id")
         if not user_id:

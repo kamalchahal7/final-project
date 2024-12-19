@@ -25,10 +25,6 @@ def lookup(value):
     pokemon = poke_db.execute("SELECT * FROM pokemon WHERE pokedex_num = ?", (value,))
     return pokemon
 
-def search():
-    pokelist = poke_db.execute("SELECT id, pokedex_num, name FROM pokemon")
-    return pokelist
-
 def find(value):
     if value is None: 
         print("No value given")

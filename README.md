@@ -1,4 +1,4 @@
-# POKEDATA
+# Pokédata
 #### Video Demo: https://www.youtube.com/watch?v=lAj2kuT4baM
 #### Description: 
 
@@ -6,9 +6,9 @@ In a nutshell, this program is an IOS application designed to query, quote and k
 
 A secure login and registration verification process has been developed to allow users to build a collection—given that they are logged in. All changes are tracked dynamically, and the collection is updated detailing the amount of total cards they possess (found on the profile tab), the total net worth of all their cards as well as specific sets and series the cards belong in. Users are given the option to change and update their personal information at anytime they please, as long as they provide the correct password. Moreover, users are also able to change their password if they would like, as long as the associated account email is provided (username cannot be used for verification as this is displayed on the Personal View tab) along with the correct password, the new password and a confirmation of the new password. Mock legal information regarding the application is also available to users for the purpose of developing adequate customer-service relationships. Credentials for developing the app, including specific datasets and APIs are also provided (along with CS50!). Users are also able to look up specific information regarding the game stats of each Pokémon (supports 8 generations).
 
-Languages used: Swift, Python, SQLite3, HTML and CSS
+## Languages used: Swift, Python, SQLite3, HTML and CSS
 
-Backend Overview:
+### Backend Overview:
 
 Flask was utilized for the backend. Notable files include:
 -	app.py
@@ -20,13 +20,14 @@ Flask was utilized for the backend. Notable files include:
 -	table_prototypes.txt. 
 -	.gitignore
 
-Frontend Overview:
+### Frontend Overview:
 
 Swift was utilized for the frontend. The main file is ContentView.swift in which there are 4 SwiftUI files for each tab of the application: 
 1)	SearchCardTabView.swift
 2)	SearchTabView.swift
 3)	CollectionTabView
 4)	ProfileTabView
+
 Other notable files include:
 -	PokemonCardInfo.swift
 -	PokemonInfo.swift
@@ -36,9 +37,9 @@ Other notable files include:
 -	CreditsView.swift
 -	PasswordChangeView.swift
 
-Backend Specifications
+## Backend Specifications
 
-app.py
+### app.py
 
 Imports and Initial Configuration
 •	Libraries:

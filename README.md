@@ -234,7 +234,7 @@ Includes all files that are not present in my github repo for this project inclu
 ### ContentView.swift
 
 #### Key Features:
-*Structs for Decodable Models*
+##### Structs for Decodable Models
 * Pokemon: Represents Pokémon data, including basic stats, abilities, types, and more. This struct adheres to the Decodable and Identifiable protocols for easy integration with SwiftUI lists.
 * PokemonCard: Represents detailed Pokémon card data, including abilities, attacks, prices, and images. It also conforms to Decodable, Identifiable, Equatable, and Hashable.
 * Set and Series: Used to represent card sets and series for organization.
@@ -244,7 +244,7 @@ ObservableObjects for Dynamic Updates
 * cards: Stores and updates the Pokémon cards in the user’s collection.
 * series: Tracks all available series and their sets, allowing for dynamic updates in the UI.
 
-*State Management*
+##### State Management
 Various @State and @AppStorage variables manage app-wide data:
 
 * @AppStorage("user_id"): Tracks the global user ID for logged-in users.

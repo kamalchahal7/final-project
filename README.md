@@ -240,7 +240,7 @@ Includes all files that are not present in my github repo for this project inclu
 * Set and Series: Used to represent card sets and series for organization.
 * UserInfo: Stores information about a logged-in user, such as their username, email, and card collection details.
 
-ObservableObjects for Dynamic Updates
+##### Observable Objects for Dynamic Updates
 * cards: Stores and updates the Pokémon cards in the user’s collection.
 * series: Tracks all available series and their sets, allowing for dynamic updates in the UI.
 

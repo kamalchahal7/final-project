@@ -6,7 +6,7 @@ In a nutshell, this program is an IOS application designed to query, quote and k
 
 A secure login and registration verification process has been developed to allow users to build a collection—given that they are logged in. All changes are tracked dynamically, and the collection is updated detailing the amount of total cards they possess (found on the profile tab), the total net worth of all their cards as well as specific sets and series the cards belong in. Users are given the option to change and update their personal information at anytime they please, as long as they provide the correct password. Moreover, users are also able to change their password if they would like, as long as the associated account email is provided (username cannot be used for verification as this is displayed on the Personal View tab) along with the correct password, the new password and a confirmation of the new password. Mock legal information regarding the application is also available to users for the purpose of developing adequate customer-service relationships. Credentials for developing the app, including specific datasets and APIs are also provided (along with CS50!). Users are also able to look up specific information regarding the game stats of each Pokémon (supports 8 generations).
 
-## Languages used: Swift, Python, SQLite3, HTML and CSS
+## Languages Utilized: Swift, Python, SQLite3, HTML and CSS
 
 ### Backend Overview:
 
@@ -41,141 +41,148 @@ Other notable files include:
 
 ### app.py
 
-Imports and Initial Configuration
-•	Libraries:
-o	os: For file system operations like checking or modifying paths.
-o	flask_cors.CORS: Allows handling Cross-Origin Resource Sharing (CORS), enabling client-side applications to make requests to this server from different origins.
-o	cs50.SQL: Used to interact with a SQLite database (accounts.db), managing user data and card collections.
-o	flask: The core framework for building the application, defining routes and handling HTTP requests.
-o	werkzeug.security: Provides functions to securely hash and check passwords.
-o	datetime and pytz: Handle time and date, including time zone conversion to UTC or Eastern Time.
-o	re: Used for regular expression operations, such as validating email formats.
-•	Flask Configuration:
-o	The app uses filesystem-based sessions (SESSION_TYPE = "filesystem") to store session data.
-o	CORS is enabled to allow cross-origin requests.
-o	The app stores user data in an SQLite database (accounts.db).
-•	File Directories:
-o	image_folder: Points to archive_new/, where Pokémon card images are stored.
-o	template_folder: Refers to legal/, where legal pages like terms of service and privacy policy are kept.
-•	Global Variables:
-o	prev_collection and prev_sets: These store previous collection and set data to avoid unnecessary recalculations or redundant responses.
-Request Handlers (Routes)
+#### Imports and Initial Configuration
+* Libraries:
+    - os: For file system operations like checking or modifying paths.
+    - flask_cors.CORS: Allows handling Cross-Origin Resource Sharing (CORS), enabling client-side applications to make requests to this server from different origins.
+    - cs50.SQL: Used to interact with a SQLite database (accounts.db), managing user data and card collections.
+    - flask: The core framework for building the application, defining routes and handling HTTP requests.
+    - werkzeug.security: Provides functions to securely hash and check passwords.
+    - datetime and pytz: Handle time and date, including time zone conversion to UTC or Eastern Time.
+    - re: Used for regular expression operations, such as validating email formats.
+* Flask Configuration: 
+    - The app uses filesystem-based sessions (SESSION_TYPE = "filesystem") to store session data.
+    - CORS is enabled to allow cross-origin requests.
+    - The app stores user data in an SQLite database (accounts.db).
+* File Directories:
+    - image_folder: Points to archive_new/, where Pokémon card images are stored.
+    - template_folder: Refers to legal/, where legal pages like terms of service and privacy policy are kept.
+* Global Variables:
+    - prev_collection and prev_sets: These store previous collection and set data to avoid unnecessary recalculations or redundant responses.
+    
+#### Request Handlers (Routes)
 1.	Index (/) - Pokémon Info Search:
-o	GET: Returns an empty JSON object.
-o	POST: Accepts a Pokémon name or Pokedex number and looks up data for that Pokémon. If no data is found, it returns an error message.
+    - GET: Returns an empty JSON object.
+    - POST: Accepts a Pokémon name or Pokedex number and looks up data for that Pokémon. If no data is found, it returns an error message.
 2.	Serve Image (/images/<filename>):
-o	Serves images from the archive_new/ directory. The send_from_directory function ensures safe serving of files.
+    - Serves images from the archive_new/ directory. The send_from_directory function ensures safe serving of files.
 3.	Serve Legal Pages (/legal/<page>):
-o	Serves legal pages like terms of service or privacy policy from the legal/ directory.
+    - Serves legal pages like terms of service or privacy policy from the legal/ directory.
 4.	Cards (/cards) - Pokémon Card Search:
-o	GET: Returns an empty JSON object.
-o	POST: Accepts a Pokémon card name or ID, searches for the card details, and returns them. If no results are found, it returns an error message.
+    - GET: Returns an empty JSON object.
+    - POST: Accepts a Pokémon card name or ID, searches for the card details, and returns them. If no results are found, it returns an error message.
 5.	Register (/register):
-o	GET: Returns a list of all registered usernames and emails.
-o	POST: Handles user registration, validating name, email, date of birth, and password. It ensures the username and email are unique, and that the password matches its confirmation. On successful registration, the user is added to the database.
+    - GET: Returns a list of all registered usernames and emails.
+    - POST: Handles user registration, validating name, email, date of birth, and password. It ensures the username and email are unique, and that the password matches its confirmation. On successful registration, the user is added to the database.
 6.	Login (/login):
-o	GET: Returns the list of usernames and emails.
-o	POST: Handles user login by verifying the provided username/email and password hash. If successful, it returns the user’s ID.
+    - GET: Returns the list of usernames and emails.
+    - POST: Handles user login by verifying the provided username/email and password hash. If successful, it returns the user’s ID.
 7.	Profile (/profile):
-o	GET: Fetches a user's profile details (e.g., username, email, first and last name, date of birth, collection count) using the provided user ID. The date of birth is formatted using date_shift.
+    - GET: Fetches a user's profile details (e.g., username, email, first and last name, date of birth, collection count) using the provided user ID. The date of birth is formatted using date_shift.
 8.	Change Password (/change):
-o	POST: Allows users to change their password by verifying their current password and ensuring the new password matches the confirmation. If successful, it updates the password in the database.
+    - POST: Allows users to change their password by verifying their current password and ensuring the new password matches the confirmation. If successful, it updates the password in the database.
 9.	Personal Information Update (/personal):
-o	POST: Allows users to update their personal details (username, email, first and last name, date of birth, and password). The app checks for existing records before updating the information.
+    - POST: Allows users to update their personal details (username, email, first and last name, date of birth, and password). The app checks for existing records before updating the information.
 10.	Collection Management (/collection):
-o	GET: Fetches a user’s card collection based on their user ID.
-o	POST: Allows users to add or remove cards from their collection. It checks the add_request parameter to determine whether a card is being added or removed and updates the collection accordingly.
-Error Handling
+    - GET: Fetches a user’s card collection based on their user ID.
+    - POST: Allows users to add or remove cards from their collection. It checks the add_request parameter to determine whether a card is being added or removed and updates the collection accordingly.
+
+#### Error Handling
 The application has error handling in place to catch issues such as:
-•	Missing form fields.
-•	Password mismatches or incorrect passwords.
-•	Invalid email formats or existing email/username conflicts.
-•	Database errors, such as not finding a user or collection.
-Database Interaction
-•	SQLite Database (accounts.db): The app uses the cs50.SQL library to interact with a SQLite database that stores user and collection information.
-o	Users Table: Stores user-related information such as username, hashed password, email, etc.
-o	Collections Table: Manages the relationship between users and Pokémon cards, linking user IDs with card IDs.
+* Missing form fields.
+* Password mismatches or incorrect passwords.
+* Invalid email formats or existing email/username conflicts.
+* Database errors, such as not finding a user or collection.
 
-These routes cover functionalities for user registration, login, profile management, Pokémon-related features, and collection handling.
+#### Database Interaction
+* SQLite Database (accounts.db): The app uses the cs50.SQL library to interact with a SQLite database that stores user and collection information.
+    * Users Table: Stores user-related information such as username, hashed password, email, etc.
+    * Collections Table: Manages the relationship between users and Pokémon cards, linking user IDs with card IDs.
 
-functions.py 
+In general, these routes cover functionalities for user registration, login, profile management, Pokémon-related features, and collection handling.
+---
 
-Imports and Configurations
-•	UUID: Used to generate unique identifiers.
-•	CS50 SQL: Used for interacting with SQLite databases (pokedex.db and accounts.db).
-•	PokemonTcgSdk: A Python SDK for accessing the Pokémon Trading Card Game (TCG) API, allowing you to fetch card details, set details, prices, etc.
-•	Datetime and Time: Used for handling and formatting time and dates.
-•	Pytz: Used for timezone conversion.
-Database and API Configuration
-•	poke_db: SQLite connection for the Pokémon database (pokedex.db).
-•	db: SQLite connection for the user account database (accounts.db).
+### functions.py 
+
+#### Imports and Configurations
+* UUID: Used to generate unique identifiers.
+* CS50 SQL: Used for interacting with SQLite databases (pokedex.db and accounts.db).
+* PokemonTcgSdk: A Python SDK for accessing the Pokémon Trading Card Game (TCG) API, allowing you to fetch card details, set details, prices, etc.
+* Datetime and Time: Used for handling and formatting time and dates.
+* Pytz: Used for timezone conversion.
+
+#### Database and API Configuration
+* poke_db: SQLite connection for the Pokémon database (pokedex.db).
+* db: SQLite connection for the user account database (accounts.db).
 •	RestClient.configure: Configures the Pokémon TCG SDK with an API key to access Pokémon card data.
-Functions
+
+#### Functions
 1.	lookup(value):
-o	Checks if a value is a Pokémon name or ID.
-o	If it's a name, the function queries the Pokémon database (pokedex.db) for Pokémon whose name is similar to the provided value.
-o	If it’s a number, the function queries the Pokémon database (pokedex.db) for the corresponding Pokémon by its ID.
+    - Checks if a value is a Pokémon name or ID.
+    - If it's a name, the function queries the Pokémon database (pokedex.db) for Pokémon whose name is similar to the provided value.
+    - If it’s a number, the function queries the Pokémon database (pokedex.db) for the corresponding Pokémon by its ID.
 2.	find(value):
-o	Searches for a Pokémon card using the Pokémon TCG SDK (Card.where).
-o	If the card is not found by its name, it searches by card ID.
-o	For each found card, the function checks and extracts various details:
-	Ancient Trait, Abilities, Attacks, Weaknesses, Resistances, and Prices.
-o	Returns a dictionary containing these details for each found card.
+    - Searches for a Pokémon card using the Pokémon TCG SDK (Card.where).
+    - If the card is not found by its name, it searches by card ID.
+    - For each found card, the function checks and extracts various details:
+        - Ancient Trait, Abilities, Attacks, Weaknesses, Resistances, and Prices.
+    - Returns a dictionary containing these details for each found card.
 3.	date_formatter(time):
-o	Strips the time value and returns only the date.
+    - Strips the time value and returns only the date.
 4.	date_shift(date):
-o	Converts a date from the format YYYY-MM-DD to MM/DD/YYYY.
+    - Converts a date from the format YYYY-MM-DD to MM/DD/YYYY.
 5.	timezone(time):
-o	Converts a given time into UTC time and formats it into YYYY-MM-DD.
+    - Converts a given time into UTC time and formats it into YYYY-MM-DD.
 6.	current_time():
-o	Retrieves the current local time. (Although the full functionality isn't implemented, it checks if daylight saving time is active.)
+    - Retrieves the current local time. (Although the full functionality isn't implemented, it checks if daylight saving time is active.)
 7.	generate_uuid():
-o	Generates a unique 128-bit UUID and returns the upper 64 bits of it as an integer.
+    - Generates a unique 128-bit UUID and returns the upper 64 bits of it as an integer.
 8.	set_call(valid_sets):
-o	Retrieves all available Pokémon TCG sets from the API.
-o	Filters sets based on valid set IDs and sorts them by release date.
-o	Extracts the unique series names of the sets and ensures that "Other" series is moved to the end.
-o	Returns a dictionary containing set details (id, name, total, release date, logo, etc.) for each series.
-9.	find_set(user_id):
-o	Queries the collection table in the user database (accounts.db) to find the card IDs associated with the user's collection.
-o	Fetches the set IDs of those cards by querying the Pokémon TCG API for each card's set information.
-o	Returns a list of valid set IDs associated with the user's collection.
+    - Retrieves all available Pokémon TCG sets from the API.
+    - Filters sets based on valid set IDs and sorts them by release date.
+    - Extracts the unique series names of the sets and ensures that "Other" series is moved to the end.
+    - Returns a dictionary containing set details (id, name, total, release date, logo, etc.) for each series.
+9. find_set(user_id):
+    - Queries the collection table in the user database (accounts.db) to find the card IDs associated with the user's collection.
+    - Fetches the set IDs of those cards by querying the Pokémon TCG API for each card's set information.
+    - Returns a list of valid set IDs associated with the user's collection.
 
-data.py
 
-1.	Imports and Setup:
-o	The script imports two Python modules:
-	sqlite3: For interacting with the SQLite database.
-	csv: For reading the CSV file.
-o	The CSV file path (pokemon.csv) and the SQLite database file (accounts.db) are defined as variables.
-2.	Database Connection and Cursor:
-o	The script establishes a connection to the SQLite database using sqlite3.connect(sql_file).
-o	A cursor object is created using conn.cursor(), which allows SQL commands to be executed.
-3.	Creating the pokemon Table:
-o	The script checks if the pokemon table already exists using the SQL command:
-CREATE TABLE IF NOT EXISTS pokemon (...)
-o	The table is defined with various columns, each representing an attribute of a Pokémon. For example:
-	id: Primary key, unique Pokémon identifier.
-	pokedex_num: The Pokémon's Pokédex number.
-	name: The name of the Pokémon (in English).
-	jap_name: The Pokémon's Japanese name.
-	Various other columns describe Pokémon stats, abilities, types, and resistances against other types.
-o	Some columns allow NULL values (e.g., type_2, ability_2, etc.), indicating that these attributes may be absent for certain Pokémon.
-4.	Reading the CSV File:
+### data.py
+
+#### Imports and Setup:
+    * The script imports two Python modules:
+        * sqlite3: For interacting with the SQLite database.
+        * csv: For reading the CSV file.
+    * The CSV file path (pokemon.csv) and the SQLite database file (accounts.db) are defined as variables.
+#### Database Connection and Cursor:
+    * The script establishes a connection to the SQLite database using sqlite3.connect(sql_file).
+    * A cursor object is created using conn.cursor(), which allows SQL commands to be executed.
+#### Creating the pokemon Table:
+    * The script checks if the pokemon table already exists using the SQL command:
+    ' CREATE TABLE IF NOT EXISTS pokemon (...) ' 
+    * The table is defined with various columns, each representing an attribute of a Pokémon. For example:
+        - id: Primary key, unique Pokémon identifier.
+        - pokedex_num: The Pokémon's Pokédex number.
+        - name: The name of the Pokémon (in English).
+        - jap_name: The Pokémon's Japanese name.
+        - Various other columns describe Pokémon stats, abilities, types, and resistances against other types.
+    * Some columns allow NULL values (e.g., type_2, ability_2, etc.), indicating that these attributes may be absent for certain Pokémon.
+#### Reading the CSV File:
 o	The csv.DictReader is used to read the CSV file. This reads each row of the CSV file into a dictionary where the keys are the column names.
 o	The script processes each row to extract the relevant values and convert them to the appropriate data types:
 	Integers (int()) are used for numerical columns like pokedex_num, generation, and stats like hp, attack, etc.
 	Floating point numbers (float()) are used for columns like height_m, weight_kg, and resistances against different types.
 	Missing values are handled by using None where appropriate (e.g., if weight_kg or catch_rate is missing).
 	The get() method is used for optional columns (e.g., type_2, ability_2, egg_type_2, etc.), which may be None if not present in the CSV.
-5.	Inserting Data into the Database:
+#### Inserting Data into the Database:
 o	After reading and processing the data from the CSV file, the script uses the cursor.executemany() method to insert multiple rows into the pokemon table at once.
 o	The INSERT INTO pokemon (...) VALUES (?, ?, ?, ...) SQL command is used to insert the data into the appropriate columns.
 o	The rows variable, which contains a list of tuples, is passed to executemany(). Each tuple contains the data for one Pokémon, and the placeholders (?) in the SQL command are replaced with the corresponding values from the tuple.
-6.	Committing the Changes:
+#### Committing the Changes:
 o	The script commits the changes to the database using conn.commit(), ensuring that the data is saved.
 o	The connection to the database is closed using conn.close().
-7.	Success Message:
+#### Success Message:
 o	A message Data Imported Successfully is printed to indicate that the data has been successfully imported into the database.
 
 legal (templates folder)

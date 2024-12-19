@@ -517,7 +517,7 @@ PokemonCardInfo is designed to display detailed information about a specific Pok
 * On changing pokemonCard, collectRequest is updated to store user preferences across sessions.
 ##### Error Handling:
 * Error codes and messages are updated as needed, and the view manages fault states to ensure users are informed when something goes wrong, such as network errors or data processing issues.
-#### Functions::
+#### Functions:
 1.	submitCollect():
     - This function sends a collection request for a Pokémon card to the server. It validates the URL, sets up an HTTP POST request with the necessary card details, and sends it asynchronously using URLSession. It handles errors and checks if the server response is successful (status code in the 200-299 range).
 2.	isPriceAvailable(in prices: [String: Double?]) -> Bool:
@@ -542,7 +542,7 @@ PokemonInfo view is a SwiftUI view that presents detailed information about a sp
 * Resistances and Weaknesses: These are presented in a DisclosureGroup that allows for easy expansion and contraction. Each type resistance and weakness is clearly labeled and accompanied by a numerical multiplier, providing quick insights into the Pokémon’s strengths and vulnerabilities.
 ##### User Interaction:
 * The view ensures that all elements are easy to interact with. Whether it’s tapping to view more details or swiping through sections, the user interface is designed to provide a smooth and responsive experience.
-#### Functions::
+#### Functions:
 1.	func calculateWidth(for value: Int, max: Int, columnWidth: CGFloat) -> CGFloat
     - This function calculates the width of a UI element (such as a progress bar) relative to a given value compared to a maximum value. It’s useful for dynamically sizing UI components based on their content, ensuring they are visually proportionate.
 2.	func colorForStat(_ value: Int, max: Int) -> Color
@@ -596,7 +596,7 @@ RegisterView is a SwiftUI view designed for user registration, featuring a form 
 * The view validates all user inputs before sending the registration data to the backend.
 * Upon successful registration, the view transitions between the registration and login views.
 * An alert displays error information if there is a backend fault.
-#### Functions::
+#### Functions:
 1.	func submitRegistration(completion: @escaping (Bool) -> Void)
     - This function sends a registration request to the server using a POST request with user inputs like first name, last name, birth date, email, username, password, and confirm password. It sets up the request with the appropriate URL and Content-Type, then sends it via URLSession. The function handles server responses, updating the UI with an error message if the response indicates a fault (status code >= 400) and setting a fault flag. For a successful submission, it calls the completion closure with the fault status.
 2.	func getUserData()
@@ -640,7 +640,7 @@ RegisterView is a SwiftUI view designed for user registration, featuring a form 
 * Error messages are color-coded to distinguish between user-facing (e.g., blue) and critical (e.g., red) messages.
 * Feedback like same tracks if there have been changes to user data and adjusts messages accordingly.
 * Alerts are shown for critical errors during submission, allowing the user to take corrective action.
-#### Functions::
+#### Functions:
 1.	submitConfirmation(completion: @escaping (Bool) -> Void)
     - This function sends a POST request to confirm user information with the server. It constructs the request with user_id and password, handles server responses, and calls a completion handler with a fault flag indicating success or failure.
 2.	submitChange(completion: @escaping (Bool) -> Void)
@@ -679,7 +679,7 @@ RegisterView is a SwiftUI view designed for user registration, featuring a form 
 * Utilizes URLSession to handle network requests for updating the password.
 * Constructs the request body using user_id, email, password, newPassword, and confirmNewPassword.
 * Handles errors and successful responses from the server, updating the fault state accordingly.
-#### Functions::
+#### Functions:
 1.	resetFields()
     - This function clears the user input fields to their default empty state, allowing for a fresh start.
  

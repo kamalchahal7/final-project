@@ -251,16 +251,8 @@ Various @State and @AppStorage variables manage app-wide data:
 * Collection States: Manage the user's collection, including edits (collectionEdit) and selected cards.
 * Login and View States: Determine which views to show (e.g., login, register, personal profile) based on the user's actions and authentication status.
 * Search and Detail Views: Handle input, search results, and toggling detailed views for Pokémon and cards.
-
-##### TabView Navigation
-The app uses a TabView to organize its UI into four primary sections:
-* Cards Tab: Displays Pokémon cards and supports searching for detailed information.
-* Search Tab: Allows users to search the Pokémon database using input strings.
-* Collection Tab: Manages the user’s card collection, including adding or editing cards.
-* Profile Tab: Handles user authentication, personal details, and settings.
-Each tab is wrapped in a GeometryReader to adapt to various screen sizes and layouts.
  
-#### Implementation Highlights:
+#### Implementation of Tabview Navigation:
 ##### Card Tab
 * Displays card-related information using SearchCardTabView.
 * Listens for updates to the card collection and gracefully hides detailed views when the user navigates away.

@@ -232,7 +232,7 @@ Includes all files that are not present in my github repo for this project inclu
 ## Frontend Specifications
 
 ### ContentView.swift
-
+This SwiftUI file defines the structure of a Pokémon-themed application that uses TabView for navigation between four primary tabs: Cards, Search, Collection, and Profile. The app incorporates various data models (e.g., Pokemon, PokemonCard, UserInfo) and observable objects (cards, series) to manage Pokémon-related and user-specific data. Each tab displays a distinct view, such as search functionalities, card collections, and user profiles, with state variables tracking user interactions and app behavior, like login status, selected Pokémon/cards, and active views. The app also supports future enhancements, such as camera integration and history views, indicated by commented-out placeholders.
 #### Key Features:
 ##### Structs for Decodable Models
 * Pokemon: Represents Pokémon data, including basic stats, abilities, types, and more. This struct adheres to the Decodable and Identifiable protocols for easy integration with SwiftUI lists.
@@ -288,7 +288,7 @@ There are placeholders for future features, such as:
 ##### Extensibility
 The file is designed to support additional features (e.g., camera integration) with minimal refactoring. Future views or functionalities can plug into the existing architecture.
 
-### Functions:
+#### Functions:
 1.	fetchUserData():
     - This function fetches user data using the user_id. If no user_id is provided, it prints an error. It makes an HTTP GET request to the server using the Config.baseURL and user_id, decodes the response JSON into UserInfo, and updates the userData state on the main thread.
 2.	resetSetsOnStart():
@@ -609,6 +609,7 @@ RegisterView is a SwiftUI view designed for user registration, featuring a form 
 ---
 
 ### PersonalView.swift
+The PersonalView SwiftUI view provides a form-based interface for updating user profile details such as name, birthdate, email, username, and password. It includes a two-step process with a password confirmation screen and a detailed personal details editing screen. The view features error validation for fields, date pickers for birthdate selection, and dynamic UI updates using animations and focus states. It integrates with user data bindings and handles alert displays for backend errors, offering a smooth and interactive user experience for managing personal information.
 #### Key Features: 
 ##### State Management:
 * The struct uses several state variables to track user input, errors, and UI state:
@@ -655,6 +656,7 @@ RegisterView is a SwiftUI view designed for user registration, featuring a form 
 ---
 
 ### PasswordChangeView.swift
+The PasswordChangeView enables users to update their account passwords. It incorporates error handling, user input validation, and a network request to submit the password change. The view uses SwiftUI bindings and focuses on an interactive user interface with visual feedback.
 #### Key Features:
 ##### User Data Management:
 * Uses @AppStorage for storing the user_id and binds to userData for managing user information.

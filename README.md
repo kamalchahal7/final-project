@@ -112,7 +112,7 @@ In general, these routes cover functionalities for user registration, login, pro
 #### Imports and Configurations
 * UUID: Used to generate unique identifiers.
 * CS50 SQL: Used for interacting with SQLite databases (pokedex.db and accounts.db).
-* PokemonTcgSdk: A Python SDK for accessing the Pokémon Trading Card Game (TCG) API, allowing you to fetch card details, set details, prices, etc.
+* PokemonTcgSdk: A Python SDK for accessing the Pokémon Trading Card Game (TCG) API; fetching card details, set details, prices, etc.
 * Datetime and Time: Used for handling and formatting time and dates.
 * Pytz: Used for timezone conversion.
 

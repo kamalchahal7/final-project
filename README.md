@@ -232,7 +232,7 @@ Includes all files that are not present in my github repo for this project inclu
 ## Frontend Specifications
 
 ### ContentView.swift
-This SwiftUI file defines the structure of a Pokémon-themed application that uses TabView for navigation between four primary tabs: Cards, Search, Collection, and Profile. The app incorporates various data models (e.g., Pokemon, PokemonCard, UserInfo) and observable objects (cards, series) to manage Pokémon-related and user-specific data. Each tab displays a distinct view, such as search functionalities, card collections, and user profiles, with state variables tracking user interactions and app behavior, like login status, selected Pokémon/cards, and active views. The app also supports future enhancements, such as camera integration and history views, indicated by commented-out placeholders.
+ContentView is the SwiftUI file that defines the structure of Pokedata by using TabView for navigation between four primary tabs: Cards, Search, Collection, and Profile. The app incorporates various data models (e.g., Pokemon, PokemonCard, UserInfo) and observable objects (cards, series) to manage Pokémon-related and user-specific data. Each tab displays a distinct view, such as search functionalities, card collections, and user profiles, with state variables tracking user interactions and app behavior, like login status, selected Pokémon/cards, and active views.
 #### Key Features:
 ##### Structs for Decodable Models
 * Pokemon: Represents Pokémon data, including basic stats, abilities, types, and more. This struct adheres to the Decodable and Identifiable protocols for easy integration with SwiftUI lists.

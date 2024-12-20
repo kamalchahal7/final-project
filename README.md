@@ -1,4 +1,4 @@
-# Pokédata
+# PokéData
 #### Video Demo: https://www.youtube.com/watch?v=lAj2kuT4baM
 #### Description: 
 
